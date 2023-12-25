@@ -4,6 +4,8 @@ import dev.thezexquex.yasmpp.core.configuration.ConfigurationLoader;
 import dev.thezexquex.yasmpp.core.configuration.Configuration;
 import dev.thezexquex.yasmpp.core.hooks.PluginHookService;
 import dev.thezexquex.yasmpp.core.message.Messenger;
+import dev.thezexquex.yasmpp.modules.blockdamage.ExplosionBlockDamageListener;
+import dev.thezexquex.yasmpp.modules.mobileworkstations.WorkstationInteractListener;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.spongepowered.configurate.serialize.SerializationException;
 
@@ -34,6 +36,13 @@ public class YasmpPlugin extends JavaPlugin {
         }
 
         messenger = new Messenger(this, messageRootNode);
+    }
+
+    private void registerListeners() {
+        var pluginManager = this.getServer().getPluginManager();
+
+        pluginManager.registerEvents(new WorkstationInteractListener(this), this);
+        pluginManager.registerEvents(new ExplosionBlockDamageListener(this), this);
     }
 
     public PluginHookService pluginHookService() {
