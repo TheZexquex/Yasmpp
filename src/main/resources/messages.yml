@@ -1,0 +1,142 @@
+prefix: "<white>[<gradient:#18edad:#18edea>SurvivalProjekt</gradient><white>]"
+chat-format: "<yellow><player><white>: <gray><message>"
+command:
+  settings:
+    borderradius: "<prefix><green>Borderradius auf <yellow><radius> <green>gesetzt"
+    elytraradius: "<prefix><green>Elytraaktivierungsradius auf <yellow><radius> <green>gesetzt"
+  restartcountdown:
+    start:
+      success: "<prefix><green>Restart Countdown gestartet"
+      already-running: "<prefix><red>Restart läuft bereits!"
+    abort:
+      success: "<prefix><green>Der Restart wurde abgebrochen"
+      not-running: "<prefix><red>Es läuft kein Restartcountdown"
+    help: "<prefix><red>Nutze <yellow>/restartcountdown <start [hh:mm:ss] | abort>"
+  blockdamage:
+    already:
+      enabled: "<prefix><red>Schaden vom Typ <yellow><type> <red>ist bereits angeschaltet"
+      disabled: "<prefix><red>Schaden vom Typ <yellow><type> <red>ist bereits ausgeschaltet"
+    success:
+      enabled: "<prefix><green>Schaden vom Typ <yellow><type> <green>angeschaltet"
+      disabled: "<prefix><green>Schaden vom Typ <yellow><type> <green>ausgeschaltet"
+  lockend:
+    sccess:
+      disabled: "<prefix><gray>Du hast das End <green>entsperrt"
+      enabled: "<prefix><gray>Du hast das End <red>gesperrt"
+    already:
+      enabled: "<prefix><red>Das End ist breits <yellow>gesperrt"
+      disabled: "<prefix><red>Das End ist breits <green>entsperrt"
+  gamesettings:
+    endlock:
+      success-true: "<prefix><green>Das End wurde gesperrt"
+      success-false: "<prefix><green>Das End wurde entsperrt"
+      error: "<prefix><red>Fehler beim sperren des Ends"
+  spawn:
+    success: "<prefix><green>Du wurdest zum Spawn teleportiert</green>"
+    no-spawn: "<prefix><red>Kein Spawn gesetzt!</red>"
+  game:
+    status: "<prefix><gray>Der Status des Spiels ist <yellow><game_state>"
+    prepare:
+      setup: "<prefix><red>Das Setup muss zu erst vervollständigt werden!"
+      setup-complete: "<prefix><green>Das Spiel ist nun in Vorbereitung"
+      preparation: "<prefix><red>Das Spiel wird bereits vorbereitet"
+      running: "<prefix><red>Das Spiel läuft bereits, stoppe es um es erneut vorzubereiten oder zu resetten"
+    stop:
+      stopped: "<prefix><red>Das Spiel ist bereits gestoppt"
+      running: "<prefix><green>Das Spiel wurde gestoppt"
+      confirm: "<prefix><red>ACHTUNG, möchtest du das wirklich tun? Alle Teilnehmer werden zum Spawn teleportiert <gray>Bitte bestätige mit <yellow>/game stop confirm"
+      no-confirm: "<prefix><red>Es läuft keine Stopanfrage!"
+    start:
+      stopped: "<prefix><red>Das Spiel muss erst die Vorbereitunsphase durchlaufen"
+      preparation: "<prefix><green>Das Spiel wurde gestartet"
+      running: "<prefix><red>Das Spiel läuft bereits, stoppe es um es erneut zu starten oder zu resetten"
+    reset:
+      preparation: "<prefix><green>Das Spiel wurde zurückgesetzt"
+      not-preparation: "<prefix><red>Das Spiel kann noch nicht resettet werden"
+      running: "<prefix><red>Das Spiel muss gestoppt sein, um es resettenn"
+      confirm: "<prefix><red>ACHTUNG, möchtest du das wirklich tun? Der gesamte Spielstand wird gelöscht! <gray>Bitte bestätige mit <yellow>/game reset confirm"
+      no-confirm: "<prefix><red>Es läuft keine Resetanfrage!"
+
+  gamemode:
+    self:
+      success: "<prefix><green>Spielmodus zu <yellow><gamemode> <green>geändert"
+    others:
+      success: "<prefix><green>Spielmodus von <yellow><player> <green>zu <yellow><gamemode> <green>geändert"
+  reload:
+    success: "<prefix><green>Plugin erfolgreich neu geladen!"
+    error: "<prefix><red>Fehler beim neuladen des Plugins"
+  setspawn:
+    error: "<prefix><red>Fehler beim setzten des Spawns: <error>"
+    success: "<prefix><green>Spawn erfolgreich auf <yellow><location> <green>gesetzt!"
+  schedulerestart:
+    start:
+      success: "<prefix><green>Der Neustart wurde erfolgreich akiviert und wird in <yellow><time> <green>durchgeführt"
+      already-running: "<prefix><red>Der Neustart Countdown läuft bereits"
+    stop:
+      success: "<prefix><green> Der Neustart Countdown wurde unterbrochen"
+      no-countdown: "<prefix><red>Es läuft derzeit kein Neustart Countdown"
+  setup:
+    complete-step: "<prefix><green>Setup Stage <yellow><index> <green>abgeschlossen!"
+    progress:
+      step:
+        1: "<click:suggest_command:'/setspawn'>Spawn setzen"
+        2: "<click:suggest_command:'/settings elytraradius'>Elytra Aktivierungsradius setzen"
+        3: "<click:suggest_command:'/settings borderdiameterinpreparation'>Worldborder Umfang in Vorbereitung setzen"
+        4: "<click:suggest_command:'/settings borderdiameteringame'>Worldborder  Umfang in Game setzen"
+        5: "<click:suggest_command:'/settings blockdamage creeper'>Blockdamage creeper setzen"
+        6: "<click:suggest_command:'/settings blockdamage tnt'>Blockdamage tnt setzen"
+        7: "<click:suggest_command:'/settings lockend'>Endlock status setzen"
+      format-line-todo: "<yellow><index> <gray>» <red><step>"
+      format-line-complete: "<yellow><index> <gray>» <green><step>"
+      format-header: "<gray>-------------------[<yellow>Setup]<gray>-------------------"
+
+exception:
+  command:
+    invalidsender: "<prefix><red>Diesen Command kannst du nur als Spieler ausführen"
+    nopermission: "<prefix><red>Dazu fehlt dir die Berechtigung"
+    falsesyntax: "<prefix><red>Bitte benutze <yellow><syntax></yellow>"
+inventory:
+  invsee:
+    title: "<yellow>Inventory - %player_displayname%"
+event:
+  elytra-boost:
+    already-used: "<prefix><red>Du hast alle deine Boosts aufgebraucht!"
+    remaining: "<prefix><green>Du kannst noch <yellow><boosts>x <green>boosten!"
+  open-crafting-table: "<prefix><gray>Du hast <yellow><type> <gray>geöffnet"
+  teleport:
+    already-teleporting: "<prefix><red>Du teleportierst dich bereits"
+  spawn-teleport:
+    success: "<prefix><green>Du wurdest zu Spawn teleportiert"
+    cancel: "<prefix><red>Da du dich bewegt hast wurde der Teleportvorgang abgebrochen"
+    countdown: "<green>Teleportiere in <yellow><time>"
+  end:
+    unlock:
+      message: "<prefix><green><bold>Das Ende wurde entsperrt!!!!"
+      title: "<green>Das End wurde freigeschaltet!"
+    lock:
+      message: "<prefix><yellow><bold>Das Ende ist nun gesperrt"
+      title: "<green>Das End wurde <red>gesperrt!"
+    enter-portal-locked: "<prefix><red>Das Ende ist bis zum <yellow>20.12.21 <red>gesperrt"
+  join: "<yellow><player> <green>hat gejoined!"
+  quit: "<yellow><player> <red>hat geleftet!"
+  first-join: "<aqua><player> <yellow>hat den Server zum ersten mal betreten!"
+  start-game:
+    in:
+      chat: "<prefix><green>Handwerksangriff startet in <yellow><hours><minutes><seconds>!"
+      title: "Handwerksangriff startet in <yellow><hours><minutes><seconds>"
+      subtitle: ""
+    now:
+      chat: "<prefix>Handwerksangriff startet JETZT!"
+      title: "<red>Handwerksangriff startet JETZT"
+      subtitle: ""
+  restart:
+    abort: "<prefix> <dark_gray>» <yellow>der Neustart wurde von einem Admin abgebrochen!"
+    in:
+      chat: "<prefix><dark_gray>» <red>Server Neustart in <yellow><hours><minutes><seconds> <red>Grund <dark_gray>» <yellow><reason>"
+      title: "<red>Server Neustart in <yellow><hours><minutes><seconds>"
+      subtitle: "<gray>Grund: <reason>"
+    now:
+      chat: "<prefix><dark_gray>» <red>Server Neustart!!!"
+      title: "<red>Server Neustart"
+      subtitle: "<gray>Grund: <reason>"
+actionbar: "<yellow>%headblocks_current% von %headblocks_max% Geschenken gefunden"

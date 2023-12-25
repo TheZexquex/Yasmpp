@@ -46,7 +46,7 @@ bukkit {
 
     load = BukkitPluginDescription.PluginLoadOrder.STARTUP
 
-    depend = listOf("PlaceholderAPI")
+    softDepend = listOf("PlaceholderAPI")
 
     defaultPermission = BukkitPluginDescription.Permission.Default.OP
 }
