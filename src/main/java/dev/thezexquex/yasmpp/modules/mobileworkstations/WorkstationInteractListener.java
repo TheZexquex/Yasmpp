@@ -74,7 +74,7 @@ public class WorkstationInteractListener implements Listener {
     }
 
     public void sendSuccessMessage(Player player, Material material) {
-        plugin.messenger().messageToPlayer(
+        plugin.messenger().sendMessage(
                 player,
                 NodePath.path("event", "open-crafting-table"),
                 TagResolver.resolver("type", Tag.preProcessParsed(material.toString()))

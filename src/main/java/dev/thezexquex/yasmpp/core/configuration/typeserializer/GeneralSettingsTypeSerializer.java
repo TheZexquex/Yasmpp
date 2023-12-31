@@ -1,4 +1,4 @@
-package dev.thezexquex.yasmpp.core.configuration.typeserializer.general;
+package dev.thezexquex.yasmpp.core.configuration.typeserializer;
 
 import dev.thezexquex.yasmpp.core.configuration.settings.GeneralSettings;
 import dev.thezexquex.yasmpp.core.configuration.settings.general.GeneralBorderSettings;
@@ -17,7 +17,7 @@ public class GeneralSettingsTypeSerializer implements TypeSerializer<GeneralSett
     public GeneralSettings deserialize(Type type, ConfigurationNode node) throws SerializationException {
         var generalBorderSettings = node.node("border").get(GeneralBorderSettings.class);
         var generalEndSettings = node.node("end").get(GeneralEndSettings.class);
-        var generalDamageSettings = node.node("damage").get(GeneralExplosionDamageSettings.class);
+        var generalDamageSettings = node.node("do-block-damage").get(GeneralExplosionDamageSettings.class);
         var generalElytraSettings = node.node("elytra").get(GeneralSpawnElytraSettings.class);
 
         return new GeneralSettings(
@@ -33,7 +33,7 @@ public class GeneralSettingsTypeSerializer implements TypeSerializer<GeneralSett
         if (generalSettings != null) {
             node.node("border").set(generalSettings.generalBorderSettings());
             node.node("end").set(generalSettings.generalEndSettings());
-            node.node("damage").set(generalSettings.generalExplosionDamageSettings());
+            node.node("do-block-damage").set(generalSettings.generalExplosionDamageSettings());
             node.node("elytra").set(generalSettings.generalSpawnElytraSettings());
         }
     }

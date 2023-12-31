@@ -16,7 +16,13 @@ public class CountDownSettingsTypeSerializer implements TypeSerializer<CountDown
         var gameStartCountDownSettings = node.node("game-start").getList(CountDownLine.class);
         var teleportCountDownSettings = node.node("teleport").getList(CountDownLine.class);
         var openEndCountDownSettings = node.node("open-end").getList(CountDownLine.class);
-        return null;
+
+        return new CountDownSettings(
+                restartCountDownSettings,
+                gameStartCountDownSettings,
+                teleportCountDownSettings,
+                openEndCountDownSettings
+        );
     }
 
     @Override

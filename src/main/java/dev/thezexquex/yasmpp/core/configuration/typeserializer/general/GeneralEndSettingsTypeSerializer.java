@@ -8,7 +8,7 @@ import org.spongepowered.configurate.serialize.TypeSerializer;
 
 import java.lang.reflect.Type;
 
-public class GeneralBEndSettingsTypeSerializer implements TypeSerializer<GeneralEndSettings> {
+public class GeneralEndSettingsTypeSerializer implements TypeSerializer<GeneralEndSettings> {
     @Override
     public GeneralEndSettings deserialize(Type type, ConfigurationNode node) {
         var lockEnd = node.node("lock-end").getBoolean();

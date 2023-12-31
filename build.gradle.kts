@@ -4,6 +4,7 @@ plugins {
     id("java")
     id("com.github.johnrengelman.shadow") version "8.1.1"
     id("net.minecrell.plugin-yml.bukkit") version "0.6.0"
+    id("io.papermc.paperweight.userdev") version "1.5.10"
 }
 
 group = "dev.thezexquex"
@@ -20,12 +21,14 @@ repositories {
 
 dependencies {
     implementation("cloud.commandframework", "cloud-paper", "1.8.4")
-    implementation("de.chojo.sadu", "sadu-sqlite", "1.4.0")
+    implementation("de.chojo.sadu", "sadu", "1.4.0")
     implementation("org.spongepowered", "configurate-yaml", "4.1.2")
     implementation("org.spongepowered", "configurate-hocon", "4.1.2")
 
     compileOnly("io.papermc.paper", "paper-api", "1.20.4-R0.1-SNAPSHOT")
     compileOnly("me.clip", "placeholderapi", "2.11.5")
+
+    paperweight.paperDevBundle("1.20.4-R0.1-SNAPSHOT")
 
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
@@ -44,9 +47,9 @@ bukkit {
 
     apiVersion = "1.20"
 
-    load = BukkitPluginDescription.PluginLoadOrder.STARTUP
+    load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
 
-    softDepend = listOf("PlaceholderAPI")
+    softDepend = listOf("PlaceholderAPI", "My_Worlds")
 
     defaultPermission = BukkitPluginDescription.Permission.Default.OP
 }
@@ -73,13 +76,17 @@ tasks {
         archiveVersion.set(rootProject.version.toString())
     }
 
+    reobfJar {
+        dependsOn(shadowJar)
+    }
+
     register<Copy>("copyToServer") {
         val path = System.getenv("SERVER_DIR")
         if (path.toString().isEmpty()) {
             println("No SERVER_DIR env variable set")
             return@register
         }
-        from(shadowJar)
+        from(reobfJar )
         destinationDir = File(path.toString())
     }
 }

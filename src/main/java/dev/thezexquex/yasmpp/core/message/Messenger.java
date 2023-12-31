@@ -7,6 +7,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.title.Title;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.spongepowered.configurate.ConfigurationNode;
@@ -27,15 +28,19 @@ public class Messenger {
         this.pluginHookService = plugin.pluginHookService();
     }
 
+    public String getString(NodePath path) {
+        return rootNode.node(path).getString();
+    }
+
     public Component prefix() {
         var prefixString = rootNode.node("prefix").getString();
         return prefixString == null ? Component.text("") : miniMessage.deserialize(prefixString);
     }
 
-    public Component message(NodePath path, Player player, TagResolver... resolvers) {
+    public Component component(NodePath path, Player player, TagResolver... resolvers) {
         var messageString = rootNode.node(path).getString();
         if (messageString == null) {
-            return Component.text("No message found");
+            return Component.text("N/A " + path);
         }
         var papiParsedString = pluginHookService.isPapiAvailable() ? PlaceholderAPI.setPlaceholders(player, messageString) : messageString;
         return miniMessage.deserialize(
@@ -45,10 +50,10 @@ public class Messenger {
         );
     }
 
-    public Component message(NodePath path, TagResolver... resolvers) {
+    public Component component(NodePath path, TagResolver... resolvers) {
         var messageString = rootNode.node(path).getString();
         if (messageString == null) {
-            return Component.text("No message found");
+            return Component.text("N/A " + path);
         }
         return miniMessage.deserialize(
                 messageString,
@@ -57,8 +62,31 @@ public class Messenger {
         );
     }
 
+    public void sendTitle(Player player, NodePath pathTitle, NodePath pathSubTitle, TagResolver... tagResolvers) {
+        var title = Title.title(
+                pathTitle == null ? Component.empty() : component(pathTitle, player, tagResolvers),
+                pathSubTitle == null ? Component.empty() : component(pathSubTitle, player, tagResolvers)
+        );
+        player.showTitle(title);
+    }
+
+    public void broadcastTitleToServer(NodePath pathTitle, NodePath pathSubTitle, TagResolver... tagResolvers) {
+        broadcastTitleToPlayers(plugin.getServer().getOnlinePlayers(), pathTitle, pathSubTitle, tagResolvers);
+    }
+
+    public void broadcastTitleToPlayers(Collection<? extends Player> players, NodePath pathTitle, NodePath pathSubTitle, TagResolver... tagResolvers) {
+        players.forEach(player -> sendTitle(player, pathTitle, pathSubTitle, tagResolvers));
+    }
+
     public void sendActionBar(Player player, NodePath path, TagResolver... tagResolvers) {
-        player.sendActionBar(this.message(path, player, tagResolvers));
+        player.sendActionBar(this.component(path, player, tagResolvers));
+    }
+
+    public void sendMessage(CommandSender sender, NodePath path, TagResolver... tagResolvers) {
+        sender.sendMessage(this.component(path, tagResolvers));
+    }
+    public void sendMessage(Player player, NodePath path, TagResolver... tagResolvers) {
+        player.sendMessage(this.component(path, player, tagResolvers));
     }
 
     public void broadcastActionBarToPlayers(Collection<? extends Player> players, NodePath path, TagResolver... tagResolvers) {
@@ -69,15 +97,8 @@ public class Messenger {
         broadcastActionBarToPlayers(plugin.getServer().getOnlinePlayers(), path, tagResolvers);
     }
 
-    public void messageToCommandSender(CommandSender sender, NodePath path, TagResolver... tagResolvers) {
-        sender.sendMessage(this.message(path, tagResolvers));
-    }
-    public void messageToPlayer(Player player, NodePath path, TagResolver... tagResolvers) {
-        player.sendMessage(this.message(path, player, tagResolvers));
-    }
-
     public void broadcastToPlayers(Collection<? extends Player> players, NodePath path, TagResolver... tagResolvers) {
-        players.forEach(player -> messageToPlayer(player, path, tagResolvers));
+        players.forEach(player -> sendMessage(player, path, tagResolvers));
     }
 
     public void broadcastToServer(NodePath path, TagResolver... tagResolvers) {

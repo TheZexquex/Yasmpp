@@ -1,9 +1,58 @@
-prefix: "<white>[<gradient:#18edad:#18edea>SurvivalProjekt</gradient><white>]"
+prefix: "<white>[<gradient:#18edad:#18edea>SurvivalProjekt</gradient><white>] "
 chat-format: "<yellow><player><white>: <gray><message>"
 command:
+  home:
+    success: "<prefix><green>Du wurdest zu <yellow><home-name> <green>teleportiert!"
+    notfound: "<prefix><red>Du hast kein Home mit dem Namen <yellow><home-name>"
+  sethome:
+    success: "<prefix><green>Du hast ein Home gesetzt: <yellow><home-name>"
+    error: "<prefix><red>Das Home konnte nicht gesetzt werden"
+  delhome:
+    success: "<prefix><green>Du hast ein Home gelöscht: <yellow><home-name>"
+    error: "<prefix><red>Das Home konnte nicht gelöscht werden"
+
+  setspawn:
+    error: "<prefix><red>Fehler beim setzten des Spawns: <error>"
+    success: "<prefix><green>Spawn erfolgreich auf <yellow><location> <green>gesetzt!"
+  spawn:
+    success: "<prefix><green>Du wurdest zum Spawn teleportiert</green>"
+    no-spawn: "<prefix><red>Kein Spawn gesetzt!</red>"
+
   settings:
     borderradius: "<prefix><green>Borderradius auf <yellow><radius> <green>gesetzt"
-    elytraradius: "<prefix><green>Elytraaktivierungsradius auf <yellow><radius> <green>gesetzt"
+    elytra:
+      radius: "<prefix><green>Elytraaktivierungsradius auf <yellow><radius> <green>gesetzt"
+      max-boosts: "<prefix><green>Elytr Max Boosts auf <yellow><boosts> <green>gesetzt"
+    blockdamage:
+      already:
+        enabled: "<prefix><red>Schaden vom Typ <yellow><type> <red>ist bereits angeschaltet"
+        disabled: "<prefix><red>Schaden vom Typ <yellow><type> <red>ist bereits ausgeschaltet"
+      success:
+        enabled: "<prefix><green>Schaden vom Typ <yellow><type> <green>angeschaltet"
+        disabled: "<prefix><green>Schaden vom Typ <yellow><type> <green>ausgeschaltet"
+    teleport:
+      cooldown: "<prefix><green>Teleportcooldown auf <yellow><cooldown> <green>gesetzt"
+      cance-on-move:
+        already:
+          enabled: "<prefix><red>Teleport Abbruch bei Bewegung ist bereits angeschaltet"
+          disabled: "<prefix><red>Teleport Abbruch bei Bewegung ist bereits ausgeschaltet"
+        success:
+          enabled: "<prefix><green>Teleport Abbruch bei Bewegung angeschaltet"
+          disabled: "<prefix><green>Teleport Abbruch bei Bewegung ausgeschaltet"
+      permission-bypass:
+        already:
+          enabled: "<prefix><red>TP Cooldown Permission Bypass ist bereits angeschaltet"
+          disabled: "<prefix><red>TP Cooldown Permission Bypass ist bereits ausgeschaltet"
+        success:
+          enabled: "<prefix><green>TP Cooldown Permission Bypass angeschaltet"
+          disabled: "<prefix><green>TP Cooldown Permission Bypass ausgeschaltet"
+    lockend:
+      success:
+        disabled: "<prefix><gray>Du hast das End <green>entsperrt"
+        enabled: "<prefix><gray>Du hast das End <red>gesperrt"
+      already:
+        enabled: "<prefix><red>Das End ist breits <yellow>gesperrt"
+        disabled: "<prefix><red>Das End ist breits <green>entsperrt"
   restartcountdown:
     start:
       success: "<prefix><green>Restart Countdown gestartet"
@@ -12,28 +61,7 @@ command:
       success: "<prefix><green>Der Restart wurde abgebrochen"
       not-running: "<prefix><red>Es läuft kein Restartcountdown"
     help: "<prefix><red>Nutze <yellow>/restartcountdown <start [hh:mm:ss] | abort>"
-  blockdamage:
-    already:
-      enabled: "<prefix><red>Schaden vom Typ <yellow><type> <red>ist bereits angeschaltet"
-      disabled: "<prefix><red>Schaden vom Typ <yellow><type> <red>ist bereits ausgeschaltet"
-    success:
-      enabled: "<prefix><green>Schaden vom Typ <yellow><type> <green>angeschaltet"
-      disabled: "<prefix><green>Schaden vom Typ <yellow><type> <green>ausgeschaltet"
-  lockend:
-    sccess:
-      disabled: "<prefix><gray>Du hast das End <green>entsperrt"
-      enabled: "<prefix><gray>Du hast das End <red>gesperrt"
-    already:
-      enabled: "<prefix><red>Das End ist breits <yellow>gesperrt"
-      disabled: "<prefix><red>Das End ist breits <green>entsperrt"
-  gamesettings:
-    endlock:
-      success-true: "<prefix><green>Das End wurde gesperrt"
-      success-false: "<prefix><green>Das End wurde entsperrt"
-      error: "<prefix><red>Fehler beim sperren des Ends"
-  spawn:
-    success: "<prefix><green>Du wurdest zum Spawn teleportiert</green>"
-    no-spawn: "<prefix><red>Kein Spawn gesetzt!</red>"
+
   game:
     status: "<prefix><gray>Der Status des Spiels ist <yellow><game_state>"
     prepare:
@@ -59,22 +87,17 @@ command:
 
   gamemode:
     self:
-      success: "<prefix><green>Spielmodus zu <yellow><gamemode> <green>geändert"
+      success: "<prefix><green>Dein Spielmodus wurde von <yellow><player><green>zu Spielmodus zu <yellow><gamemode> <green>geändert"
     others:
-      success: "<prefix><green>Spielmodus von <yellow><player> <green>zu <yellow><gamemode> <green>geändert"
+      success: "<prefix><green>Dein Spielmodus wurde von <yellow><player> <green>zu <yellow><speed> <green>geändert"
+  speed:
+    self:
+      success: "<prefix><green>Dein <type>speed wurde von <yellow><player><green>zu Spielmodus zu <yellow><gamemode> <green>geändert"
+    others:
+      success: "<prefix><green>Dein <type>speed wurde von <yellow><player> <green>zu <yellow><speed> <green>geändert"
   reload:
     success: "<prefix><green>Plugin erfolgreich neu geladen!"
     error: "<prefix><red>Fehler beim neuladen des Plugins"
-  setspawn:
-    error: "<prefix><red>Fehler beim setzten des Spawns: <error>"
-    success: "<prefix><green>Spawn erfolgreich auf <yellow><location> <green>gesetzt!"
-  schedulerestart:
-    start:
-      success: "<prefix><green>Der Neustart wurde erfolgreich akiviert und wird in <yellow><time> <green>durchgeführt"
-      already-running: "<prefix><red>Der Neustart Countdown läuft bereits"
-    stop:
-      success: "<prefix><green> Der Neustart Countdown wurde unterbrochen"
-      no-countdown: "<prefix><red>Es läuft derzeit kein Neustart Countdown"
   setup:
     complete-step: "<prefix><green>Setup Stage <yellow><index> <green>abgeschlossen!"
     progress:
@@ -99,13 +122,14 @@ inventory:
   invsee:
     title: "<yellow>Inventory - %player_displayname%"
 event:
+  death:
+    no-bed: "<prefix><red>Du bist gestorben und wurdest zum Spawn teleportiert, da du kein Bett platziert hast!"
   elytra-boost:
-    already-used: "<prefix><red>Du hast alle deine Boosts aufgebraucht!"
+    all-used: "<prefix><red>Du hast alle deine Boosts aufgebraucht!"
     remaining: "<prefix><green>Du kannst noch <yellow><boosts>x <green>boosten!"
   open-crafting-table: "<prefix><gray>Du hast <yellow><type> <gray>geöffnet"
   teleport:
     already-teleporting: "<prefix><red>Du teleportierst dich bereits"
-  spawn-teleport:
     success: "<prefix><green>Du wurdest zu Spawn teleportiert"
     cancel: "<prefix><red>Da du dich bewegt hast wurde der Teleportvorgang abgebrochen"
     countdown: "<green>Teleportiere in <yellow><time>"
@@ -120,14 +144,14 @@ event:
   join: "<yellow><player> <green>hat gejoined!"
   quit: "<yellow><player> <red>hat geleftet!"
   first-join: "<aqua><player> <yellow>hat den Server zum ersten mal betreten!"
-  start-game:
+  game-start:
     in:
       chat: "<prefix><green>Handwerksangriff startet in <yellow><hours><minutes><seconds>!"
-      title: "Handwerksangriff startet in <yellow><hours><minutes><seconds>"
+      title: "<green>Handwerksangriff startet in <yellow><hours><minutes><seconds>"
       subtitle: ""
     now:
-      chat: "<prefix>Handwerksangriff startet JETZT!"
-      title: "<red>Handwerksangriff startet JETZT"
+      chat: "<prefix><yellow>Handwerksangriff startet JETZT!"
+      title: "<yellow>Handwerksangriff startet JETZT"
       subtitle: ""
   restart:
     abort: "<prefix> <dark_gray>» <yellow>der Neustart wurde von einem Admin abgebrochen!"

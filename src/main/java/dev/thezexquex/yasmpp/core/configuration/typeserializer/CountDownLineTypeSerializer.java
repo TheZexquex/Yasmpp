@@ -24,7 +24,7 @@ public class CountDownLineTypeSerializer implements TypeSerializer<CountDownLine
                 useChat,
                 useTitle,
                 useSound,
-                Sound.sound(Key.key(soundName), Sound.Source.MASTER, 1, 1)
+                Sound.sound(Key.key(soundName), Sound.Source.MASTER, 1F, 1F)
         );
     }
 

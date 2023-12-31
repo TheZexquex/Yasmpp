@@ -11,16 +11,17 @@ import java.lang.reflect.Type;
 public class GeneralExplosionDamageSettingsTypeSerializer implements TypeSerializer<GeneralExplosionDamageSettings> {
     @Override
     public GeneralExplosionDamageSettings deserialize(Type type, ConfigurationNode node) throws SerializationException {
-        var doCreeperDamage = node.node("do-creeper-damage").getBoolean();
-        var doTntDamage = node.node("do-tnt-damage").getBoolean();
-        return null;
+        var doCreeperDamage = node.node("creeper").getBoolean();
+        var doTntDamage = node.node("tnt").getBoolean();
+
+        return new GeneralExplosionDamageSettings(doCreeperDamage, doTntDamage);
     }
 
     @Override
     public void serialize(Type type, @Nullable GeneralExplosionDamageSettings generalExplosionDamageSettings, ConfigurationNode node) throws SerializationException {
         if (generalExplosionDamageSettings != null) {
-            node.node("do-creeper-damage").set(generalExplosionDamageSettings.doCreeperDamage());
-            node.node("do-tnt-damage").set(generalExplosionDamageSettings.doTntDamage());
+            node.node("creeper").set(generalExplosionDamageSettings.doCreeperDamage());
+            node.node("tnt").set(generalExplosionDamageSettings.doTntDamage());
         }
     }
 }
