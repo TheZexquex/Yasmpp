@@ -1,5 +1,15 @@
 # Yet Another Survival Multiplayer Plugin
 
+### Dependencies
+- Java 20
+- Paper 1.20.4 
+- PlaceholderAPI (Optional)
+
+### How to build from source
+- Clone the source code to a local folder on your computer
+- Navigate to to the plugins root directory
+- Run gradlew reobfJar or ./gradlew reobfJar 
+
 ### Adds following features:
 - Spawnelytra
 - Open every crafting table (and Catographietable and Enderchest and so on and so on) without placing (Sneak + right click)
@@ -23,5 +33,3 @@
 | `/game <start\|stop>`              | `yasmpp.command.game.<start\|stop>` | `Doesn't do much at the moment except change the worldborder size`|🟨Add more functionality|
 | `/restartcountdown start <duration> <reason>`                   | `yasmpp.command.reload`             | `Schedules a server restart an broadcasts warings`                                              |✅Done                  |
 | `/yasmpp reload`                   | `yasmpp.command.reload`             | `Reloads the plugin`                                              |✅Done                  |
-
-
