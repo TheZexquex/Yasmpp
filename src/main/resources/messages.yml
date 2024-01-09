@@ -3,14 +3,21 @@ chat-format: "<yellow><player><white>: <gray><message>"
 command:
   home:
     success: "<prefix><green>Du wurdest zu <yellow><home-name> <green>teleportiert!"
-    notfound: "<prefix><red>Du hast kein Home mit dem Namen <yellow><home-name>"
+    notfound: "<prefix><red>Es wurde kein Home namens <yellow><home-name> <red>gefunden"
   sethome:
     success: "<prefix><green>Du hast ein Home gesetzt: <yellow><home-name>"
     error: "<prefix><red>Das Home konnte nicht gesetzt werden"
+    max-homes-reached: "<prefix><red>Du hast deine maximalen Homes erreicht!"
+    already-exists: "<prefix><red>Ein Home namens <yellow><home-name> <red>existiert bereits"
   delhome:
     success: "<prefix><green>Du hast ein Home gelöscht: <yellow><home-name>"
     error: "<prefix><red>Das Home konnte nicht gelöscht werden"
-
+    not-exists: "<prefix><red>Es wurde kein Home namens <yellow><home-name> <red>gefunden"
+  homes:
+    header: "<gray>------------- <prefix><gray>-------------"
+    footer: "<gray>-------------<prefix><gray>-------------"
+    entry: "  <yellow><home-name> <gray>» <yellow><world><gray>, <yellow>x<gray>, <yellow>y<gray>, <yellow>z<gray>, <yellow>yaw<gray>, <yellow>pitch <white>[<green><click:run_command:'/home <home-name>'><hover:show_text:'<gray>Klicke um dich zu <yellow><home-name> <gray>zu teleportieren'>TP</hover></click><white>] <white>[<red><click:run_command:'/delhome <home-name>'><hover:show_text:'<red>Klicke um <yellow><home-name> <red>zu löschen'>X</hover></click><white>] "
+    empty: "<prefix><red>Du hast noch kein Home gesetzt!"
   setspawn:
     error: "<prefix><red>Fehler beim setzten des Spawns: <error>"
     success: "<prefix><green>Spawn erfolgreich auf <yellow><location> <green>gesetzt!"

@@ -5,6 +5,7 @@ import dev.thezexquex.yasmpp.core.data.database.dao.location.LocationWrapper;
 import dev.thezexquex.yasmpp.core.data.database.dao.location.home.HomeDao;
 import org.bukkit.Location;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -33,7 +34,7 @@ public class HomeService {
         return homeDao.deleteHome(playerId, id);
     }
 
-    public CompletableFuture<List<LocationWrapper>> getHomes(UUID playerId, String id) {
+    public CompletableFuture<List<LocationWrapper>> getHomes(UUID playerId) {
         return homeDao.getHomes(playerId);
     }
 }

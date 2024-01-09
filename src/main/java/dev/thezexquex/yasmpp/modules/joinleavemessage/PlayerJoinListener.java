@@ -18,6 +18,8 @@ public class PlayerJoinListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         var player = event.getPlayer();
 
+        plugin.smpPlayerService().addSmpPlayer(player);
+
         if (player.hasPlayedBefore()) {
             var messageComponent = plugin.messenger().component(
                     NodePath.path("event", "join"),

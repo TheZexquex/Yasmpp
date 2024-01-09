@@ -7,8 +7,6 @@ import com.zaxxer.hikari.HikariDataSource;
 import de.chojo.sadu.wrapper.QueryBuilderConfig;
 import dev.thezexquex.yasmpp.commands.*;
 import dev.thezexquex.yasmpp.commands.admin.GameCommand;
-import dev.thezexquex.yasmpp.commands.admin.GameModeCommand;
-import dev.thezexquex.yasmpp.commands.admin.SpeedCommand;
 import dev.thezexquex.yasmpp.core.configuration.ConfigurationLoader;
 import dev.thezexquex.yasmpp.core.configuration.Configuration;
 import dev.thezexquex.yasmpp.core.data.database.DataBaseProvider;
@@ -17,6 +15,7 @@ import dev.thezexquex.yasmpp.core.data.database.dao.location.home.SqliteHomeDao;
 import dev.thezexquex.yasmpp.core.data.database.dao.location.special.SqliteLocationDao;
 import dev.thezexquex.yasmpp.core.data.service.HomeService;
 import dev.thezexquex.yasmpp.core.data.service.LocationService;
+import dev.thezexquex.yasmpp.core.data.service.SmpPlayerService;
 import dev.thezexquex.yasmpp.core.hooks.PluginHookService;
 import dev.thezexquex.yasmpp.core.message.Messenger;
 import dev.thezexquex.yasmpp.modules.blockdamage.ExplosionBlockDamageListener;
@@ -52,6 +51,7 @@ public class YasmpPlugin extends JavaPlugin {
     private CommandManager<CommandSender> commandManager;
     private LocationService locationService;
     private HomeService homeService;
+    private SmpPlayerService smpPlayerService;
     private ElytraManager elytraManager;
     private TeleportQueue teleportQueue;
 
@@ -66,6 +66,8 @@ public class YasmpPlugin extends JavaPlugin {
 
         registerListeners();
         reloadPlugin();
+
+        initDataServices();
 
         //new StackSizeChanger(this).changeAllItemStackSizes();
     }
@@ -90,7 +92,6 @@ public class YasmpPlugin extends JavaPlugin {
         messenger = new Messenger(this, messageRootNode);
 
         updateAndConnectToDatabase();
-        initDataServices();
 
         initCommandManager();
         registerCommands();
@@ -164,6 +165,7 @@ public class YasmpPlugin extends JavaPlugin {
 
         var homeDao = new SqliteHomeDao(dataSource);
         homeService = new HomeService(homeDao);
+        smpPlayerService = new SmpPlayerService(this);
     }
 
     private void initCommandManager() {
@@ -198,11 +200,15 @@ public class YasmpPlugin extends JavaPlugin {
         return homeService;
     }
 
+    public SmpPlayerService smpPlayerService() {
+        return smpPlayerService;
+    }
+
     public ElytraManager elytraManager() {
         return elytraManager;
     }
 
-    public TeleportQueue getTeleportQueue() {
+    public TeleportQueue teleportQueue() {
         return teleportQueue;
     }
 

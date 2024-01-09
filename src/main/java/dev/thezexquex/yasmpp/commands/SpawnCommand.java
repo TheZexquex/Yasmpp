@@ -5,10 +5,8 @@ import cloud.commandframework.context.CommandContext;
 import dev.thezexquex.yasmpp.YasmpPlugin;
 import dev.thezexquex.yasmpp.core.command.BaseCommand;
 import dev.thezexquex.yasmpp.core.timer.Countdown;
-import net.kyori.adventure.sound.Sound;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import org.bukkit.SoundCategory;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.spongepowered.configurate.NodePath;
@@ -33,7 +31,7 @@ public class SpawnCommand extends BaseCommand {
     private void handleSpawn(CommandContext<CommandSender> commandSenderCommandContext) {
         var player = (Player) commandSenderCommandContext.getSender();
 
-        if (plugin.getTeleportQueue().isTeleporting(player)) {
+        if (plugin.teleportQueue().isTeleporting(player)) {
             plugin.messenger().sendMessage(
                     player,
                     NodePath.path("event", "teleport", "already-teleporting")
@@ -61,7 +59,7 @@ public class SpawnCommand extends BaseCommand {
         var countDown = new Countdown();
         var countDownSettings = plugin.configuration().countDownSettings().teleportCountDownSettings();
 
-        plugin.getTeleportQueue().addToTeleportQueue(player, countDown);
+        plugin.teleportQueue().addToTeleportQueue(player, countDown);
 
         countDown.start(countDownInSec, TimeUnit.SECONDS, (timeSpan) -> {
             var currentCDSettingOpt = countDownSettings.stream().filter(countDownLine -> countDownLine.second() == timeSpan).findFirst();
@@ -93,7 +91,7 @@ public class SpawnCommand extends BaseCommand {
             }
         }, () -> {
             plugin.getServer().getScheduler().runTask(plugin, () -> player.teleport(location));
-            plugin.getTeleportQueue().clearQueue(player);
+            plugin.teleportQueue().clearQueue(player);
         });
     }
 }
