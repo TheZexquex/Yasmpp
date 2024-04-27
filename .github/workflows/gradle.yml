@@ -9,9 +9,9 @@ name: Build Yasmp Plugin
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ "release" ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ "release" ]
 
 jobs:
   build:
@@ -38,6 +38,25 @@ jobs:
 
     - name: Build with Gradle Wrapper
       run: ./gradlew shadowJar
+
+    - name: Automatic Releases
+      # You may pin to the exact commit or the version.
+      # uses: marvinpinto/action-automatic-releases@919008cf3f741b179569b7a6fb4d8860689ab7f0
+      uses: marvinpinto/action-automatic-releases@v1.2.1
+      with:
+        # GitHub secret token
+        repo_token: ${{ secrets.DEPLOYMENT_KEY }}
+        # Git tag (for automatic releases)
+        automatic_release_tag: true # optional
+        # Should this release be marked as a draft?
+        draft: false # optional
+        # Should this release be marked as a pre-release?
+        prerelease: true # optional, default is true
+        # Release title (for automatic releases)
+        title: "Automatic release" # optional
+        # Assets to upload to the release
+        files: /build/libs/Yasmpp-1.0-SNAPSHOT-all.jar # optional
+          
 
     # NOTE: The Gradle Wrapper is the default and recommended way to run Gradle (https://docs.gradle.org/current/userguide/gradle_wrapper.html).
     # If your project does not have the Gradle Wrapper configured, you can use the following configuration to run Gradle with a specified version.
