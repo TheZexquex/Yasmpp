@@ -17,16 +17,20 @@ public class CancelTeleportListener implements Listener {
     public void onMove(PlayerMoveEvent event) {
         var player = event.getPlayer();
 
-        if (!plugin.teleportQueue().isTeleporting(player)) {
-            return;
-        }
+        plugin.smpPlayerService().getSmpPlayer(player).ifPresent(smpPlayer -> {
+            if (!smpPlayer.isInTeleportWarmup()) {
+                return;
+            }
 
-        if (!event.getFrom().getBlock().equals(event.getTo().getBlock())) {
-            plugin.teleportQueue().cancelTeleport(player);
-            plugin.messenger().sendMessage(
-                    player,
-                    NodePath.path("event", "teleport", "cancel")
-            );
-        }
+            if (!event.getFrom().getBlock().equals(event.getTo().getBlock())) {
+                smpPlayer.cancelCurrentTeleport();
+                plugin.messenger().sendMessage(
+                        player,
+                        NodePath.path("event", "teleport", "cancel")
+                );
+            }
+        });
+
+
     }
 }

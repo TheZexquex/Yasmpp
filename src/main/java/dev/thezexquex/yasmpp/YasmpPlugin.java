@@ -1,23 +1,22 @@
 package dev.thezexquex.yasmpp;
 
-import cloud.commandframework.CommandManager;
-import cloud.commandframework.execution.CommandExecutionCoordinator;
-import cloud.commandframework.paper.PaperCommandManager;
-import com.zaxxer.hikari.HikariDataSource;
-import de.chojo.sadu.wrapper.QueryBuilderConfig;
+import de.unknowncity.astralib.common.configuration.setting.defaults.ModernDataBaseSetting;
+import de.unknowncity.astralib.common.database.StandardDataBaseProvider;
+import de.unknowncity.astralib.common.message.lang.Language;
+import de.unknowncity.astralib.common.message.lang.Localization;
+import de.unknowncity.astralib.paper.api.hook.defaulthooks.PlaceholderApiHook;
+import de.unknowncity.astralib.paper.api.message.PaperMessenger;
+import de.unknowncity.astralib.paper.api.plugin.PaperAstraPlugin;
 import dev.thezexquex.yasmpp.commands.*;
 import dev.thezexquex.yasmpp.commands.admin.GameCommand;
-import dev.thezexquex.yasmpp.core.configuration.ConfigurationLoader;
-import dev.thezexquex.yasmpp.core.configuration.Configuration;
-import dev.thezexquex.yasmpp.core.data.database.DataBaseProvider;
-import dev.thezexquex.yasmpp.core.data.database.DataBaseUpdater;
-import dev.thezexquex.yasmpp.core.data.database.dao.location.home.SqliteHomeDao;
-import dev.thezexquex.yasmpp.core.data.database.dao.location.special.SqliteLocationDao;
-import dev.thezexquex.yasmpp.core.data.service.HomeService;
-import dev.thezexquex.yasmpp.core.data.service.LocationService;
-import dev.thezexquex.yasmpp.core.data.service.SmpPlayerService;
-import dev.thezexquex.yasmpp.core.hooks.PluginHookService;
-import dev.thezexquex.yasmpp.core.message.Messenger;
+import dev.thezexquex.yasmpp.commands.admin.GameModeCommand;
+import dev.thezexquex.yasmpp.commands.admin.SpeedCommand;
+import dev.thezexquex.yasmpp.configuration.YasmppConfiguration;
+import dev.thezexquex.yasmpp.data.database.dao.location.impl.sqlite.SqliteHomeDao;
+import dev.thezexquex.yasmpp.data.database.dao.location.impl.sqlite.SqliteLocationDao;
+import dev.thezexquex.yasmpp.data.service.HomeService;
+import dev.thezexquex.yasmpp.data.service.LocationService;
+import dev.thezexquex.yasmpp.data.service.SmpPlayerService;
 import dev.thezexquex.yasmpp.modules.blockdamage.ExplosionBlockDamageListener;
 import dev.thezexquex.yasmpp.modules.chat.ChatListener;
 import dev.thezexquex.yasmpp.modules.joinleavemessage.PlayerJoinListener;
@@ -25,83 +24,60 @@ import dev.thezexquex.yasmpp.modules.joinleavemessage.PlayerQuitListener;
 import dev.thezexquex.yasmpp.modules.lockend.LockEndListener;
 import dev.thezexquex.yasmpp.modules.mobileworkstations.WorkstationInteractListener;
 import dev.thezexquex.yasmpp.modules.respawn.RespawnListener;
-import dev.thezexquex.yasmpp.modules.spawnelytra.*;
+import dev.thezexquex.yasmpp.modules.spawnelytra.ElytraManager;
 import dev.thezexquex.yasmpp.modules.spawnelytra.listener.*;
 import dev.thezexquex.yasmpp.modules.teleport.CancelTeleportListener;
-import dev.thezexquex.yasmpp.modules.teleport.TeleportQueue;
-import org.bukkit.command.CommandSender;
-import org.bukkit.plugin.java.JavaPlugin;
-import org.spongepowered.configurate.serialize.SerializationException;
 
-import java.io.IOException;
 import java.nio.file.Path;
-import java.sql.SQLException;
-import java.util.concurrent.Executors;
-import java.util.function.Function;
-import java.util.logging.Level;
 
-public class YasmpPlugin extends JavaPlugin {
-    private Configuration configuration;
-    private Messenger messenger;
-    private PluginHookService pluginHookService;
-    private DataBaseUpdater dataBaseUpdater;
-    private DataBaseProvider dataBaseProvider;
-    private HikariDataSource dataSource;
-    private ConfigurationLoader configurationLoader;
-    private CommandManager<CommandSender> commandManager;
+public class YasmpPlugin extends PaperAstraPlugin {
+    private YasmppConfiguration configuration;
+    private PaperMessenger messenger;
     private LocationService locationService;
     private HomeService homeService;
     private SmpPlayerService smpPlayerService;
     private ElytraManager elytraManager;
-    private TeleportQueue teleportQueue;
 
     @Override
-    public void onEnable() {
-        QueryBuilderConfig.setDefault(QueryBuilderConfig.builder()
-                .withExceptionHandler(err -> {
-                    getLogger().log(Level.SEVERE, "An error occured during a database request", err);
-                })
-                .withExecutor(Executors.newCachedThreadPool())
-                .build());
-
-        registerListeners();
+    public void onPluginEnable() {
         reloadPlugin();
-
-        initDataServices();
-
+        applyListeners();
         //new StackSizeChanger(this).changeAllItemStackSizes();
     }
 
     public void reloadPlugin() {
-        this.pluginHookService = new PluginHookService(this.getServer());
 
-        configurationLoader = new ConfigurationLoader(this);
+        loadConfigAndMessages();
+        initDataServices();
+        //updateAndConnectToDatabase();
 
-        configurationLoader.saveDefaultConfigs();
-        configurationLoader.intiConfigurationLoader();
-
-        var configurationRootNode = configurationLoader.loadConfiguration();
-        var messageRootNode = configurationLoader.loadMessageConfiguration();
-
-        try {
-            configuration = configurationRootNode.get(Configuration.class)  ;
-        } catch (SerializationException e) {
-            this.getLogger().log(Level.SEVERE, "Failed to load config.conf", e);
-        }
-
-        messenger = new Messenger(this, messageRootNode);
-
-        updateAndConnectToDatabase();
-
-        initCommandManager();
-        registerCommands();
-
-        teleportQueue = new TeleportQueue();
+        applyCommands();
 
         elytraManager = new ElytraManager(this);
     }
 
-    private void registerListeners() {
+    public void loadConfigAndMessages() {
+
+        saveDefaultResource("lang/de_DE.yml", Path.of("lang/de_DE.yml"));
+
+        var localization = Localization.builder(getDataPath().resolve("lang"))
+                .withLogger(getLogger())
+                .buildAndLoad();
+
+        var papiHook = hookRegistry.getRegistered(PlaceholderApiHook.class);
+
+        this.messenger = PaperMessenger.builder(localization)
+                .withPlaceHolderAPI(papiHook)
+                .withDefaultLanguage(Language.GERMAN)
+                .build();
+
+        var configOpt = YasmppConfiguration.loadFromFile(YasmppConfiguration.class);
+
+        this.configuration = configOpt.orElseGet(YasmppConfiguration::new);
+        this.configuration.save();
+    }
+
+    private void applyListeners() {
         var pluginManager = this.getServer().getPluginManager();
 
         pluginManager.registerEvents(new WorkstationInteractListener(this), this);
@@ -131,64 +107,41 @@ public class YasmpPlugin extends JavaPlugin {
 
     }
 
-    private void registerCommands() {
-        new HomeCommand(this).register(commandManager);
-        new SetSpawnCommand(this).register(commandManager);
-        new SpawnCommand(this).register(commandManager);
-        new ReloadCommand(this).register(commandManager);
-        new RestartCommand(this).register(commandManager);
-        new GameSettingsCommand(this).register(commandManager);
+    private void applyCommands() {
+        new HomeCommand(this).apply(commandManager);
+        new SpawnCommand(this).apply(commandManager);
+        new SetSpawnCommand(this).apply(commandManager);
 
-        //new GameModeCommand(this).register(commandManager);
-        //new SpeedCommand(this).register(commandManager);
-        new GameCommand(this).register(commandManager);
-    }
+        new GameModeCommand(this).apply(commandManager);
+        new SpeedCommand(this).apply(commandManager);
 
-    private void updateAndConnectToDatabase() {
-        var databasePath = this.getDataFolder().toPath().resolve(Path.of("db.sqlite"));
-        this.dataBaseProvider = new DataBaseProvider(databasePath);
-        this.dataSource = this.dataBaseProvider.createDataSource();
+        new GameCommand(this).apply(commandManager);
+        new GameSettingsCommand(this).apply(commandManager);
 
-        this.dataBaseUpdater = new DataBaseUpdater(dataSource);
-        try {
-            dataBaseUpdater.update();
-        } catch (IOException | SQLException e) {
-            this.getLogger().log(Level.SEVERE, "Failed to update database", e);
-            this.getServer().getPluginManager().disablePlugin(this);
-        }
+        new RestartCommand(this).apply(commandManager);
+        new ReloadCommand(this).apply(commandManager);
     }
 
     private void initDataServices() {
-        var locationDao = new SqliteLocationDao(dataSource);
-        locationService = new LocationService(locationDao);
-        locationService.cacheLocations(getServer());
+        var queryConfig = StandardDataBaseProvider.updateAndConnectToDataBase(
+                new ModernDataBaseSetting(),
+                getClassLoader(),
+                getDataPath()
+        );
 
-        var homeDao = new SqliteHomeDao(dataSource);
+        var locationDao = new SqliteLocationDao(queryConfig);
+        locationService = new LocationService(locationDao);
+
+        var homeDao = new SqliteHomeDao(queryConfig);
         homeService = new HomeService(homeDao);
         smpPlayerService = new SmpPlayerService(this);
     }
 
-    private void initCommandManager() {
-        try {
-            this.commandManager = new PaperCommandManager<>(
-                    this,
-                    CommandExecutionCoordinator.simpleCoordinator(),
-                    Function.identity(),
-                    Function.identity());
-        } catch (Exception e) {
-            this.getLogger().log(Level.SEVERE, "Failed to initialize command manager", e);
-            this.getServer().getPluginManager().disablePlugin(this);
-        }
-    }
-
-    public PluginHookService pluginHookService() {
-        return pluginHookService;
-    }
-    public Configuration configuration() {
+    public YasmppConfiguration configuration() {
         return configuration;
     }
 
-    public Messenger messenger() {
+    public PaperMessenger messenger() {
         return messenger;
     }
 
@@ -206,13 +159,5 @@ public class YasmpPlugin extends JavaPlugin {
 
     public ElytraManager elytraManager() {
         return elytraManager;
-    }
-
-    public TeleportQueue teleportQueue() {
-        return teleportQueue;
-    }
-
-    public ConfigurationLoader configurationLoader() {
-        return configurationLoader;
     }
 }

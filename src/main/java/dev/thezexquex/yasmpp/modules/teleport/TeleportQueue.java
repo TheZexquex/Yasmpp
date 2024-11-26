@@ -1,6 +1,6 @@
 package dev.thezexquex.yasmpp.modules.teleport;
 
-import dev.thezexquex.yasmpp.core.timer.Countdown;
+import de.unknowncity.astralib.common.timer.Countdown;
 import org.bukkit.entity.Player;
 
 import java.util.HashMap;

@@ -1,6 +1,8 @@
 package dev.thezexquex.yasmpp.modules.joinleavemessage;
 
+import de.unknowncity.astralib.common.message.lang.Language;
 import dev.thezexquex.yasmpp.YasmpPlugin;
+import dev.thezexquex.yasmpp.data.adapter.LocationAdapter;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -22,6 +24,7 @@ public class PlayerJoinListener implements Listener {
 
         if (player.hasPlayedBefore()) {
             var messageComponent = plugin.messenger().component(
+                    Language.GERMAN,
                     NodePath.path("event", "join"),
                     Placeholder.component("player", player.name())
             );
@@ -31,21 +34,18 @@ public class PlayerJoinListener implements Listener {
         }
 
         var messageComponent = plugin.messenger().component(
+                Language.GERMAN,
                 NodePath.path("event", "first-join"),
                 Placeholder.component("player", player.name())
         );
 
-
         event.joinMessage(messageComponent);
 
-
         var locationService = plugin.locationService();
-        if (!locationService.existsCachedLocation("spawn")) {
-            plugin.messenger().sendMessage(player, NodePath.path("command", "spawn", "no-spawn"));
-            return;
-        }
-
-
-        player.teleport(locationService.getCachedLocation("spawn"));
+        plugin.locationService().getLocation("spawn").whenComplete((location, throwable) -> {
+           location.ifPresentOrElse(worldPosition -> {
+               player.teleport(LocationAdapter.adapt(worldPosition.locationContainer(), player.getServer()));
+           }, () -> plugin.messenger().sendMessage(player, NodePath.path("command", "spawn", "no-spawn")));
+        });
     }
 }

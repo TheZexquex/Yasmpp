@@ -1,22 +1,24 @@
 package dev.thezexquex.yasmpp.commands;
 
-import cloud.commandframework.CommandManager;
-import cloud.commandframework.arguments.standard.DurationArgument;
-import cloud.commandframework.arguments.standard.StringArgument;
-import cloud.commandframework.context.CommandContext;
+import de.unknowncity.astralib.common.timer.Countdown;
+import de.unknowncity.astralib.paper.api.command.PaperCommand;
 import dev.thezexquex.yasmpp.YasmpPlugin;
-import dev.thezexquex.yasmpp.core.command.BaseCommand;
-import dev.thezexquex.yasmpp.core.timer.Countdown;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.title.Title;
 import org.bukkit.command.CommandSender;
+import org.incendo.cloud.CommandManager;
+import org.incendo.cloud.context.CommandContext;
 import org.spongepowered.configurate.NodePath;
 
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
-public class RestartCommand extends BaseCommand {
-    private Countdown countdown;
+import static org.incendo.cloud.parser.standard.DurationParser.durationParser;
+import static org.incendo.cloud.parser.standard.StringParser.quotedStringParser;
+
+public class RestartCommand extends PaperCommand<YasmpPlugin> {
+    private final Countdown countdown;
 
     public RestartCommand(YasmpPlugin plugin) {
         super(plugin);
@@ -24,12 +26,12 @@ public class RestartCommand extends BaseCommand {
     }
 
     @Override
-    public void register(CommandManager<CommandSender> commandManager) {
+    public void apply(CommandManager<CommandSender> commandManager) {
         commandManager.command(commandManager.commandBuilder("restartcountdown")
                 .permission("yasmpp.command.restartcountdown")
                 .literal("start")
-                .argument(DurationArgument.of("time"))
-                .argument(StringArgument.of("reason", StringArgument.StringMode.QUOTED))
+                .required("time", durationParser())
+                .required("reason", quotedStringParser())
                 .handler(this::handleStart)
                 .build()
         );
@@ -49,24 +51,24 @@ public class RestartCommand extends BaseCommand {
     }
 
     private void handleHelp(CommandContext<CommandSender> commandSenderCommandContext) {
-        var sender = commandSenderCommandContext.getSender();
+        var sender = commandSenderCommandContext.sender();
         plugin.messenger().sendMessage(sender, NodePath.path("command", "restartcountdown", "help"));
     }
 
     private void handleAbort(CommandContext<CommandSender> commandSenderCommandContext) {
-        var sender = commandSenderCommandContext.getSender();
+        var sender = commandSenderCommandContext.sender();
         if (!countdown.isRunning()) {
-            plugin.messenger().broadcastToServer(NodePath.path("command", "restart", "abort", "not-running"));
+            plugin.messenger().broadcastMessage(NodePath.path("command", "restart", "abort", "not-running"));
             return;
         }
 
         countdown.abort();
-        plugin.messenger().broadcastToServer(NodePath.path("event", "restart", "abort"));
+        plugin.messenger().broadcastMessage(NodePath.path("event", "restart", "abort"));
         plugin.messenger().sendMessage(sender, NodePath.path("command", "restartcountdown", "abort", "success"));
     }
 
     private void handleStart(CommandContext<CommandSender> commandSenderCommandContext) {
-        var sender = commandSenderCommandContext.getSender();
+        var sender = commandSenderCommandContext.sender();
         if (countdown.isRunning()) {
             plugin.messenger().sendMessage(
                     sender,
@@ -80,7 +82,7 @@ public class RestartCommand extends BaseCommand {
 
         plugin.messenger().sendMessage(sender, NodePath.path("command", "restartcountdown", "start", "success"));
 
-        var countDownSettings = plugin.configuration().countDownSettings().restartCountDownSettings();
+        var countDownSettings = plugin.configuration().countDownSettings().restartCountDown();
         countdown.start(duration.toSeconds(), TimeUnit.SECONDS, (timeSpan) -> {
             var currentCDSettingOpt = countDownSettings.stream().filter(countDownLine -> countDownLine.second() == timeSpan).findFirst();
 
@@ -95,7 +97,7 @@ public class RestartCommand extends BaseCommand {
             var seconds = dur.toSecondsPart() == 0 ? "" : dur.toSecondsPart() + " s";
 
             if (currentCountDownSetting.useChat()) {
-                plugin.messenger().broadcastToServer(
+                plugin.messenger().broadcastMessage(
                         NodePath.path("event", "restart", "in", "chat"),
                         TagResolver.resolver("hours", Tag.preProcessParsed(hours)),
                         TagResolver.resolver("minutes", Tag.preProcessParsed(minutes)),
@@ -105,7 +107,7 @@ public class RestartCommand extends BaseCommand {
             }
 
             if (currentCountDownSetting.useTitle()) {
-                plugin.messenger().broadcastTitleToServer(
+                plugin.messenger().broadcastTitle(
                         NodePath.path("event", "restart", "in", "title"),
                         NodePath.path("event", "restart", "in", "subtitle"),
                         TagResolver.resolver("hours", Tag.preProcessParsed(hours)),
@@ -116,17 +118,18 @@ public class RestartCommand extends BaseCommand {
             }
 
             if (currentCountDownSetting.useSound()) {
-                plugin.getServer().getOnlinePlayers().forEach(player -> player.playSound(currentCountDownSetting.soundName()));
+                plugin.getServer().getOnlinePlayers().forEach(player -> player.playSound(currentCountDownSetting.sound()));
             }
         }, () -> plugin.getServer().getScheduler().runTask(plugin, () -> {
-            plugin.messenger().broadcastToServer(
+            plugin.messenger().broadcastMessage(
                     NodePath.path("event", "restart", "now", "chat"),
                     TagResolver.resolver("reason", Tag.preProcessParsed(reason))
             );
 
-            plugin.messenger().broadcastTitleToServer(
+            plugin.messenger().broadcastTitle(
                     NodePath.path("event", "restart", "now", "title"),
                     NodePath.path("event", "restart", "now", "subtitle"),
+                    Title.Times.times(Duration.ZERO, Duration.ofSeconds(3), Duration.ZERO),
                     TagResolver.resolver("reason", Tag.preProcessParsed(reason))
             );
             plugin.getServer().getScheduler().runTaskLater(plugin, () ->

@@ -2,13 +2,13 @@ import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 
 plugins {
     id("java")
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("com.gradleup.shadow") version "8.3.3"
     id("net.minecrell.plugin-yml.bukkit") version "0.6.0"
-    id("io.papermc.paperweight.userdev") version "1.5.10"
+    id("xyz.jpenilla.run-paper") version "2.3.0"
 }
 
 group = "dev.thezexquex"
-version = "1.0-SNAPSHOT"
+version = "0.2.0"
 
 val mainClass = "${group}.${rootProject.name.lowercase()}.YasmpPlugin"
 val shadeBasePath = "${group}.${rootProject.name.lowercase()}.libs."
@@ -17,18 +17,17 @@ repositories {
     mavenCentral()
     maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
+    maven("https://repo.xenondevs.xyz/releases")
+    maven("https://repo.unknowncity.de/snapshots")
 }
 
 dependencies {
-    implementation("cloud.commandframework", "cloud-paper", "1.8.4")
-    implementation("de.chojo.sadu", "sadu", "1.4.0")
-    implementation("org.spongepowered", "configurate-yaml", "4.1.2")
-    implementation("org.spongepowered", "configurate-hocon", "4.1.2")
+    implementation("de.chojo.sadu", "sadu", "2.3.0")
+    implementation("xyz.xenondevs.invui", "invui", "1.41")
 
-    compileOnly("io.papermc.paper", "paper-api", "1.20.4-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper", "paper-api", "1.21.3-R0.1-SNAPSHOT")
     compileOnly("me.clip", "placeholderapi", "2.11.5")
-
-    paperweight.paperDevBundle("1.20.4-R0.1-SNAPSHOT")
+    compileOnly("de.unknowncity.astralib", "astralib-paper-api", "0.5.0-SNAPSHOT")
 
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
@@ -37,7 +36,7 @@ dependencies {
 bukkit {
 
     name = "Yasmpp"
-    version = "0.1.0"
+    version = rootProject.version.toString()
     description = "Yet another smp plugin"
     author = "TheZexquex"
 
@@ -45,25 +44,26 @@ bukkit {
 
     foliaSupported = false
 
-    apiVersion = "1.20"
+    apiVersion = "1.21"
 
     load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
 
     softDepend = listOf("PlaceholderAPI", "My_Worlds")
+    depend = listOf("AstraLib")
 
     defaultPermission = BukkitPluginDescription.Permission.Default.OP
 }
 
 
 java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(20))
+    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
 }
 
 tasks {
     shadowJar {
-        relocate("org.spongepowered", shadeBasePath + "configurate")
-        relocate("de.chojo.sadu", shadeBasePath + "sadu")
-        relocate("cloud.commandframework", shadeBasePath + "cloud")
+        fun relocateDependency(from : String) = relocate(from, "$shadeBasePath$from")
+
+        relocateDependency("xzy.xenondevs")
     }
 
     compileJava {
@@ -76,8 +76,15 @@ tasks {
         archiveVersion.set(rootProject.version.toString())
     }
 
-    reobfJar {
-        dependsOn(shadowJar)
+    runServer {
+        minecraftVersion("1.21.3")
+
+        downloadPlugins {
+            // ADD plugins needed for testing
+            //url("https://github.com/EssentialsX/Essentials/releases/download/2.20.1/EssentialsX-2.20.1.jar")
+            //url("https://ci.unknowncity.de/job/AstraLib/37/artifact/astralib-paper-plugin/build/libs/AstraLib-Paper-0.5.0-SNAPSHOT-%2337.jar")
+            jvmArgs("-Dcom.mojang.eula.agree=true")
+        }
     }
 
     register<Copy>("copyToServer") {
@@ -86,7 +93,7 @@ tasks {
             println("No SERVER_DIR env variable set")
             return@register
         }
-        from(reobfJar )
+        from(shadowJar)
         destinationDir = File(path.toString())
     }
 }

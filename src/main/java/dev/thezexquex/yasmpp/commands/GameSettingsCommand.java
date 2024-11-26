@@ -1,103 +1,94 @@
 package dev.thezexquex.yasmpp.commands;
 
-import cloud.commandframework.CommandManager;
-import cloud.commandframework.arguments.standard.BooleanArgument;
-import cloud.commandframework.arguments.standard.IntegerArgument;
-import cloud.commandframework.context.CommandContext;
+import de.unknowncity.astralib.paper.api.command.PaperCommand;
 import dev.thezexquex.yasmpp.YasmpPlugin;
-import dev.thezexquex.yasmpp.core.command.BaseCommand;
 import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.command.CommandSender;
+import org.incendo.cloud.CommandManager;
+import org.incendo.cloud.context.CommandContext;
 import org.spongepowered.configurate.NodePath;
 
-public class GameSettingsCommand extends BaseCommand {
+import static org.incendo.cloud.parser.standard.BooleanParser.booleanParser;
+import static org.incendo.cloud.parser.standard.EnumParser.enumParser;
+import static org.incendo.cloud.parser.standard.IntegerParser.integerParser;
+
+public class GameSettingsCommand extends PaperCommand<YasmpPlugin> {
     public GameSettingsCommand(YasmpPlugin plugin) {
         super(plugin);
     }
 
+    private enum DamageType {
+        TNT, CREEPER
+    }
+
     @Override
-    public void register(CommandManager<CommandSender> commandManager) {
-        commandManager.command(
-                commandManager.commandBuilder("gamesettings")
-                        .literal("lockend")
-                        .argument(BooleanArgument.of("lockEnd"))
-                        .permission("yasmpp.command.gamesettings")
-                        .handler(this::handleLockEnd)
+    public void apply(CommandManager<CommandSender> commandManager) {
+        commandManager.command(commandManager.commandBuilder("gamesettings")
+                .literal("lockend")
+                .required("lock-end", booleanParser())
+                .permission("yasmpp.command.gamesettings")
+                .handler(this::handleLockEnd)
         );
 
-        commandManager.command(
-                commandManager.commandBuilder("gamesettings")
-                        .literal("blockdamage")
-                        .literal("creeper")
-                        .argument(BooleanArgument.of("doDamage"))
-                        .permission("yasmpp.command.gamesettings")
-                        .handler(this::handleCreeperDamage)
+
+        commandManager.command(commandManager.commandBuilder("gamesettings")
+                .literal("blockdamage")
+                .required("type", enumParser(DamageType.class))
+                .required("do-damage", booleanParser())
+                .permission("yasmpp.command.gamesettings")
+                .handler(this::handleDamage)
         );
 
-        commandManager.command(
-                commandManager.commandBuilder("gamesettings")
-                        .literal("blockdamage")
-                        .literal("tnt")
-                        .argument(BooleanArgument.of("doDamage"))
-                        .permission("yasmpp.command.gamesettings")
-                        .handler(this::handleTntDamage)
+        commandManager.command(commandManager.commandBuilder("gamesettings")
+                .literal("elytra")
+                .literal("maxBoosts")
+                .required("max-boosts", integerParser())
+                .permission("yasmpp.command.gamesettings")
+                .handler(this::handleElytraMaxBoosts)
         );
 
-        commandManager.command(
-                commandManager.commandBuilder("gamesettings")
-                        .literal("elytra")
-                        .literal("maxBoosts")
-                        .argument(IntegerArgument.of("maxBoosts"))
-                        .permission("yasmpp.command.gamesettings")
-                        .handler(this::handleElytraMaxBoosts)
+        commandManager.command(commandManager.commandBuilder("gamesettings")
+                .literal("elytra")
+                .literal("radius")
+                .required("radius", integerParser())
+                .permission("yasmpp.command.gamesettings")
+                .handler(this::handleElytraRadius)
         );
 
-        commandManager.command(
-                commandManager.commandBuilder("gamesettings")
-                        .literal("elytra")
-                        .literal("radius")
-                        .argument(IntegerArgument.of("radius"))
-                        .permission("yasmpp.command.gamesettings")
-                        .handler(this::handleElytraRadius)
-        );
-        
 
-        commandManager.command(
-                commandManager.commandBuilder("gamesettings")
-                        .literal("teleport")
-                        .literal("cancelOnMove")
-                        .argument(BooleanArgument.of("cancel"))
-                        .permission("yasmpp.command.gamesettings")
-                        .handler(this::handleTeleportCancel)
+        commandManager.command(commandManager.commandBuilder("gamesettings")
+                .literal("teleport")
+                .literal("cancelOnMove")
+                .required("cancel", booleanParser())
+                .permission("yasmpp.command.gamesettings")
+                .handler(this::handleTeleportCancel)
         );
 
-        commandManager.command(
-                commandManager.commandBuilder("gamesettings")
-                        .literal("teleport")
-                        .literal("cooldown")
-                        .argument(IntegerArgument.of("cooldown"))
-                        .permission("yasmpp.command.gamesettings")
-                        .handler(this::handleTeleportCooldown)
+        commandManager.command(commandManager.commandBuilder("gamesettings")
+                .literal("teleport")
+                .literal("cooldown")
+                .required("cooldown", integerParser())
+                .permission("yasmpp.command.gamesettings")
+                .handler(this::handleTeleportCooldown)
         );
 
-        commandManager.command(
-                commandManager.commandBuilder("gamesettings")
-                        .literal("teleport")
-                        .literal("permissionBypassesCooldown")
-                        .argument(IntegerArgument.of("bypasses"))
-                        .permission("yasmpp.command.gamesettings")
-                        .handler(this::handleTeleportPermissionBypass)
+        commandManager.command(commandManager.commandBuilder("gamesettings")
+                .literal("teleport")
+                .literal("permissionBypassesCooldown")
+                .required("bypasses", booleanParser())
+                .permission("yasmpp.command.gamesettings")
+                .handler(this::handleTeleportPermissionBypass)
         );
     }
 
     private void handleTeleportCooldown(CommandContext<CommandSender> commandSenderCommandContext) {
-        var sender = commandSenderCommandContext.getSender();
+        var sender = commandSenderCommandContext.sender();
 
         var value = (int) commandSenderCommandContext.get("cooldown");
 
         plugin.configuration().generalSettings().generalSpawnElytraSettings().setMaxBoosts(value);
-        plugin.configurationLoader().saveConfiguration();
+        plugin.configuration().save();
 
         plugin.messenger().sendMessage(
                 sender,
@@ -107,7 +98,7 @@ public class GameSettingsCommand extends BaseCommand {
     }
 
     private void handleTeleportPermissionBypass(CommandContext<CommandSender> commandSenderCommandContext) {
-        var sender = commandSenderCommandContext.getSender();
+        var sender = commandSenderCommandContext.sender();
 
         var value = (boolean) commandSenderCommandContext.get("bypasses");
 
@@ -120,7 +111,8 @@ public class GameSettingsCommand extends BaseCommand {
         }
 
         plugin.configuration().teleportSettings().setPermissionBypassesCoolDown(value);
-        plugin.configurationLoader().saveConfiguration();
+        plugin.configuration().save();
+
 
         plugin.messenger().sendMessage(
                 sender,
@@ -129,7 +121,7 @@ public class GameSettingsCommand extends BaseCommand {
     }
 
     private void handleTeleportCancel(CommandContext<CommandSender> commandSenderCommandContext) {
-        var sender = commandSenderCommandContext.getSender();
+        var sender = commandSenderCommandContext.sender();
 
         var value = (boolean) commandSenderCommandContext.get("cancel");
 
@@ -142,7 +134,7 @@ public class GameSettingsCommand extends BaseCommand {
         }
 
         plugin.configuration().teleportSettings().setCancelOnMove(value);
-        plugin.configurationLoader().saveConfiguration();
+        plugin.configuration().save();
 
         plugin.messenger().sendMessage(
                 sender,
@@ -151,12 +143,12 @@ public class GameSettingsCommand extends BaseCommand {
     }
 
     private void handleElytraMaxBoosts(CommandContext<CommandSender> commandSenderCommandContext) {
-        var sender = commandSenderCommandContext.getSender();
+        var sender = commandSenderCommandContext.sender();
 
-        var value = (int) commandSenderCommandContext.get("maxBoosts");
+        var value = (int) commandSenderCommandContext.get("max-boosts");
 
         plugin.configuration().generalSettings().generalSpawnElytraSettings().setMaxBoosts(value);
-        plugin.configurationLoader().saveConfiguration();
+        plugin.configuration().save();
 
         plugin.messenger().sendMessage(
                 sender,
@@ -166,12 +158,12 @@ public class GameSettingsCommand extends BaseCommand {
     }
 
     private void handleElytraRadius(CommandContext<CommandSender> commandSenderCommandContext) {
-        var sender = commandSenderCommandContext.getSender();
+        var sender = commandSenderCommandContext.sender();
 
         var value = (int) commandSenderCommandContext.get("radius");
 
         plugin.configuration().generalSettings().generalSpawnElytraSettings().setRadius(value);
-        plugin.configurationLoader().saveConfiguration();
+        plugin.configuration().save();
 
         plugin.messenger().sendMessage(
                 sender,
@@ -181,9 +173,9 @@ public class GameSettingsCommand extends BaseCommand {
     }
 
     private void handleLockEnd(CommandContext<CommandSender> commandSenderCommandContext) {
-        var sender = commandSenderCommandContext.getSender();
+        var sender = commandSenderCommandContext.sender();
 
-        var value = (boolean) commandSenderCommandContext.get("lockEnd");
+        var value = (boolean) commandSenderCommandContext.get("lock-end");
 
         if (plugin.configuration().generalSettings().generalEndSettings().lockEnd() == value) {
             plugin.messenger().sendMessage(
@@ -194,7 +186,7 @@ public class GameSettingsCommand extends BaseCommand {
         }
 
         plugin.configuration().generalSettings().generalEndSettings().setLockEnd(value);
-        plugin.configurationLoader().saveConfiguration();
+        plugin.configuration().save();
 
         plugin.messenger().sendMessage(
                 sender,
@@ -202,51 +194,48 @@ public class GameSettingsCommand extends BaseCommand {
         );
     }
 
-    private void handleCreeperDamage(CommandContext<CommandSender> commandSenderCommandContext) {
-        var sender = commandSenderCommandContext.getSender();
+    private void handleDamage(CommandContext<CommandSender> commandSenderCommandContext) {
+        var sender = commandSenderCommandContext.sender();
 
-        var value = (boolean) commandSenderCommandContext.get("doDamage");
+        var value = (boolean) commandSenderCommandContext.get("do-damage");
+        var type = (DamageType) commandSenderCommandContext.get("type");
 
-        if (plugin.configuration().generalSettings().generalExplosionDamageSettings().doCreeperDamage() == value) {
+        if (type == DamageType.TNT) {
+            if (plugin.configuration().generalSettings().generalExplosionDamageSettings().doTntDamage() == value) {
+                plugin.messenger().sendMessage(
+                        sender,
+                        NodePath.path("command", "settings", "blockdamage", "already", value ? "enabled" : "disabled"),
+                        TagResolver.resolver("type", Tag.preProcessParsed("Tnt"))
+                );
+                return;
+            }
+
+            plugin.configuration().generalSettings().generalExplosionDamageSettings().setDoTntDamage(value);
+            plugin.configuration().save();
+
             plugin.messenger().sendMessage(
                     sender,
-                    NodePath.path("command", "settings", "blockdamage", "already", value ? "enabled" : "disabled"),
-                    TagResolver.resolver("type", Tag.preProcessParsed("Creeper"))
-            );
-            return;
-        }
-
-        plugin.configuration().generalSettings().generalExplosionDamageSettings().setDoCreeperDamage(value);
-        plugin.configurationLoader().saveConfiguration();
-
-        plugin.messenger().sendMessage(
-                sender,
-                NodePath.path("command", "settings", "blockdamage", "success", value ? "enabled" : "disabled"),
-                TagResolver.resolver("type", Tag.preProcessParsed("Creeper"))
-        );
-    }
-
-    private void handleTntDamage(CommandContext<CommandSender> commandSenderCommandContext) {
-        var sender = commandSenderCommandContext.getSender();
-
-        var value = (boolean) commandSenderCommandContext.get("doDamage");
-
-        if (plugin.configuration().generalSettings().generalExplosionDamageSettings().doTntDamage() == value) {
-            plugin.messenger().sendMessage(
-                    sender,
-                    NodePath.path("command", "settings", "blockdamage", "already", value ? "enabled" : "disabled"),
+                    NodePath.path("command", "settings", "blockdamage", "success", value ? "enabled" : "disabled"),
                     TagResolver.resolver("type", Tag.preProcessParsed("Tnt"))
             );
-            return;
+        } else if (type == DamageType.CREEPER) {
+            if (plugin.configuration().generalSettings().generalExplosionDamageSettings().doCreeperDamage() == value) {
+                plugin.messenger().sendMessage(
+                        sender,
+                        NodePath.path("command", "settings", "blockdamage", "already", value ? "enabled" : "disabled"),
+                        TagResolver.resolver("type", Tag.preProcessParsed("Creeper"))
+                );
+                return;
+            }
+
+            plugin.configuration().generalSettings().generalExplosionDamageSettings().setDoCreeperDamage(value);
+            plugin.configuration().save();
+
+            plugin.messenger().sendMessage(
+                    sender,
+                    NodePath.path("command", "settings", "blockdamage", "success", value ? "enabled" : "disabled"),
+                    TagResolver.resolver("type", Tag.preProcessParsed("Creeper"))
+            );
         }
-
-        plugin.configuration().generalSettings().generalExplosionDamageSettings().setDoTntDamage(value);
-        plugin.configurationLoader().saveConfiguration();
-
-        plugin.messenger().sendMessage(
-                sender,
-                NodePath.path("command", "settings", "blockdamage", "success", value ? "enabled" : "disabled"),
-                TagResolver.resolver("type", Tag.preProcessParsed("Tnt"))
-        );
     }
 }

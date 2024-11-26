@@ -1,5 +1,6 @@
 package dev.thezexquex.yasmpp.modules.joinleavemessage;
 
+import de.unknowncity.astralib.common.message.lang.Language;
 import dev.thezexquex.yasmpp.YasmpPlugin;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.event.EventHandler;
@@ -20,6 +21,7 @@ public class PlayerQuitListener implements Listener {
         var player = event.getPlayer();
 
         var messageComponent = plugin.messenger().component(
+                Language.GERMAN,
                 NodePath.path("event", "quit"),
                 Placeholder.component("player", player.name())
         );

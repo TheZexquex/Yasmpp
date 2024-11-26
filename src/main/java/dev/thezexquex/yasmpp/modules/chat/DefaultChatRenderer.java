@@ -1,5 +1,6 @@
 package dev.thezexquex.yasmpp.modules.chat;
 
+import de.unknowncity.astralib.common.message.lang.Language;
 import dev.thezexquex.yasmpp.YasmpPlugin;
 import io.papermc.paper.chat.ChatRenderer;
 import net.kyori.adventure.audience.Audience;
@@ -22,6 +23,6 @@ public class DefaultChatRenderer implements ChatRenderer {
             @NotNull Component sourceDisplayName,
             @NotNull Component message,
             @NotNull Audience viewer) {
-        return ChatUtil.getFormattedChatMessage(source, message, plugin.messenger().getString(NodePath.path("chat-format")));
+        return ChatUtil.getFormattedChatMessage(source, message, plugin.messenger().getString(Language.GERMAN, NodePath.path("chat-format")));
     }
 }

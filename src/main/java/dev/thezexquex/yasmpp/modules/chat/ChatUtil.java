@@ -1,5 +1,6 @@
 package dev.thezexquex.yasmpp.modules.chat;
 
+import de.unknowncity.astralib.paper.api.message.color.LegacyChatColor;
 import me.clip.placeholderapi.PlaceholderAPI;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.MiniMessage;

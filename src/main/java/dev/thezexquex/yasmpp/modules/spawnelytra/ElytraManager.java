@@ -16,7 +16,7 @@ public class ElytraManager {
     private final HashMap<UUID, Integer> flyingPlayers;
     private final YasmpPlugin plugin;
     private final int maxBoosts;
-    private ItemStack firework;
+    private final ItemStack firework;
 
     public ElytraManager(YasmpPlugin plugin) {
         this.plugin = plugin;
