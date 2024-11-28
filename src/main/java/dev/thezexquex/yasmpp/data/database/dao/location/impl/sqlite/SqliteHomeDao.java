@@ -52,7 +52,7 @@ public class SqliteHomeDao extends QueryConfigHolder implements HomeDao {
 
         @Language("sql")
         var query = """
-                INSERT OR REPLACE INTO home(player_id, id, world, x, y, z, yaw, pitch) VALUES(player_id, id, world, x, y, z, yaw, pitch)
+                INSERT OR REPLACE INTO home(player_id, id, world, x, y, z, yaw, pitch) VALUES(:player_id, :id, :world, :x, :y, :z, :yaw, :pitch)
                 """;
 
         var location = home.locationContainer();
