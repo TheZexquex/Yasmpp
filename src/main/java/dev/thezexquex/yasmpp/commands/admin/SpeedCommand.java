@@ -2,9 +2,7 @@ package dev.thezexquex.yasmpp.commands.admin;
 
 import de.unknowncity.astralib.paper.api.command.PaperCommand;
 import dev.thezexquex.yasmpp.YasmpPlugin;
-import net.kyori.adventure.text.minimessage.tag.Tag;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.CommandManager;
@@ -83,7 +81,7 @@ public class SpeedCommand extends PaperCommand<YasmpPlugin> {
     }
 
     public void setPlayerSpeed(Player target, int speed) {
-        var realSpeed = Float.parseFloat(String.valueOf(speed));
+        var realSpeed = speed * 0.1F;
         if (target.isFlying()) {
             target.setFlySpeed(realSpeed);
             return;
