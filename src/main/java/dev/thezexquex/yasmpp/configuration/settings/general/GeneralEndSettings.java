@@ -1,6 +1,6 @@
 package dev.thezexquex.yasmpp.configuration.settings.general;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import de.unknowncity.astralib.libs.com.fasterxml.jackson.annotation.JsonProperty;
 
 public final class GeneralEndSettings {
     @JsonProperty

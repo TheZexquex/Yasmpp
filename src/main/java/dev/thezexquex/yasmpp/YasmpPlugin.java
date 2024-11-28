@@ -124,7 +124,7 @@ public class YasmpPlugin extends PaperAstraPlugin {
 
     private void initDataServices() {
         var queryConfig = StandardDataBaseProvider.updateAndConnectToDataBase(
-                new ModernDataBaseSetting(),
+                configuration.modernDataBaseSetting(),
                 getClassLoader(),
                 getDataPath()
         );

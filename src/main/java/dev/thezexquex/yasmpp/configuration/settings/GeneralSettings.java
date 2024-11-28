@@ -1,6 +1,6 @@
 package dev.thezexquex.yasmpp.configuration.settings;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import de.unknowncity.astralib.libs.com.fasterxml.jackson.annotation.JsonProperty;
 import dev.thezexquex.yasmpp.configuration.settings.general.GeneralBorderSettings;
 import dev.thezexquex.yasmpp.configuration.settings.general.GeneralEndSettings;
 import dev.thezexquex.yasmpp.configuration.settings.general.GeneralExplosionDamageSettings;

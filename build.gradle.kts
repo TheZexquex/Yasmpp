@@ -22,7 +22,7 @@ repositories {
 }
 
 dependencies {
-    implementation("de.chojo.sadu", "sadu", "2.3.0")
+    compileOnly("de.chojo.sadu", "sadu", "2.3.0")
     implementation("xyz.xenondevs.invui", "invui", "1.41")
 
     compileOnly("io.papermc.paper", "paper-api", "1.21.3-R0.1-SNAPSHOT")
@@ -63,13 +63,14 @@ tasks {
     shadowJar {
         fun relocateDependency(from : String) = relocate(from, "$shadeBasePath$from")
 
-        relocateDependency("xzy.xenondevs")
+        relocateDependency("xyz.xenondevs")
+        relocateDependency("org.jetbrains")
+        relocateDependency("org.intellij")
     }
 
     compileJava {
         options.encoding = "UTF-8"
     }
-
 
     jar {
         archiveBaseName.set(rootProject.name)
@@ -83,8 +84,9 @@ tasks {
             // ADD plugins needed for testing
             //url("https://github.com/EssentialsX/Essentials/releases/download/2.20.1/EssentialsX-2.20.1.jar")
             //url("https://ci.unknowncity.de/job/AstraLib/37/artifact/astralib-paper-plugin/build/libs/AstraLib-Paper-0.5.0-SNAPSHOT-%2337.jar")
-            jvmArgs("-Dcom.mojang.eula.agree=true")
         }
+
+        jvmArgs("-Dcom.mojang.eula.agree=true")
     }
 
     register<Copy>("copyToServer") {

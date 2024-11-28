@@ -1,9 +1,9 @@
 package dev.thezexquex.yasmpp.configuration;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import de.unknowncity.astralib.common.configuration.YamlAstraConfiguration;
 import de.unknowncity.astralib.common.configuration.annotation.Config;
 import de.unknowncity.astralib.common.configuration.setting.defaults.ModernDataBaseSetting;
+import de.unknowncity.astralib.libs.com.fasterxml.jackson.annotation.JsonProperty;
 import dev.thezexquex.yasmpp.configuration.settings.ChatSettings;
 import dev.thezexquex.yasmpp.configuration.settings.CountDownSettings;
 import dev.thezexquex.yasmpp.configuration.settings.GeneralSettings;
@@ -13,15 +13,19 @@ import dev.thezexquex.yasmpp.configuration.settings.TeleportSettings;
 public class YasmppConfiguration extends YamlAstraConfiguration {
 
     @JsonProperty
-    ModernDataBaseSetting modernDataBaseSetting = new ModernDataBaseSetting();
+    private ModernDataBaseSetting modernDataBaseSetting = new ModernDataBaseSetting();
 
-    private final GeneralSettings generalSettings = new GeneralSettings();
+    @JsonProperty
+    private GeneralSettings generalSettings = new GeneralSettings();
 
-    private final TeleportSettings teleportSettings = new TeleportSettings();
+    @JsonProperty
+    private TeleportSettings teleportSettings = new TeleportSettings();
 
+    @JsonProperty
     private final ChatSettings chatSettings = new ChatSettings();
 
-    private final CountDownSettings countDownSettings = new CountDownSettings();
+    @JsonProperty
+    private CountDownSettings countDownSettings = new CountDownSettings();
 
     public YasmppConfiguration() {
 
