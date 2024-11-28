@@ -195,8 +195,8 @@ public class HomeCommand extends PaperCommand<YasmpPlugin> {
                     if (currCountDownEntry.useTitle()) {
                         plugin.messenger().sendTitle(
                                 player,
-                                NodePath.path("event", "teleport", "countdown"),
-                                null,
+                                NodePath.path("event", "teleport", "countdown", "title"),
+                                NodePath.path("event", "teleport", "countdown", "subtitle"),
                                 Title.Times.times(Duration.ZERO, Duration.ofSeconds(1), Duration.ZERO),
                                 Placeholder.parsed("time", String.valueOf(timeSpan))
                         );

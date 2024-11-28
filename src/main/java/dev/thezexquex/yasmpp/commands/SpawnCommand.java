@@ -49,7 +49,7 @@ public class SpawnCommand extends PaperCommand<YasmpPlugin> {
 
             locationService.getLocation("spawn").whenComplete((locationOpt, throwable) -> {
                 locationOpt.ifPresentOrElse(worldPosition -> {
-                    startSpawnTeleport(smpPlayer, worldPosition);
+                    plugin.getServer().getScheduler().runTask(plugin, () -> startSpawnTeleport(smpPlayer, worldPosition));
                 }, () -> {
                     plugin.messenger().sendMessage(
                             player,
@@ -92,8 +92,8 @@ public class SpawnCommand extends PaperCommand<YasmpPlugin> {
             if (currentCountDownSetting.useTitle()) {
                 plugin.messenger().sendTitle(
                         player.toBukkitPlayer(),
-                        NodePath.path("event", "teleport", "countdown"),
-                        null,
+                        NodePath.path("event", "teleport", "countdown", "title"),
+                        NodePath.path("event", "teleport", "countdown", "subtitle"),
                         Title.Times.times(Duration.ZERO, Duration.ofSeconds(1), Duration.ZERO),
                         Placeholder.parsed("time", String.valueOf(timeSpan))
                 );
@@ -103,8 +103,8 @@ public class SpawnCommand extends PaperCommand<YasmpPlugin> {
                 player.toBukkitPlayer().playSound(currentCountDownSetting.sound());
             }
         }, () -> plugin.getServer().getScheduler().runTask(plugin, () -> {
-            player.toBukkitPlayer().teleportAsync(LocationAdapter.adapt(worldPosition.locationContainer(), plugin.getServer()));
             player.cancelCurrentTeleport();
+            player.toBukkitPlayer().teleport(LocationAdapter.adapt(worldPosition.locationContainer(), plugin.getServer()));
         }));
     }
 }
