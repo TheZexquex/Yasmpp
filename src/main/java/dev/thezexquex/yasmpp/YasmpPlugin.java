@@ -1,6 +1,5 @@
 package dev.thezexquex.yasmpp;
 
-import de.unknowncity.astralib.common.configuration.setting.defaults.ModernDataBaseSetting;
 import de.unknowncity.astralib.common.database.StandardDataBaseProvider;
 import de.unknowncity.astralib.common.message.lang.Language;
 import de.unknowncity.astralib.common.message.lang.Localization;
@@ -43,15 +42,13 @@ public class YasmpPlugin extends PaperAstraPlugin {
         reloadPlugin();
         applyListeners();
         //new StackSizeChanger(this).changeAllItemStackSizes();
+        applyCommands();
     }
 
     public void reloadPlugin() {
-
         loadConfigAndMessages();
         initDataServices();
         //updateAndConnectToDatabase();
-
-        applyCommands();
 
         elytraManager = new ElytraManager(this);
     }
