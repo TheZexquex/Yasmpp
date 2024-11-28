@@ -81,6 +81,7 @@ public class GameModeCommand extends PaperCommand<YasmpPlugin> {
         }
 
         var gameMode = gameModes.get(gameModeInput);
+        target.setGameMode(gameMode);
 
         if (sender instanceof Player senderPlayer && !senderPlayer.equals(target)) {
             plugin.messenger().sendMessage(
