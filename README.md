@@ -3,7 +3,7 @@
 ### Dependencies
 - Java 21
 - Paper 1.23.1 
-- [AstraLib](https://github.com/UnknownCity/AstraLib)
+- [AstraLib](https://github.com/UnknownCityMC/AstraLib)
 - PlaceholderAPI (Optional)
 
 ### How to build from source
