@@ -3,13 +3,12 @@ package dev.thezexquex.yasmpp.commands;
 import de.unknowncity.astralib.common.timer.Countdown;
 import de.unknowncity.astralib.paper.api.command.PaperCommand;
 import dev.thezexquex.yasmpp.YasmpPlugin;
+import dev.thezexquex.yasmpp.commands.util.CountDownMessenger;
+import dev.thezexquex.yasmpp.configuration.settings.CountDownEntry;
 import dev.thezexquex.yasmpp.data.adapter.LocationAdapter;
-import dev.thezexquex.yasmpp.data.entity.WorldPosition;
 import dev.thezexquex.yasmpp.data.entity.SmpPlayer;
-import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
-import net.kyori.adventure.title.Title;
+import dev.thezexquex.yasmpp.data.entity.WorldPosition;
+import dev.thezexquex.yasmpp.util.timer.aborttrigger.MovementAbortTrigger;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.CommandManager;
@@ -17,7 +16,7 @@ import org.incendo.cloud.context.CommandContext;
 import org.spongepowered.configurate.NodePath;
 
 import java.time.Duration;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
 
 public class SpawnCommand extends PaperCommand<YasmpPlugin> {
     public SpawnCommand(YasmpPlugin plugin) {
@@ -37,7 +36,7 @@ public class SpawnCommand extends PaperCommand<YasmpPlugin> {
         var player = commandSenderCommandContext.sender();
 
         plugin.smpPlayerService().getSmpPlayer(player).ifPresent(smpPlayer -> {
-            if (smpPlayer.isInTeleportWarmup()) {
+            if (smpPlayer.isCurrentlyInTeleport()) {
                 plugin.messenger().sendMessage(
                         player,
                         NodePath.path("event", "teleport", "already-teleporting")
@@ -62,49 +61,53 @@ public class SpawnCommand extends PaperCommand<YasmpPlugin> {
 
     private void startSpawnTeleport(SmpPlayer player, WorldPosition worldPosition) {
         var countDownInSec = plugin.configuration().teleportSettings().teleportCoolDownInSeconds();
+        var countDownSettings = plugin.configuration().countDownSettings().teleportCountDown();
 
         if (plugin.configuration().teleportSettings().permissionBypassesCoolDown()
                 && player.toBukkitPlayer().hasPermission("yasmpp.teleport.cooldown.bypass")) {
             countDownInSec = 0;
         }
+        player.currentlyInTeleport(true);
+        var countDown = Countdown.builder()
+                .withAbortTriggers(new MovementAbortTrigger(player.toBukkitPlayer(), () -> {
+                    player.currentlyInTeleport(false);
+                    plugin.messenger().sendMessage(player.toBukkitPlayer(), NodePath.path("event", "teleport", "cancel"));
+                }))
+                .withRunOnStep(duration -> handleCountDownStep(duration, countDownSettings, player.toBukkitPlayer()))
+                .withRunOnFinish(() -> handleCountDownFinish(worldPosition, player))
+                .build();
 
-        var countDown = new Countdown();
-        var countDownSettings = plugin.configuration().countDownSettings().teleportCountDown();
+        countDown.start(countDownInSec);
+    }
 
-        countDown.start(countDownInSec, TimeUnit.SECONDS, (timeSpan) -> {
-            player.setCurrentTeleportCountDown(countDown);
+    private void handleCountDownStep(Duration duration, List<CountDownEntry> countDownEntries, Player player) {
+        var currCountDownEntry = countDownEntries.stream()
+                .filter(countDownLine -> countDownLine.second() == duration.toSeconds())
+                .findFirst();
 
-            var currentCDSettingOpt = countDownSettings.stream().filter(countDownLine -> countDownLine.second() == timeSpan).findFirst();
+        if (currCountDownEntry.isEmpty()) {
+            return;
+        }
 
-            if (currentCDSettingOpt.isEmpty()) {
-                return;
-            }
-            var currentCountDownSetting = currentCDSettingOpt.get();
+        CountDownMessenger.sendCountDown(
+                player,
+                plugin.messenger(),
+                currCountDownEntry.get(),
+                NodePath.path("event", "teleport", "chat"),
+                NodePath.path("event", "teleport", "title"),
+                NodePath.path("event", "teleport", "subtitle")
+        );
+    }
 
-            if (currentCountDownSetting.useChat()) {
-                plugin.messenger().sendMessage(
-                        player.toBukkitPlayer(),
-                        NodePath.path("event", "teleport", "countdown"),
-                        TagResolver.resolver("time", Tag.preProcessParsed(String.valueOf(timeSpan)))
-                );
-            }
+    private void handleCountDownFinish(WorldPosition spawn, SmpPlayer smpPlayer) {
+        var player = smpPlayer.toBukkitPlayer();
+        smpPlayer.currentlyInTeleport(false);
+        plugin.getServer().getScheduler().runTask(plugin, () -> player.teleportAsync(
+                LocationAdapter.adapt(spawn.locationContainer(), player.getServer())
+        ));
 
-            if (currentCountDownSetting.useTitle()) {
-                plugin.messenger().sendTitle(
-                        player.toBukkitPlayer(),
-                        NodePath.path("event", "teleport", "countdown", "title"),
-                        NodePath.path("event", "teleport", "countdown", "subtitle"),
-                        Title.Times.times(Duration.ZERO, Duration.ofSeconds(1), Duration.ZERO),
-                        Placeholder.parsed("time", String.valueOf(timeSpan))
-                );
-            }
-
-            if (currentCountDownSetting.useSound()) {
-                player.toBukkitPlayer().playSound(currentCountDownSetting.sound());
-            }
-        }, () -> plugin.getServer().getScheduler().runTask(plugin, () -> {
-            player.cancelCurrentTeleport();
-            player.toBukkitPlayer().teleport(LocationAdapter.adapt(worldPosition.locationContainer(), plugin.getServer()));
-        }));
+        plugin.messenger().sendMessage(player,
+                NodePath.path("command", "spawn", "success")
+        );
     }
 }

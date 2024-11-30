@@ -3,10 +3,14 @@ package dev.thezexquex.yasmpp.commands;
 import de.unknowncity.astralib.common.timer.Countdown;
 import de.unknowncity.astralib.paper.api.command.PaperCommand;
 import dev.thezexquex.yasmpp.YasmpPlugin;
+import dev.thezexquex.yasmpp.commands.util.CountDownMessenger;
+import dev.thezexquex.yasmpp.configuration.settings.CountDownEntry;
 import dev.thezexquex.yasmpp.data.adapter.LocationAdapter;
+import dev.thezexquex.yasmpp.data.entity.Home;
+import dev.thezexquex.yasmpp.data.entity.SmpPlayer;
 import dev.thezexquex.yasmpp.modules.shop.HomeShop;
+import dev.thezexquex.yasmpp.util.timer.aborttrigger.MovementAbortTrigger;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
-import net.kyori.adventure.title.Title;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.CommandManager;
@@ -17,7 +21,6 @@ import org.spongepowered.configurate.NodePath;
 import java.time.Duration;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.TimeUnit;
 
 import static org.incendo.cloud.parser.standard.StringParser.stringParser;
 
@@ -143,7 +146,7 @@ public class HomeCommand extends PaperCommand<YasmpPlugin> {
 
         smpPlayerOpt.ifPresent(smpPlayer -> {
 
-            if (smpPlayer.isInTeleportWarmup()) {
+            if (smpPlayer.isCurrentlyInTeleport()) {
                 plugin.messenger().sendMessage(player,
                         NodePath.path("event", "teleport", "already-teleporting")
                 );
@@ -161,9 +164,14 @@ public class HomeCommand extends PaperCommand<YasmpPlugin> {
             var countDownSettings = plugin.configuration().countDownSettings().teleportCountDown();
 
             smpPlayer.getHome(homeName).ifPresent(home -> {
-
-                var countDown = new Countdown();
                 var countDownInSec = plugin.configuration().teleportSettings().teleportCoolDownInSeconds();
+                var countDown = Countdown.builder()
+                        .withRunOnFinish(() -> handleCountDownFinish(home, smpPlayer))
+                        .withRunOnStep(duration -> handleCountDownStep(duration, countDownSettings, player))
+                        .withAbortTriggers(new MovementAbortTrigger(player, () -> {
+                            plugin.messenger().sendMessage(player, NodePath.path("event", "teleport", "cancel"));
+                        }))
+                        .build();
 
                 // Player is allowed to bypass the teleport warmup time
                 if (plugin.configuration().teleportSettings().permissionBypassesCoolDown()
@@ -171,53 +179,42 @@ public class HomeCommand extends PaperCommand<YasmpPlugin> {
                     countDownInSec = 0;
                 }
 
-                countDown.start(countDownInSec, TimeUnit.SECONDS, (timeSpan) -> {
-                    smpPlayer.setCurrentTeleportCountDown(countDown);
-
-                    var currCountDownEntryOpt = countDownSettings.stream()
-                            .filter(countDownLine -> countDownLine.second() == timeSpan)
-                            .findFirst();
-
-                    if (currCountDownEntryOpt.isEmpty()) {
-                        return;
-                    }
-
-                    var currCountDownEntry = currCountDownEntryOpt.get();
-
-                    if (currCountDownEntry.useChat()) {
-                        plugin.messenger().sendMessage(
-                                player,
-                                NodePath.path("event", "teleport", "countdown"),
-                                Placeholder.parsed("time", String.valueOf(timeSpan))
-                        );
-                    }
-
-                    if (currCountDownEntry.useTitle()) {
-                        plugin.messenger().sendTitle(
-                                player,
-                                NodePath.path("event", "teleport", "countdown", "title"),
-                                NodePath.path("event", "teleport", "countdown", "subtitle"),
-                                Title.Times.times(Duration.ZERO, Duration.ofSeconds(1), Duration.ZERO),
-                                Placeholder.parsed("time", String.valueOf(timeSpan))
-                        );
-                    }
-
-                    if (currCountDownEntry.useSound()) {
-                        player.playSound(currCountDownEntry.sound());
-
-                    }
-                }, () -> {
-                    plugin.getServer().getScheduler().runTask(plugin, () -> player.teleportAsync(
-                            LocationAdapter.adapt(home.locationContainer(), player.getServer())
-                    ));
-                    plugin.messenger().sendMessage(player,
-                            NodePath.path("command", "home", "success"),
-                            Placeholder.parsed("home-name", homeName)
-                    );
-                    smpPlayer.cancelCurrentTeleport();
-                });
+                smpPlayer.currentlyInTeleport(true);
+                countDown.start(countDownInSec);
             });
         });
+    }
+
+    private void handleCountDownStep(Duration duration, List<CountDownEntry> countDownEntries, Player player) {
+        var currCountDownEntry = countDownEntries.stream()
+                .filter(countDownLine -> countDownLine.second() == duration.toSeconds())
+                .findFirst();
+
+        if (currCountDownEntry.isEmpty()) {
+            return;
+        }
+
+        CountDownMessenger.sendCountDown(
+                player,
+                plugin.messenger(),
+                currCountDownEntry.get(),
+                NodePath.path("event", "teleport", "chat"),
+                NodePath.path("event", "teleport", "title"),
+                NodePath.path("event", "teleport", "subtitle")
+        );
+    }
+
+    private void handleCountDownFinish(Home home, SmpPlayer smpPlayer) {
+        var player = smpPlayer.toBukkitPlayer();
+        smpPlayer.currentlyInTeleport(false);
+        plugin.getServer().getScheduler().runTask(plugin, () -> player.teleportAsync(
+                LocationAdapter.adapt(home.locationContainer(), player.getServer())
+        ));
+
+        plugin.messenger().sendMessage(player,
+                NodePath.path("command", "home", "success"),
+                home.tagResolvers()
+        );
     }
 
     private CompletableFuture<List<Suggestion>> getHomeSuggestions(Player player) {

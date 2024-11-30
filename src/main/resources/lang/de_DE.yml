@@ -143,7 +143,9 @@ event:
     already-teleporting: "<prefix><red>Du teleportierst dich bereits"
     success: "<prefix><green>Du wurdest zu Spawn teleportiert"
     cancel: "<prefix><red>Da du dich bewegt hast wurde der Teleportvorgang abgebrochen"
-    countdown: "<green>Teleportiere in <yellow><time>"
+    title: "<green>Teleportiere in <yellow><seconds>s"
+    subtitle: ""
+    chat: ""
   end:
     unlock:
       message: "<prefix><green><bold>Das Ende wurde entsperrt!!!!"

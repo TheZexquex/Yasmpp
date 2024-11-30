@@ -25,7 +25,6 @@ import dev.thezexquex.yasmpp.modules.mobileworkstations.WorkstationInteractListe
 import dev.thezexquex.yasmpp.modules.respawn.RespawnListener;
 import dev.thezexquex.yasmpp.modules.spawnelytra.ElytraManager;
 import dev.thezexquex.yasmpp.modules.spawnelytra.listener.*;
-import dev.thezexquex.yasmpp.modules.teleport.CancelTeleportListener;
 
 import java.nio.file.Path;
 
@@ -40,17 +39,15 @@ public class YasmpPlugin extends PaperAstraPlugin {
     @Override
     public void onPluginEnable() {
         reloadPlugin();
+        initDataServices();
         applyListeners();
         //new StackSizeChanger(this).changeAllItemStackSizes();
         applyCommands();
+        elytraManager = new ElytraManager(this);
     }
 
     public void reloadPlugin() {
         loadConfigAndMessages();
-        initDataServices();
-        //updateAndConnectToDatabase();
-
-        elytraManager = new ElytraManager(this);
     }
 
     public void loadConfigAndMessages() {
@@ -98,10 +95,7 @@ public class YasmpPlugin extends PaperAstraPlugin {
         pluginManager.registerEvents(new LockEndListener(this), this);
 
         //Teleport
-        pluginManager.registerEvents(new CancelTeleportListener(this), this);
-
         pluginManager.registerEvents(new ChatListener(this), this);
-
     }
 
     private void applyCommands() {

@@ -1,6 +1,5 @@
 package dev.thezexquex.yasmpp.data.entity;
 
-import de.unknowncity.astralib.common.timer.Countdown;
 import dev.thezexquex.yasmpp.data.adapter.LocationAdapter;
 import dev.thezexquex.yasmpp.data.service.HomeService;
 import org.bukkit.Location;
@@ -12,7 +11,7 @@ public class SmpPlayer {
     private final Player player;
     private final List<Home> homeCache;
     private final HomeService homeService;
-    private Countdown currentTeleportCountDown = null;
+    private boolean isCurrentlyInTeleport = false;
 
     public SmpPlayer(Player player, HomeService homeService) {
         this.player = player;
@@ -47,20 +46,15 @@ public class SmpPlayer {
         return homeCache.stream().anyMatch(home -> home.name().equalsIgnoreCase(id));
     }
 
-    public boolean isInTeleportWarmup() {
-        return currentTeleportCountDown != null;
-    }
-
-    public void setCurrentTeleportCountDown(Countdown countdown) {
-        this.currentTeleportCountDown = countdown;
-    }
-
     public Player toBukkitPlayer() {
         return player;
     }
 
-    public void cancelCurrentTeleport() {
-        this.currentTeleportCountDown.abort();
-        this.currentTeleportCountDown = null;
+    public boolean isCurrentlyInTeleport() {
+        return isCurrentlyInTeleport;
+    }
+
+    public void currentlyInTeleport(boolean currentlyInTeleport) {
+        isCurrentlyInTeleport = currentlyInTeleport;
     }
 }
