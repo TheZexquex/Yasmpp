@@ -1,14 +1,12 @@
 package dev.thezexquex.yasmpp.commands.admin;
 
 import de.unknowncity.astralib.common.timer.Countdown;
-import de.unknowncity.astralib.common.timer.Stopwatch;
 import de.unknowncity.astralib.paper.api.command.PaperCommand;
-import de.unknowncity.astralib.paper.api.timer.aborttrigger.MovementAbortTrigger;
 import dev.thezexquex.yasmpp.YasmpPlugin;
 import dev.thezexquex.yasmpp.commands.util.CountDownMessenger;
 import dev.thezexquex.yasmpp.configuration.settings.CountDownEntry;
-import dev.thezexquex.yasmpp.configuration.settings.CountDownSettings;
 import dev.thezexquex.yasmpp.data.adapter.LocationAdapter;
+import dev.thezexquex.yasmpp.data.database.future.BukkitFutureResult;
 import dev.thezexquex.yasmpp.util.PlayerProgressUtil;
 import net.kyori.adventure.title.Title;
 import org.bukkit.command.CommandSender;
@@ -81,8 +79,40 @@ public class GameCommand extends PaperCommand<YasmpPlugin> {
                 NodePath.path("event", "game-start", "now", "subtitle"),
                 Title.Times.times(Duration.ZERO, Duration.ofSeconds(1), Duration.ZERO)
         );
-        plugin.getServer().getScheduler().runTask(plugin, () -> {
-            plugin.locationService().getLocation("spawn").whenComplete((location, throwable) -> {
+
+        BukkitFutureResult.of(plugin.locationService().getLocation("spawn")).whenComplete(plugin, location -> {
+            plugin.getServer().getScheduler().runTask(plugin, () -> {
+
+                if (location.isEmpty()) {
+                    return;
+                }
+
+                var loc = LocationAdapter.adapt(location.get().locationContainer(), plugin.getServer());
+
+                var worldBorder = loc.getWorld().getWorldBorder();
+
+                var borderDiameterInGame = plugin.configuration()
+                        .generalSettings().generalBorderSettings().borderDiameterGamePhase();
+
+                if (borderDiameterInGame == -1) {
+                    worldBorder.reset();
+                    worldBorder.setCenter(loc);
+                } else {
+                    worldBorder.setSize(borderDiameterInGame);
+                }
+                plugin.getServer().getOnlinePlayers().forEach(player -> {
+                    player.teleportAsync(loc);
+                });
+            });
+        });
+    }
+
+    private void handelReset(CommandContext<CommandSender> context) {
+        var isHardReset = context.flags().hasFlag("hard");
+
+        BukkitFutureResult.of(plugin.locationService().getLocation("spawn")).whenComplete(plugin, location -> {
+            plugin.getServer().getScheduler().runTask(plugin, () -> {
+
                 if (location.isEmpty()) {
                     return;
                 }
@@ -91,40 +121,23 @@ public class GameCommand extends PaperCommand<YasmpPlugin> {
 
                 plugin.getServer().getOnlinePlayers().forEach(player -> {
                     player.teleportAsync(loc);
+                    if (isHardReset) {
+                        PlayerProgressUtil.revokeAllAdvancements(player);
+                        PlayerProgressUtil.revokeAllRecipes(player);
+                        PlayerProgressUtil.clearEnderChest(player);
+                        PlayerProgressUtil.clearInventory(player);
+                    }
                 });
 
                 var worldBorder = loc.getWorld().getWorldBorder();
 
                 worldBorder.setCenter(loc);
-                worldBorder.setSize(plugin.configuration().generalSettings().generalBorderSettings().borderDiameterGamePhase());
+
+                var borderDiameterInLobby = plugin.configuration()
+                        .generalSettings().generalBorderSettings().borderDiameterLobbyPhase();
+                worldBorder.setSize(borderDiameterInLobby);
+
             });
-        });
-    }
-
-    private void handelReset(CommandContext<CommandSender> context) {
-        var isHardReset = context.flags().hasFlag("hard");
-
-        plugin.locationService().getLocation("spawn").whenComplete((location, throwable) -> {
-            if (location.isEmpty()) {
-                return;
-            }
-
-            var loc = LocationAdapter.adapt(location.get().locationContainer(), plugin.getServer());
-
-            plugin.getServer().getOnlinePlayers().forEach(player -> {
-                player.teleportAsync(loc);
-                if (isHardReset) {
-                    PlayerProgressUtil.revokeAllAdvancements(player);
-                    PlayerProgressUtil.revokeAllRecipes(player);
-                    PlayerProgressUtil.clearEnderChest(player);
-                    PlayerProgressUtil.clearInventory(player);
-                }
-            });
-
-            var worldBorder = loc.getWorld().getWorldBorder();
-
-            worldBorder.setCenter(loc);
-            worldBorder.setSize(plugin.configuration().generalSettings().generalBorderSettings().borderDiameterLobbyPhase());
 
             plugin.messenger().broadcastMessage(
                     NodePath.path("event", "game-reset", "complete")
