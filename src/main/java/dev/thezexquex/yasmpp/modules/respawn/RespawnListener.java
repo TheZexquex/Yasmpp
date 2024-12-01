@@ -3,8 +3,11 @@ package dev.thezexquex.yasmpp.modules.respawn;
 import com.destroystokyo.paper.event.player.PlayerPostRespawnEvent;
 import dev.thezexquex.yasmpp.YasmpPlugin;
 import dev.thezexquex.yasmpp.data.adapter.LocationAdapter;
+import dev.thezexquex.yasmpp.data.database.future.BukkitFutureResult;
+import dev.thezexquex.yasmpp.message.LocationPlaceholders;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
+import org.bukkit.event.entity.PlayerDeathEvent;
 import org.spongepowered.configurate.NodePath;
 
 public class RespawnListener implements Listener {
@@ -18,11 +21,6 @@ public class RespawnListener implements Listener {
     public void onRespawn(PlayerPostRespawnEvent event) {
         var player = event.getPlayer();
 
-        plugin.messenger().sendMessage(
-                player,
-                NodePath.path("event", "death", "coords")
-        );
-
         if (player.getPotentialBedLocation() != null) {
             plugin.messenger().sendMessage(
                     player,
@@ -31,7 +29,7 @@ public class RespawnListener implements Listener {
             return;
         }
 
-        plugin.locationService().getLocation("spawn").whenComplete((location, throwable) -> {
+        BukkitFutureResult.of(plugin.locationService().getLocation("spawn")).whenComplete(plugin, location -> {
             location.ifPresent(worldPosition -> {
                 player.teleport(LocationAdapter.adapt(worldPosition.locationContainer(), player.getServer()));
                 plugin.messenger().sendMessage(
@@ -40,5 +38,17 @@ public class RespawnListener implements Listener {
                 );
             });
         });
+    }
+
+    @EventHandler
+    public void onPlayerDeath(PlayerDeathEvent event) {
+        var player = event.getEntity();
+        var deathLocation = player.getLocation();
+
+        plugin.messenger().sendMessage(
+                player,
+                NodePath.path("event", "death", "coords"),
+                LocationPlaceholders.of(deathLocation)
+        );
     }
 }

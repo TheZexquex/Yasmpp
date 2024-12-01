@@ -135,6 +135,8 @@ inventory:
 event:
   death:
     no-bed: "<prefix><red>Du bist gestorben und wurdest zum Spawn teleportiert, da du kein Bett platziert hast!"
+    bed: "<prefix><red>Du bist gestorben und wurdest an den Bett teleportiert"
+    coords: "<prefix><red>Du bist gestorben <white>☠ <br><red>Todespunkt <gray>world: <yellow><world> <gray>x: <yellow><x> <gray>y: <yellow><y> <gray>z: <yellow><x> <gray>yaw: <yellow><yaw> <gray>pitch: <yellow><pitch> <green>"
   elytra-boost:
     all-used: "<prefix><red>Du hast alle deine Boosts aufgebraucht!"
     remaining: "<prefix><green>Du kannst noch <yellow><boosts>x <green>boosten!"
