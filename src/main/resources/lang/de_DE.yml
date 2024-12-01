@@ -178,4 +178,6 @@ event:
       chat: "<prefix><dark_gray>» <red>Server Neustart!!!"
       title: "<red>Server Neustart"
       subtitle: "<gray>Grund: <reason>"
+  chat:
+    not-allowed-string: "<prefix><red>Deine Chatnachricht enthält verbotene Ausdrücke: <yellow><match>"
 actionbar: "<yellow>%headblocks_current% von %headblocks_max% Geschenken gefunden"
