@@ -54,10 +54,6 @@ public class WorkstationInteractListener implements Listener {
                 player.openSmithingTable(location, true);
                 sendSuccessMessage(player, item.getType());
             }
-            case ANVIL, CHIPPED_ANVIL, DAMAGED_ANVIL -> {
-                player.openAnvil(location, true);
-                sendSuccessMessage(player, item.getType());
-            }
             case LOOM -> {
                 player.openLoom(location, true);
                 sendSuccessMessage(player, item.getType());
@@ -77,7 +73,7 @@ public class WorkstationInteractListener implements Listener {
         plugin.messenger().sendMessage(
                 player,
                 NodePath.path("event", "open-crafting-table"),
-                TagResolver.resolver("type", Tag.preProcessParsed(material.toString()))
+                TagResolver.resolver("type", Tag.preProcessParsed(material.name()))
         );
     }
 }
