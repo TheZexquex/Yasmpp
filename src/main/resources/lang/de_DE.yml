@@ -91,7 +91,6 @@ command:
       running: "<prefix><red>Das Spiel muss gestoppt sein, um es resettenn"
       confirm: "<prefix><red>ACHTUNG, möchtest du das wirklich tun? Der gesamte Spielstand wird gelöscht! <gray>Bitte bestätige mit <yellow>/game reset confirm"
       no-confirm: "<prefix><red>Es läuft keine Resetanfrage!"
-
   gamemode:
     notify:
       success: "<prefix><green>Dein <yellow>Spielmodus <green>wurde von <yellow><player> <green>zu <yellow><gamemode> <green>geändert"
@@ -123,7 +122,45 @@ command:
       format-line-todo: "<yellow><index> <gray>» <red><step>"
       format-line-complete: "<yellow><index> <gray>» <green><step>"
       format-header: "<gray>-------------------[<yellow>Setup]<gray>-------------------"
-
+  ontime:
+    global: |
+      <gold><player>'s <gray>Spielzeit auf gold>Handwerksangriff
+      <gray>» <#dea459>Erster Login <gray>⇛ <#de7359><first_joined> <gray>(<first_joined_ago> Tage)
+      <gray>» <#dea459>Login <gray>⇛ <#de7359> <ontime_session>
+      <gray>» <#dea459>Heute <gray>⇛ <#de7359> <ontime_day>
+      <gray>» <#dea459>Letzte 7 Tage <gray>⇛ <#de7359> <ontime_week>
+      <gray>» <#dea459>Letzte 30 Tage  <gray>⇛ <#de7359> <ontime_month>
+      <gray>» <#dea459><year>  <gray>⇛ <#de7359> <ontime_year>
+      <gray>» <#dea459>Gesamt  <gray>⇛ <#de7359> <ontime_all>
+    global-offline: |
+      <gold><player>'s <gray>Spielzeit auf <gold>Handwerksangriff
+      <gray>» <#dea459>Erster Login <gray>⇛ <#de7359><first_joined> <gray>(<first_joined_ago> Tage)
+      <gray>» <#dea459>Offline <gray>⇛ <#de7359> <ontime_session>
+      <gray>» <#dea459>Heute <gray>⇛ <#de7359> <ontime_day>
+      <gray>» <#dea459>Letzte 7 Tage <gray>⇛ <#de7359> <ontime_week>
+      <gray>» <#dea459>Letzte 30 Tage  <gray>⇛ <#de7359> <ontime_month>
+      <gray>» <#dea459><year>  <gray>⇛ <#de7359> <ontime_year>
+      <gray>» <#dea459>Gesamt  <gray>⇛ <#de7359> <ontime_all>
+    empty: "N/A"
+    never-joined: "<prefix><red>Dieser Spieler war noch nie auf diesem Server"
+  ontimetop:
+    max-pages-reached: "<prefix><red>Diese Seite existiert nicht!"
+    header: "<gold>Top <gray>Spielzeiten auf <gold>Handwerksangriff"
+    list-self: "<gold><count> <yellow><player> <gold><ontime> <gray>(Du)"
+    list: "<gray><count> <#dea459><player> <#de7359><ontime>"
+    footer: "<gray><click:run_command:'/ontimetop <previous>'>[<#dea459><<<gray>]</click>==========[<#dea459><current-page><gray>/<#dea459><max-page><gray>]========<gray><click:run_command:'/ontimetop <next>'>[<#dea459>>><gray>]</click>"
+    footer-no-prev: "<gray>=============[<#dea459><current-page><gray>/<#dea459><max-page><gray>]========<gray><click:run_command:'/ontimetop <next>'>[<#dea459>>><gray>]</click>"
+    footer-no-prev-no-next: "<gray>=============[<#dea459><current-page><gray>/<#dea459><max-page><gray>]==========="
+    footer-no-next: "<gray><click:run_command:'/ontimetop <previous>'>[<#dea459><<<gray>]</click>==========[<#dea459><current-page><gray>/<#dea459><max-page><gray>]==========="
+  lastonline:
+    max-pages-reached: "<prefix><red>Diese Seite existiert nicht!"
+    header: "<gold>Zuletzt Online <gray>auf <gold>Handwerksangriff"
+    list-self: "<gold><count> <yellow><player> <gold><lastonline> <gray>(Du)"
+    list: "<gray><count> <#dea459><player> <#de7359><lastonline>"
+    footer: "<gray><click:run_command:'/lastonline <previous>'>[<#dea459><<<gray>]</click>==========[<#dea459><current-page><gray>/<#dea459><max-page><gray>]========<gray><click:run_command:'/lastonline <next>'>[<#dea459>>><gray>]</click>"
+    footer-no-prev: "<gray>=============[<#dea459><current-page><gray>/<#dea459><max-page><gray>]========<gray><click:run_command:'/lastonline <next>'>[<#dea459>>><gray>]</click>"
+    footer-no-prev-no-next: "<gray>=============[<#dea459><current-page><gray>/<#dea459><max-page><gray>]==========="
+    footer-no-next: "<gray><click:run_command:'/lastonline <previous>'>[<#dea459><<<gray>]</click>==========[<#dea459><current-page><gray>/<#dea459><max-page><gray>]==========="
 exception:
   command:
     invalidsender: "<prefix><red>Diesen Command kannst du nur als Spieler ausführen"

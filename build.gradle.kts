@@ -19,6 +19,7 @@ repositories {
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
     maven("https://repo.xenondevs.xyz/releases")
     maven("https://repo.unknowncity.de/snapshots")
+    maven("https://jitpack.io")
 }
 
 dependencies {
@@ -28,6 +29,7 @@ dependencies {
     compileOnly("io.papermc.paper", "paper-api", "1.21.3-R0.1-SNAPSHOT")
     compileOnly("me.clip", "placeholderapi", "2.11.5")
     compileOnly("de.unknowncity.astralib", "astralib-paper-api", "0.5.0-SNAPSHOT")
+    compileOnly("com.github.plan-player-analytics:Plan:5.6.2906")
 
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")

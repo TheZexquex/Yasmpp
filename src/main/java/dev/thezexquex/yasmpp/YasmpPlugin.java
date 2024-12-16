@@ -1,8 +1,11 @@
 package dev.thezexquex.yasmpp;
 
 import de.unknowncity.astralib.common.database.StandardDataBaseProvider;
+import de.unknowncity.astralib.common.hook.HookRegistry;
+import de.unknowncity.astralib.common.hook.PluginHook;
 import de.unknowncity.astralib.common.message.lang.Language;
 import de.unknowncity.astralib.common.message.lang.Localization;
+import de.unknowncity.astralib.paper.api.hook.PaperPluginHook;
 import de.unknowncity.astralib.paper.api.hook.defaulthooks.PlaceholderApiHook;
 import de.unknowncity.astralib.paper.api.message.PaperMessenger;
 import de.unknowncity.astralib.paper.api.plugin.PaperAstraPlugin;
@@ -16,6 +19,7 @@ import dev.thezexquex.yasmpp.data.database.dao.location.impl.sqlite.SqliteLocati
 import dev.thezexquex.yasmpp.data.service.HomeService;
 import dev.thezexquex.yasmpp.data.service.LocationService;
 import dev.thezexquex.yasmpp.data.service.SmpPlayerService;
+import dev.thezexquex.yasmpp.hooks.PlanHook;
 import dev.thezexquex.yasmpp.modules.blockdamage.ExplosionBlockDamageListener;
 import dev.thezexquex.yasmpp.modules.chat.ChatListener;
 import dev.thezexquex.yasmpp.modules.joinleavemessage.PlayerJoinListener;
@@ -25,6 +29,7 @@ import dev.thezexquex.yasmpp.modules.mobileworkstations.WorkstationInteractListe
 import dev.thezexquex.yasmpp.modules.respawn.RespawnListener;
 import dev.thezexquex.yasmpp.modules.spawnelytra.ElytraManager;
 import dev.thezexquex.yasmpp.modules.spawnelytra.listener.*;
+import org.yaml.snakeyaml.Yaml;
 
 import java.nio.file.Path;
 
@@ -42,6 +47,7 @@ public class YasmpPlugin extends PaperAstraPlugin {
         initDataServices();
         applyListeners();
         //new StackSizeChanger(this).changeAllItemStackSizes();
+        hookRegistry.register(new PlanHook(this));
         applyCommands();
         elytraManager = new ElytraManager(this);
     }
@@ -126,6 +132,10 @@ public class YasmpPlugin extends PaperAstraPlugin {
         var homeDao = new SqliteHomeDao(queryConfig);
         homeService = new HomeService(homeDao);
         smpPlayerService = new SmpPlayerService(this);
+    }
+
+    public HookRegistry<PaperAstraPlugin, PaperPluginHook> hookRegistry() {
+        return hookRegistry;
     }
 
     public YasmppConfiguration configuration() {

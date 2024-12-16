@@ -8,6 +8,9 @@ import dev.thezexquex.yasmpp.configuration.settings.general.GeneralSpawnElytraSe
 
 public class GeneralSettings {
     @JsonProperty
+    private String planServerName = "Handwerksangriff";
+    private int planDataRefreshInterval = 120;
+    @JsonProperty
     private GeneralBorderSettings generalBorderSettings = new GeneralBorderSettings();
     @JsonProperty
     private GeneralEndSettings generalEndSettings = new GeneralEndSettings();
@@ -18,6 +21,14 @@ public class GeneralSettings {
 
     public GeneralSettings() {
 
+    }
+
+    public String planServerName() {
+        return planServerName;
+    }
+
+    public int planDataRefreshInterval() {
+        return planDataRefreshInterval;
     }
 
     public GeneralBorderSettings generalBorderSettings() {
