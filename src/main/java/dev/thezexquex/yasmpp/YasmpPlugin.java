@@ -29,7 +29,6 @@ import dev.thezexquex.yasmpp.modules.mobileworkstations.WorkstationInteractListe
 import dev.thezexquex.yasmpp.modules.respawn.RespawnListener;
 import dev.thezexquex.yasmpp.modules.spawnelytra.ElytraManager;
 import dev.thezexquex.yasmpp.modules.spawnelytra.listener.*;
-import org.yaml.snakeyaml.Yaml;
 
 import java.nio.file.Path;
 
