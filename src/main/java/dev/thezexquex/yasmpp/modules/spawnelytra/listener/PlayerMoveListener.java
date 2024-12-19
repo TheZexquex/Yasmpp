@@ -3,6 +3,7 @@ package dev.thezexquex.yasmpp.modules.spawnelytra.listener;
 import de.unknowncity.astralib.paper.api.region.SphericalRegion;
 import dev.thezexquex.yasmpp.YasmpPlugin;
 import dev.thezexquex.yasmpp.data.adapter.LocationAdapter;
+import dev.thezexquex.yasmpp.modules.spawnelytra.integration.FJetpack2Reloaded;
 import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -41,6 +42,11 @@ public class PlayerMoveListener implements Listener {
                     if (player.hasPermission("yasmpp.fly.survival")) {
                         return;
                     }
+
+                    if (FJetpack2Reloaded.wearsJetpack(player)) {
+                        return;
+                    }
+
                     player.setAllowFlight(false);
                     return;
                 }

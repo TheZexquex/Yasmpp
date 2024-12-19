@@ -23,6 +23,7 @@ public class ArmorChangeListener implements Listener {
         if (!plugin.elytraManager().isFlying(player)) {
             return;
         }
+
         plugin.elytraManager().disableElytra(player, true);
     }
 }
