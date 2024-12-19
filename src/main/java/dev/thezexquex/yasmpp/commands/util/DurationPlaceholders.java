@@ -1,5 +1,6 @@
 package dev.thezexquex.yasmpp.commands.util;
 
+import dev.thezexquex.yasmpp.util.DurationFormatter;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 
@@ -20,6 +21,7 @@ public class DurationPlaceholders {
                 Placeholder.parsed("minutes", minutes),
                 Placeholder.parsed("seconds", seconds),
                 Placeholder.parsed("millis", millis),
+                Placeholder.parsed("duration", DurationFormatter.formatDuration(duration, "")),
         };
     }
 }

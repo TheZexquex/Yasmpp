@@ -182,7 +182,7 @@ event:
     already-teleporting: "<prefix><red>Du teleportierst dich bereits"
     success: "<prefix><green>Du wurdest zu Spawn teleportiert"
     cancel: "<prefix><red>Da du dich bewegt hast wurde der Teleportvorgang abgebrochen"
-    title: "<green>Teleportiere in <yellow><seconds>s"
+    title: "<green>Teleportiere in <yellow><seconds>"
     subtitle: ""
     chat: ""
   end:
@@ -192,14 +192,14 @@ event:
     lock:
       message: "<prefix><yellow><bold>Das Ende ist nun gesperrt"
       title: "<green>Das End wurde <red>gesperrt!"
-    enter-portal-locked: "<prefix><red>Das Ende ist bis zum <yellow>20.12.21 <red>gesperrt"
+    enter-portal-locked: "<prefix><red>Das Ende ist bis zum <yellow>xx.xx.xx <red>gesperrt"
   join: "<yellow><player> <green>hat gejoined!"
   quit: "<yellow><player> <red>hat geleftet!"
   first-join: "<aqua><player> <yellow>hat den Server zum ersten mal betreten!"
   game-start:
     in:
-      chat: "<prefix><green>Handwerksangriff startet in <yellow><hours><minutes><seconds>!"
-      title: "<green>Handwerksangriff startet in <yellow><hours><minutes><seconds>"
+      chat: "<prefix><green>Handwerksangriff startet in <yellow><duration>!"
+      title: "<green>Handwerksangriff startet in <yellow><duration>"
       subtitle: ""
     now:
       chat: "<prefix><yellow>Handwerksangriff startet JETZT!"
@@ -208,8 +208,8 @@ event:
   restart:
     abort: "<prefix> <dark_gray>» <yellow>der Neustart wurde von einem Admin abgebrochen!"
     in:
-      chat: "<prefix><dark_gray>» <red>Server Neustart in <yellow><hours><minutes><seconds> <red>Grund <dark_gray>» <yellow><reason>"
-      title: "<red>Server Neustart in <yellow><hours><minutes><seconds>"
+      chat: "<prefix><dark_gray>» <red>Server Neustart in <yellow><duration> <red>Grund <dark_gray>» <yellow><reason>"
+      title: "<red>Server Neustart in <yellow><duration>"
       subtitle: "<gray>Grund: <reason>"
     now:
       chat: "<prefix><dark_gray>» <red>Server Neustart!!!"

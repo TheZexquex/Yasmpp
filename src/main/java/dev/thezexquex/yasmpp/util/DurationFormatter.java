@@ -14,7 +14,6 @@ public class DurationFormatter {
         );
 
         formattedString = formattedString.replaceAll("\\b0+[dhms]\\b", "").replaceAll("\\s+", " ").trim();
-
         return formattedString.isEmpty() ? empty : formattedString;
     }
 
