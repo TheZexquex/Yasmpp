@@ -1,29 +1,28 @@
 package dev.thezexquex.yasmpp.commands;
 
-import cloud.commandframework.CommandManager;
-import cloud.commandframework.context.CommandContext;
+import de.unknowncity.astralib.paper.api.command.PaperCommand;
 import dev.thezexquex.yasmpp.YasmpPlugin;
-import dev.thezexquex.yasmpp.core.command.BaseCommand;
 import org.bukkit.command.CommandSender;
+import org.incendo.cloud.CommandManager;
+import org.incendo.cloud.context.CommandContext;
 import org.spongepowered.configurate.NodePath;
 
-public class ReloadCommand extends BaseCommand {
+public class ReloadCommand extends PaperCommand<YasmpPlugin> {
     public ReloadCommand(YasmpPlugin plugin) {
         super(plugin);
     }
 
     @Override
-    public void register(CommandManager<CommandSender> commandManager) {
-        commandManager.command(
-                commandManager.commandBuilder("yasmpp")
-                        .literal("reload")
-                        .permission("yasmpp.command.reload")
-                        .handler(this::reload)
+    public void apply(CommandManager<CommandSender> commandManager) {
+        commandManager.command(commandManager.commandBuilder("yasmpp")
+                .literal("reload")
+                .permission("yasmpp.command.reload")
+                .handler(this::reload)
         );
     }
 
     private void reload(CommandContext<CommandSender> commandSenderCommandContext) {
-        var commandSender = commandSenderCommandContext.getSender();
+        var commandSender = commandSenderCommandContext.sender();
 
         plugin.reloadPlugin();
         plugin.messenger().sendMessage(

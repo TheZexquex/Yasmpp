@@ -1,7 +1,10 @@
 package dev.thezexquex.yasmpp.modules.spawnelytra.listener;
 
 import dev.thezexquex.yasmpp.YasmpPlugin;
+import dev.thezexquex.yasmpp.modules.spawnelytra.integration.FJetpack2Reloaded;
 import org.bukkit.GameMode;
+import org.bukkit.NamespacedKey;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerToggleFlightEvent;
@@ -22,6 +25,10 @@ public class FlightAttemptListener implements Listener {
         }
 
         if (player.hasPermission("yasmpp.fly.survival")) {
+            return;
+        }
+
+        if (FJetpack2Reloaded.wearsJetpack(player)) {
             return;
         }
 

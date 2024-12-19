@@ -1,102 +1,91 @@
 package dev.thezexquex.yasmpp.commands.admin;
 
-import cloud.commandframework.CommandManager;
-import cloud.commandframework.arguments.standard.IntegerArgument;
-import cloud.commandframework.bukkit.parsers.PlayerArgument;
-import cloud.commandframework.context.CommandContext;
+import de.unknowncity.astralib.paper.api.command.PaperCommand;
 import dev.thezexquex.yasmpp.YasmpPlugin;
-import dev.thezexquex.yasmpp.core.command.BaseCommand;
-import net.kyori.adventure.text.minimessage.tag.Tag;
-import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.incendo.cloud.CommandManager;
+import org.incendo.cloud.context.CommandContext;
 import org.spongepowered.configurate.NodePath;
 
-public class SpeedCommand extends BaseCommand {
+import static org.incendo.cloud.bukkit.parser.PlayerParser.playerParser;
+import static org.incendo.cloud.parser.standard.IntegerParser.integerParser;
+
+public class SpeedCommand extends PaperCommand<YasmpPlugin> {
     public SpeedCommand(YasmpPlugin plugin) {
         super(plugin);
     }
 
     @Override
-    public void register(CommandManager<CommandSender> commandManager) {
-        commandManager.command(commandManager.commandBuilder("speed")
-                .argument(IntegerArgument.<CommandSender>builder("speed1").withMin(0).withMax(10))
-                .argument(PlayerArgument.optional("player"))
+    public void apply(CommandManager<CommandSender> commandManager) {
+        var speedBuilder = commandManager.commandBuilder("speed")
+                .required("speed", integerParser(0, 10))
+                .permission("yasmpp.command.speed");
+
+        commandManager.command(speedBuilder
                 .senderType(Player.class)
-                .permission("yasmpp.command.speed")
                 .handler(this::handleSpeedSelf)
         );
 
-        commandManager.command(commandManager.commandBuilder("speed")
-                .argument(IntegerArgument.<CommandSender>builder("speed2").withMin(0).withMax(10))
-                .argument(PlayerArgument.of("player"))
+        commandManager.command(speedBuilder
+                .required("player", playerParser())
                 .permission("yasmpp.command.speed")
                 .handler(this::handleSpeedOthers)
         );
     }
 
-    private void handleSpeedSelf(CommandContext<CommandSender> commandSenderCommandContext) {
-        var player = (Player) commandSenderCommandContext.getSender();
+    private void handleSpeedSelf(CommandContext<Player> commandSenderCommandContext) {
+        var player = commandSenderCommandContext.sender();
 
-        var speed = (int) commandSenderCommandContext.get("speed1");
+        var speed = (int) commandSenderCommandContext.get("speed");
 
-        if (player.isFlying()) {
-            player.setFlySpeed(speed);
-            plugin.messenger().sendMessage(
-                    player,
-                    NodePath.path("command", "speed", "self", "success"),
-                    TagResolver.resolver("type", Tag.preProcessParsed("Flight")),
-                    TagResolver.resolver("speed", Tag.preProcessParsed(String.valueOf(speed)))
-            );
-        } else {
-            player.setWalkSpeed(speed);
-            plugin.messenger().sendMessage(
-                    player,
-                    NodePath.path("command", "speed", "self", "success"),
-                    TagResolver.resolver("type", Tag.preProcessParsed("Walk")),
-                    TagResolver.resolver("speed", Tag.preProcessParsed(String.valueOf(speed)))
-            );
-        }
+        setPlayerSpeed(player, speed);
+
+        plugin.messenger().sendMessage(
+                player,
+                NodePath.path("command", "speed", "self", "success"),
+                Placeholder.parsed("type", player.isFlying() ? "Flight" : "Walk"),
+                Placeholder.parsed("speed", String.valueOf(speed))
+        );
     }
 
     private void handleSpeedOthers(CommandContext<CommandSender> commandSenderCommandContext) {
-        var sender = commandSenderCommandContext.getSender();
+        var sender = commandSenderCommandContext.sender();
         var player = (Player) commandSenderCommandContext.get("player");
 
-        var speed = (int) commandSenderCommandContext.get("speed2");
+        var speed = (int) commandSenderCommandContext.get("speed");
 
-        if (player.isFlying()) {
-            player.setFlySpeed(speed);
-            plugin.messenger().sendMessage(
-                    player,
-                    NodePath.path("command", "speed", "self", "success"),
-                    TagResolver.resolver("type", Tag.preProcessParsed("Flight")),
-                    TagResolver.resolver("speed", Tag.preProcessParsed(String.valueOf(speed))),
-                    TagResolver.resolver("player", Tag.preProcessParsed(sender.getName()))
-            );
-            plugin.messenger().sendMessage(
-                    sender,
-                    NodePath.path("command", "speed", "others", "success"),
-                    TagResolver.resolver("type", Tag.preProcessParsed("Flight")),
-                    TagResolver.resolver("speed", Tag.preProcessParsed(String.valueOf(speed))),
-                    TagResolver.resolver("player", Tag.preProcessParsed(player.getName()))
-            );
-        } else {
-            player.setWalkSpeed(speed);
-            plugin.messenger().sendMessage(
-                    player,
-                    NodePath.path("command", "speed", "self", "success"),
-                    TagResolver.resolver("type", Tag.preProcessParsed("Walk")),
-                    TagResolver.resolver("speed", Tag.preProcessParsed(String.valueOf(speed))),
-                    TagResolver.resolver("player", Tag.preProcessParsed(sender.getName()))
-            );
-            plugin.messenger().sendMessage(
-                    sender,
-                    NodePath.path("command", "speed", "others", "success"),
-                    TagResolver.resolver("type", Tag.preProcessParsed("Walk")),
-                    TagResolver.resolver("speed", Tag.preProcessParsed(String.valueOf(speed))),
-                    TagResolver.resolver("player", Tag.preProcessParsed(player.getName()))
-            );
+        setPlayerSpeed(player, speed);
+
+        plugin.messenger().sendMessage(
+                sender,
+                NodePath.path("command", "speed", "others", "success"),
+                Placeholder.parsed("type", player.isFlying() ? "Flight" : "Walk"),
+                Placeholder.parsed("speed", String.valueOf(speed)),
+                Placeholder.parsed("player", player.getName())
+        );
+
+
+        if (!player.hasPermission("yasmpp.notify.speed")) {
+            return;
         }
+
+        plugin.messenger().sendMessage(
+                player,
+                NodePath.path("command", "speed", "notify", "success"),
+                Placeholder.parsed("type", player.isFlying() ? "Flight" : "Walk"),
+                Placeholder.parsed("speed", String.valueOf(speed)),
+                Placeholder.parsed("player", sender.getName())
+        );
+    }
+
+    public void setPlayerSpeed(Player target, int speed) {
+        var realSpeed = speed * 0.1F;
+        if (target.isFlying()) {
+            target.setFlySpeed(realSpeed);
+            return;
+        }
+        target.setWalkSpeed(realSpeed);
     }
 }

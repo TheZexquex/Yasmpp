@@ -1,35 +1,41 @@
 package dev.thezexquex.yasmpp.commands;
 
-import cloud.commandframework.CommandManager;
-import cloud.commandframework.arguments.standard.DurationArgument;
-import cloud.commandframework.arguments.standard.StringArgument;
-import cloud.commandframework.context.CommandContext;
+import de.unknowncity.astralib.common.timer.Countdown;
+import de.unknowncity.astralib.paper.api.command.PaperCommand;
 import dev.thezexquex.yasmpp.YasmpPlugin;
-import dev.thezexquex.yasmpp.core.command.BaseCommand;
-import dev.thezexquex.yasmpp.core.timer.Countdown;
+import dev.thezexquex.yasmpp.commands.util.CountDownMessenger;
+import dev.thezexquex.yasmpp.configuration.settings.CountDownEntry;
 import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
+import net.kyori.adventure.title.Title;
 import org.bukkit.command.CommandSender;
+import org.incendo.cloud.CommandManager;
+import org.incendo.cloud.context.CommandContext;
 import org.spongepowered.configurate.NodePath;
 
 import java.time.Duration;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class RestartCommand extends BaseCommand {
+import static org.incendo.cloud.parser.standard.DurationParser.durationParser;
+import static org.incendo.cloud.parser.standard.StringParser.quotedStringParser;
+
+public class RestartCommand extends PaperCommand<YasmpPlugin> {
     private Countdown countdown;
 
     public RestartCommand(YasmpPlugin plugin) {
         super(plugin);
-        this.countdown = new Countdown();
+        this.countdown = null;
     }
 
     @Override
-    public void register(CommandManager<CommandSender> commandManager) {
+    public void apply(CommandManager<CommandSender> commandManager) {
         commandManager.command(commandManager.commandBuilder("restartcountdown")
                 .permission("yasmpp.command.restartcountdown")
                 .literal("start")
-                .argument(DurationArgument.of("time"))
-                .argument(StringArgument.of("reason", StringArgument.StringMode.QUOTED))
+                .required("time", durationParser())
+                .required("reason", quotedStringParser())
                 .handler(this::handleStart)
                 .build()
         );
@@ -49,89 +55,77 @@ public class RestartCommand extends BaseCommand {
     }
 
     private void handleHelp(CommandContext<CommandSender> commandSenderCommandContext) {
-        var sender = commandSenderCommandContext.getSender();
+        var sender = commandSenderCommandContext.sender();
         plugin.messenger().sendMessage(sender, NodePath.path("command", "restartcountdown", "help"));
     }
 
     private void handleAbort(CommandContext<CommandSender> commandSenderCommandContext) {
-        var sender = commandSenderCommandContext.getSender();
-        if (!countdown.isRunning()) {
-            plugin.messenger().broadcastToServer(NodePath.path("command", "restart", "abort", "not-running"));
+        var sender = commandSenderCommandContext.sender();
+        if (countdown == null || !countdown.isRunning()) {
+            plugin.messenger().broadcastMessage(NodePath.path("command", "restart", "abort", "not-running"));
             return;
         }
 
         countdown.abort();
-        plugin.messenger().broadcastToServer(NodePath.path("event", "restart", "abort"));
+        plugin.messenger().broadcastMessage(NodePath.path("event", "restart", "abort"));
         plugin.messenger().sendMessage(sender, NodePath.path("command", "restartcountdown", "abort", "success"));
     }
 
     private void handleStart(CommandContext<CommandSender> commandSenderCommandContext) {
-        var sender = commandSenderCommandContext.getSender();
-        if (countdown.isRunning()) {
-            plugin.messenger().sendMessage(
-                    sender,
-                    NodePath.path("command", "restartcountdown", "start", "already-running")
-            );
+        var sender = commandSenderCommandContext.sender();
+        var duration = (Duration) commandSenderCommandContext.get("time");
+        var reason = (String) commandSenderCommandContext.get("reason");
+        var countDownSettings = plugin.configuration().countDownSettings().restartCountDown();
+        if (countdown == null || !countdown.isRunning()) {
+            countdown = Countdown.builder()
+                    .withRunOnFinish(() -> handleCountDownFinish(reason))
+                    .withRunOnStep(durationLeft -> handleCountDownStep(durationLeft, countDownSettings, reason))
+                    .build();
+
+            countdown.start(duration.toSeconds());
+            plugin.messenger().sendMessage(sender, NodePath.path("command", "restartcountdown", "start", "success"));
             return;
         }
 
-        var duration = (Duration) commandSenderCommandContext.get("time");
-        var reason = (String) commandSenderCommandContext.get("reason");
+        plugin.messenger().sendMessage(
+                sender,
+                NodePath.path("command", "restartcountdown", "start", "already-running")
+        );
+    }
 
-        plugin.messenger().sendMessage(sender, NodePath.path("command", "restartcountdown", "start", "success"));
+    private void handleCountDownStep(Duration duration, List<CountDownEntry> countDownEntries, String reason) {
+        var currCountDownEntry = countDownEntries.stream()
+                .filter(countDownLine -> countDownLine.second() == duration.toSeconds())
+                .findFirst();
 
-        var countDownSettings = plugin.configuration().countDownSettings().restartCountDownSettings();
-        countdown.start(duration.toSeconds(), TimeUnit.SECONDS, (timeSpan) -> {
-            var currentCDSettingOpt = countDownSettings.stream().filter(countDownLine -> countDownLine.second() == timeSpan).findFirst();
+        if (currCountDownEntry.isEmpty()) {
+            return;
+        }
 
-            if (currentCDSettingOpt.isEmpty()) {
-                return;
-            }
-            var currentCountDownSetting = currentCDSettingOpt.get();
+        CountDownMessenger.broadcastCountDown(
+                plugin.messenger(),
+                currCountDownEntry.get(),
+                NodePath.path("event", "restart", "in", "chat"),
+                NodePath.path("event", "restart", "in", "title"),
+                NodePath.path("event", "restart", "in", "subtitle"),
+                Placeholder.parsed("reason", reason)
+        );
+    }
 
-            var dur = Duration.ofSeconds(timeSpan);
-            var hours = dur.toHours() == 0 ? "" : dur.toHours() + " h ";
-            var minutes = dur.toMinutesPart() == 0 ? "" : dur.toMinutesPart() + " m ";
-            var seconds = dur.toSecondsPart() == 0 ? "" : dur.toSecondsPart() + " s";
+    private void handleCountDownFinish(String reason) {
+        plugin.messenger().broadcastMessage(
+                NodePath.path("event", "restart", "now", "chat"),
+                Placeholder.parsed("reason", reason)
+        );
 
-            if (currentCountDownSetting.useChat()) {
-                plugin.messenger().broadcastToServer(
-                        NodePath.path("event", "restart", "in", "chat"),
-                        TagResolver.resolver("hours", Tag.preProcessParsed(hours)),
-                        TagResolver.resolver("minutes", Tag.preProcessParsed(minutes)),
-                        TagResolver.resolver("seconds", Tag.preProcessParsed(seconds)),
-                        TagResolver.resolver("reason", Tag.preProcessParsed(reason))
-                );
-            }
-
-            if (currentCountDownSetting.useTitle()) {
-                plugin.messenger().broadcastTitleToServer(
-                        NodePath.path("event", "restart", "in", "title"),
-                        NodePath.path("event", "restart", "in", "subtitle"),
-                        TagResolver.resolver("hours", Tag.preProcessParsed(hours)),
-                        TagResolver.resolver("minutes", Tag.preProcessParsed(minutes)),
-                        TagResolver.resolver("seconds", Tag.preProcessParsed(seconds)),
-                        TagResolver.resolver("reason", Tag.preProcessParsed(reason))
-                );
-            }
-
-            if (currentCountDownSetting.useSound()) {
-                plugin.getServer().getOnlinePlayers().forEach(player -> player.playSound(currentCountDownSetting.soundName()));
-            }
-        }, () -> plugin.getServer().getScheduler().runTask(plugin, () -> {
-            plugin.messenger().broadcastToServer(
-                    NodePath.path("event", "restart", "now", "chat"),
-                    TagResolver.resolver("reason", Tag.preProcessParsed(reason))
-            );
-
-            plugin.messenger().broadcastTitleToServer(
-                    NodePath.path("event", "restart", "now", "title"),
-                    NodePath.path("event", "restart", "now", "subtitle"),
-                    TagResolver.resolver("reason", Tag.preProcessParsed(reason))
-            );
-            plugin.getServer().getScheduler().runTaskLater(plugin, () ->
-                    plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), "restart"), 20
-            );
-        }));
+        plugin.messenger().broadcastTitle(
+                NodePath.path("event", "restart", "now", "title"),
+                NodePath.path("event", "restart", "now", "subtitle"),
+                Title.Times.times(Duration.ZERO, Duration.ofSeconds(3), Duration.ZERO),
+                Placeholder.parsed("reason", reason)
+        );
+        plugin.getServer().getScheduler().runTaskLater(plugin, () ->
+                plugin.getServer().dispatchCommand(plugin.getServer().getConsoleSender(), "restart"), 20
+        );
     }
 }
