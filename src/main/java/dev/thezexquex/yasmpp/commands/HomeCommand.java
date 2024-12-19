@@ -114,11 +114,12 @@ public class HomeCommand extends PaperCommand<YasmpPlugin> {
                         NodePath.path("command", "sethome", "already-exists"),
                         Placeholder.parsed("home-name", homeName)
                 );
-            } else {
+            } else if ((smpPlayer.hasHome(homeName) && contex.flags().hasFlag("override")) ||
+                    (!smpPlayer.hasHome(homeName) && !contex.flags().hasFlag("override"))) {
                 var maxHomes = HomeShop.getCurrentMaxHomes(player);
                 var currHomes = smpPlayer.getHomeCache().size();
 
-                if (maxHomes == -1 || maxHomes > currHomes) {
+                if (maxHomes == -1 || maxHomes > currHomes || contex.flags().hasFlag("override")) {
                     smpPlayer.createOrUpdateHome(homeName, player.getLocation());
                     plugin.messenger().sendMessage(player,
                             NodePath.path("command", "sethome", "success"),
@@ -134,6 +135,11 @@ public class HomeCommand extends PaperCommand<YasmpPlugin> {
                             Placeholder.parsed("max-homes", String.valueOf(maxHomes))
                     );
                 }
+            } else {
+                plugin.messenger().sendMessage(player,
+                        NodePath.path("command", "sethome", "tztz"),
+                        Placeholder.parsed("home-name", homeName)
+                );
             }
         }
     }

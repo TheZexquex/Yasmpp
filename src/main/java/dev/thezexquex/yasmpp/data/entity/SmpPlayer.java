@@ -34,6 +34,7 @@ public class SmpPlayer {
 
     public void createOrUpdateHome(String id, Location location) {
         var home = new Home(player.getUniqueId(), id, LocationAdapter.asData(location));
+        homeCache.removeIf(home1 -> home1.name().equalsIgnoreCase(id));
         homeCache.add(home);
         homeService.insertHome(player.getUniqueId(), id, location);
     }

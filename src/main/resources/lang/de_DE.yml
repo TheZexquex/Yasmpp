@@ -9,6 +9,7 @@ command:
     error: "<prefix><red>Das Home konnte nicht gesetzt werden"
     max-homes-reached: "<prefix><red>Du hast deine maximalen Homes erreicht!"
     already-exists: "<prefix><red>Ein Home namens <yellow><home-name> <red>existiert bereits"
+    tztz: "<prefix><red>Sooo nicht! 😡"
   delhome:
     success: "<prefix><green>Du hast ein Home gelöscht: <yellow><home-name>"
     error: "<prefix><red>Das Home konnte nicht gelöscht werden"
