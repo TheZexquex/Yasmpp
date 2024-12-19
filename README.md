@@ -2,7 +2,7 @@
 
 ### Dependencies
 - Java 21
-- Paper 1.23.1 
+- Paper 1.21.3 
 - [AstraLib](https://github.com/UnknownCityMC/AstraLib)
 - PlaceholderAPI (Optional)
 
