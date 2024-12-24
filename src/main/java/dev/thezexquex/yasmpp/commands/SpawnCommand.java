@@ -9,6 +9,7 @@ import dev.thezexquex.yasmpp.data.adapter.LocationAdapter;
 import dev.thezexquex.yasmpp.data.entity.SmpPlayer;
 import dev.thezexquex.yasmpp.data.entity.WorldPosition;
 import dev.thezexquex.yasmpp.util.timer.aborttrigger.MovementAbortTrigger;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.CommandManager;
@@ -33,28 +34,32 @@ public class SpawnCommand extends PaperCommand<YasmpPlugin> {
     }
 
     private void handleSpawn(CommandContext<Player> commandSenderCommandContext) {
-        var player = commandSenderCommandContext.sender();
+        Bukkit.getServer().getScheduler().runTask(plugin, () -> {
+            var player = commandSenderCommandContext.sender();
 
-        plugin.smpPlayerService().getSmpPlayer(player).ifPresent(smpPlayer -> {
-            if (smpPlayer.isCurrentlyInTeleport()) {
-                plugin.messenger().sendMessage(
-                        player,
-                        NodePath.path("event", "teleport", "already-teleporting")
-                );
-                return;
-            }
-
-            var locationService = plugin.locationService();
-
-            locationService.getLocation("spawn").whenComplete((locationOpt, throwable) -> {
-                locationOpt.ifPresentOrElse(worldPosition -> {
-                    plugin.getServer().getScheduler().runTask(plugin, () -> startSpawnTeleport(smpPlayer, worldPosition));
-                }, () -> {
+            plugin.smpPlayerService().getSmpPlayer(player).ifPresentOrElse(smpPlayer -> {
+                if (smpPlayer.isCurrentlyInTeleport()) {
                     plugin.messenger().sendMessage(
                             player,
-                            NodePath.path("command", "spawn", "no-spawn")
+                            NodePath.path("event", "teleport", "already-teleporting")
                     );
+                    return;
+                }
+
+                var locationService = plugin.locationService();
+
+                locationService.getLocation("spawn").whenComplete((locationOpt, throwable) -> {
+                    locationOpt.ifPresentOrElse(worldPosition -> {
+                        plugin.getServer().getScheduler().runTask(plugin, () -> startSpawnTeleport(smpPlayer, worldPosition));
+                    }, () -> {
+                        plugin.messenger().sendMessage(
+                                player,
+                                NodePath.path("command", "spawn", "no-spawn")
+                        );
+                    });
                 });
+            }, () -> {
+                plugin.getLogger().info("virtueller Account existiert nicht");
             });
         });
     }
@@ -102,7 +107,7 @@ public class SpawnCommand extends PaperCommand<YasmpPlugin> {
     private void handleCountDownFinish(WorldPosition spawn, SmpPlayer smpPlayer) {
         var player = smpPlayer.toBukkitPlayer();
         smpPlayer.currentlyInTeleport(false);
-        plugin.getServer().getScheduler().runTask(plugin, () -> player.teleportAsync(
+        plugin.getServer().getScheduler().runTask(plugin, () -> player.teleport(
                 LocationAdapter.adapt(spawn.locationContainer(), player.getServer())
         ));
 

@@ -26,7 +26,7 @@ dependencies {
     compileOnly("de.chojo.sadu", "sadu", "2.3.0")
     implementation("xyz.xenondevs.invui", "invui", "1.41")
 
-    compileOnly("io.papermc.paper", "paper-api", "1.21.3-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper", "paper-api", "1.21.4-R0.1-SNAPSHOT")
     compileOnly("me.clip", "placeholderapi", "2.11.5")
     compileOnly("de.unknowncity.astralib", "astralib-paper-api", "0.5.0-SNAPSHOT")
     compileOnly("com.github.plan-player-analytics:Plan:5.6.2906")
@@ -80,7 +80,7 @@ tasks {
     }
 
     runServer {
-        minecraftVersion("1.21.3")
+        minecraftVersion("1.21.4")
 
         downloadPlugins {
             // ADD plugins needed for testing
