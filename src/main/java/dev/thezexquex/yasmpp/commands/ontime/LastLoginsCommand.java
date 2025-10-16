@@ -1,6 +1,5 @@
 package dev.thezexquex.yasmpp.commands.ontime;
 
-import de.unknowncity.astralib.common.command.sender.CommandSource;
 import de.unknowncity.astralib.paper.api.command.PaperCommand;
 import dev.thezexquex.yasmpp.YasmpPlugin;
 import dev.thezexquex.yasmpp.data.plan.PlanUser;
@@ -30,12 +29,12 @@ public class LastLoginsCommand extends PaperCommand<YasmpPlugin> {
     public void apply(CommandManager<CommandSender> commandManager) {
         commandManager.command(commandManager.commandBuilder("lastonline")
                 .optional("page", integerParser(1))
-                .permission("ucessentials.command.lastonline")
-                .handler(this::handleOnTimeTop)
+                .permission("yasmpp.command.lastonline")
+                .handler(this::handleLastLogins)
         );
     }
 
-    private void handleOnTimeTop(CommandContext<CommandSender> commandSourceCommandContext) {
+    private void handleLastLogins(CommandContext<CommandSender> commandSourceCommandContext) {
         var sender = (Player) commandSourceCommandContext.sender();
         var page = (int) commandSourceCommandContext.getOrDefault("page", 1);
 

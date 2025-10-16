@@ -7,6 +7,7 @@ import org.bukkit.entity.Player;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 public class SmpPlayerService {
 
@@ -22,9 +23,14 @@ public class SmpPlayerService {
         var smpPlayer = new SmpPlayer(player, plugin.homeService());
         players.add(smpPlayer);
         smpPlayer.loadHomes();
+        smpPlayer.loadHomeSlots();
     }
 
     public Optional<SmpPlayer> getSmpPlayer(Player player) {
         return players.stream().filter(smpPlayer -> smpPlayer.toBukkitPlayer().getUniqueId().equals(player.getUniqueId())).findFirst();
+    }
+
+    public Optional<SmpPlayer> getSmpPlayer(UUID player) {
+        return players.stream().filter(smpPlayer -> smpPlayer.toBukkitPlayer().getUniqueId().equals(player)).findFirst();
     }
 }

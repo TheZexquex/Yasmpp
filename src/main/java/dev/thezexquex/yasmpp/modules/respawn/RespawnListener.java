@@ -29,14 +29,14 @@ public class RespawnListener implements Listener {
             return;
         }
 
-        BukkitFutureResult.of(plugin.locationService().getLocation("spawn")).whenComplete(plugin, location -> {
-            location.ifPresent(worldPosition -> {
-                player.teleport(LocationAdapter.adapt(worldPosition.locationContainer(), player.getServer()));
-                plugin.messenger().sendMessage(
-                        player,
-                        NodePath.path("event", "death", "no-bed")
-                );
-            });
+        var spawnLocation = plugin.locationService().getLocation("spawn");
+
+        spawnLocation.ifPresent(worldPosition -> {
+            player.teleport(LocationAdapter.adapt(worldPosition.locationContainer(), player.getServer()));
+            plugin.messenger().sendMessage(
+                    player,
+                    NodePath.path("event", "death", "no-bed")
+            );
         });
     }
 

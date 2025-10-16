@@ -24,7 +24,7 @@ public class OnTimeTopCommand extends PaperCommand<YasmpPlugin> {
         commandManager.command(commandManager.commandBuilder("ontimetop")
                 .senderType(Player.class)
                 .optional("page", integerParser(1))
-                .permission("ucessentials.command.ontimetop")
+                .permission("yasmpp.command.ontimetop")
                 .handler(this::handleOnTimeTop)
         );
     }

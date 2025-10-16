@@ -1,11 +1,10 @@
-package dev.thezexquex.yasmpp.data.database.dao.location.impl.sqlite;
+package dev.thezexquex.yasmpp.data.database.dao;
 
 import de.chojo.sadu.queries.api.call.Call;
 import de.chojo.sadu.queries.api.configuration.QueryConfiguration;
 import de.chojo.sadu.queries.call.adapter.UUIDAdapter;
 import de.unknowncity.astralib.common.database.QueryConfigHolder;
 import dev.thezexquex.yasmpp.data.entity.Home;
-import dev.thezexquex.yasmpp.data.database.dao.location.abst.HomeDao;
 import org.intellij.lang.annotations.Language;
 
 import java.util.List;
@@ -13,42 +12,39 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
-public class SqliteHomeDao extends QueryConfigHolder implements HomeDao {
+public class HomeDao extends QueryConfigHolder {
 
-    public SqliteHomeDao(QueryConfiguration config) {
+    public HomeDao(QueryConfiguration config) {
         super(config);
     }
 
-    @Override
-    public CompletableFuture<Optional<Home>> getHome(UUID playerId, String id) {
+    public Optional<Home> getHome(UUID playerId, String id) {
 
         @Language("sql")
         var query = """
                 SELECT player_id, id, world, x, y, z, yaw, pitch FROM home WHERE id = :id AND player_id = :player_id
                 """;
 
-        return CompletableFuture.supplyAsync(() -> config.query(query)
+        return config.query(query)
                 .single(Call.call().bind("id", id).bind("player_id", playerId, UUIDAdapter.AS_STRING))
-                .map(Home.map())
-                .first());
+                .mapAs(Home.class)
+                .first();
     }
 
-    @Override
-    public CompletableFuture<List<Home>> getHomes(UUID playerId) {
+    public List<Home> getHomes(UUID playerId) {
 
         @Language("sql")
         var query = """
                 SELECT player_id, id, world, x, y, z, yaw, pitch FROM home WHERE player_id = :player_id
                 """;
 
-        return CompletableFuture.supplyAsync(() -> config.query(query)
+        return config.query(query)
                 .single(Call.call().bind("player_id", playerId, UUIDAdapter.AS_STRING))
-                .map(Home.map())
-                .all());
+                .mapAs(Home.class)
+                .all();
     }
 
-    @Override
-    public CompletableFuture<Boolean> saveHome(Home home) {
+    public boolean saveHome(Home home) {
 
         @Language("sql")
         var query = """
@@ -59,7 +55,7 @@ public class SqliteHomeDao extends QueryConfigHolder implements HomeDao {
         var id = home.name();
         var playerId = home.owner();
 
-        return CompletableFuture.supplyAsync(() -> config.query(query)
+        return config.query(query)
                 .single(Call.call()
                         .bind("player_id", playerId, UUIDAdapter.AS_STRING)
                         .bind("id", id)
@@ -71,12 +67,10 @@ public class SqliteHomeDao extends QueryConfigHolder implements HomeDao {
                         .bind("pitch", location.pitch())
                 )
                 .insert()
-                .changed());
-
+                .changed();
     }
 
-    @Override
-    public CompletableFuture<Boolean> updateHome(Home home) {
+    public boolean updateHome(Home home) {
 
         var location = home.locationContainer();
         var id = home.name();
@@ -87,7 +81,7 @@ public class SqliteHomeDao extends QueryConfigHolder implements HomeDao {
                 UPDATE home SET world = :world, x = :x, y = :y, z = :z, yaw = :yaw, pitch = :pitch WHERE id = :id AND player_id = :player_id
                 """;
 
-        return CompletableFuture.supplyAsync(() -> config.query(query)
+        return config.query(query)
                 .single(Call.call()
                         .bind("player_id", playerId, UUIDAdapter.AS_STRING)
                         .bind("id", id)
@@ -99,20 +93,19 @@ public class SqliteHomeDao extends QueryConfigHolder implements HomeDao {
                         .bind("pitch", location.pitch())
                 )
                 .update()
-                .changed());
+                .changed();
     }
 
-    @Override
-    public CompletableFuture<Boolean> deleteHome(UUID playerId, String id) {
+    public boolean deleteHome(UUID playerId, String id) {
 
         @Language("sql")
         var query = """
                 DELETE FROM home WHERE id = :id AND player_id = :player_id
                 """;
 
-        return CompletableFuture.supplyAsync(() -> config.query(query)
+        return config.query(query)
                 .single(Call.call().bind("id", id).bind("player_id", playerId, UUIDAdapter.AS_STRING))
                 .delete()
-                .changed());
+                .changed();
     }
 }

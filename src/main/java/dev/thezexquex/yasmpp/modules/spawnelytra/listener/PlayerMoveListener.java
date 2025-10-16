@@ -29,31 +29,30 @@ public class PlayerMoveListener implements Listener {
             return;
         }
 
-        locationService.getLocation("spawn").whenComplete((location, throwable) -> {
-            location.ifPresent(worldPosition -> {
-                var radius = plugin.configuration().generalSettings().generalSpawnElytraSettings().radius();
-                var region = new SphericalRegion(LocationAdapter.adapt(worldPosition.locationContainer(), player.getServer()), radius);
+        var spawnLocation = locationService.getLocation("spawn");
 
-                if (!region.isInRegion(player)) {
-                    if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) {
-                        return;
-                    }
+        spawnLocation.ifPresent(worldPosition -> {
+            var radius = plugin.configuration().generalSettings().generalSpawnElytraSettings().radius();
+            var region = new SphericalRegion(LocationAdapter.adapt(worldPosition.locationContainer(), player.getServer()), radius);
 
-                    if (player.hasPermission("yasmpp.fly.survival")) {
-                        return;
-                    }
-
-                    if (FJetpack2Reloaded.wearsJetpack(player)) {
-                        return;
-                    }
-
-                    player.setAllowFlight(false);
+            if (!region.isInRegion(player)) {
+                if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) {
                     return;
                 }
 
-                player.setAllowFlight(true);
+                if (player.hasPermission("yasmpp.fly.survival")) {
+                    return;
+                }
 
-            });
+                if (FJetpack2Reloaded.wearsJetpack(player)) {
+                    return;
+                }
+
+                player.setAllowFlight(false);
+                return;
+            }
+
+            player.setAllowFlight(true);
         });
     }
 }

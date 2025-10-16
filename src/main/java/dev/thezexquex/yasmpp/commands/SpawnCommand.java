@@ -18,6 +18,7 @@ import org.spongepowered.configurate.NodePath;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.logging.Level;
 
 public class SpawnCommand extends PaperCommand<YasmpPlugin> {
     public SpawnCommand(YasmpPlugin plugin) {
@@ -48,17 +49,18 @@ public class SpawnCommand extends PaperCommand<YasmpPlugin> {
 
                 var locationService = plugin.locationService();
 
-                locationService.getLocation("spawn").whenComplete((locationOpt, throwable) -> {
-                    locationOpt.ifPresentOrElse(worldPosition -> {
-                        plugin.getServer().getScheduler().runTask(plugin, () -> startSpawnTeleport(smpPlayer, worldPosition));
-                    }, () -> {
-                        plugin.messenger().sendMessage(
-                                player,
-                                NodePath.path("command", "spawn", "no-spawn")
-                        );
-                    });
+                var spawnLocation = locationService.getLocation("spawn");
+
+                spawnLocation.ifPresentOrElse(worldPosition -> {
+                    plugin.getServer().getScheduler().runTask(plugin, () -> startSpawnTeleport(smpPlayer, worldPosition));
+                }, () -> {
+                    plugin.messenger().sendMessage(
+                            player,
+                            NodePath.path("command", "spawn", "no-spawn")
+                    );
                 });
             }, () -> {
+                plugin.messenger().sendMessage(player, NodePath.path("event", "teleport", "not-logged-in"));
                 plugin.getLogger().info("virtueller Account existiert nicht");
             });
         });

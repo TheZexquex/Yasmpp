@@ -10,6 +10,7 @@ import java.util.*;
 public class SmpPlayer {
     private final Player player;
     private final List<Home> homeCache;
+    private int maxHomeSlots;
     private final HomeService homeService;
     private boolean isCurrentlyInTeleport = false;
 
@@ -43,6 +44,10 @@ public class SmpPlayer {
         homeService.getHomes(player.getUniqueId()).whenComplete((homes, throwable) -> homeCache.addAll(homes));
     }
 
+    public void loadHomeSlots() {
+        homeService.getHomeSlots(player.getUniqueId()).whenComplete((homeSlots, throwable) -> maxHomeSlots(homeSlots));
+    }
+
     public boolean hasHome(String id) {
         return homeCache.stream().anyMatch(home -> home.name().equalsIgnoreCase(id));
     }
@@ -57,5 +62,13 @@ public class SmpPlayer {
 
     public void currentlyInTeleport(boolean currentlyInTeleport) {
         isCurrentlyInTeleport = currentlyInTeleport;
+    }
+
+    public int maxHomeSlots() {
+        return maxHomeSlots;
+    }
+
+    public void maxHomeSlots(int maxHomeSlots) {
+        this.maxHomeSlots = maxHomeSlots;
     }
 }

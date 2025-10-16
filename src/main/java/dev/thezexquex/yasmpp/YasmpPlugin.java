@@ -2,7 +2,6 @@ package dev.thezexquex.yasmpp;
 
 import de.unknowncity.astralib.common.database.StandardDataBaseProvider;
 import de.unknowncity.astralib.common.hook.HookRegistry;
-import de.unknowncity.astralib.common.hook.PluginHook;
 import de.unknowncity.astralib.common.message.lang.Language;
 import de.unknowncity.astralib.common.message.lang.Localization;
 import de.unknowncity.astralib.paper.api.hook.PaperPluginHook;
@@ -14,8 +13,9 @@ import dev.thezexquex.yasmpp.commands.admin.GameCommand;
 import dev.thezexquex.yasmpp.commands.admin.GameModeCommand;
 import dev.thezexquex.yasmpp.commands.admin.SpeedCommand;
 import dev.thezexquex.yasmpp.configuration.YasmppConfiguration;
-import dev.thezexquex.yasmpp.data.database.dao.location.impl.sqlite.SqliteHomeDao;
-import dev.thezexquex.yasmpp.data.database.dao.location.impl.sqlite.SqliteLocationDao;
+import dev.thezexquex.yasmpp.data.database.dao.HomeDao;
+import dev.thezexquex.yasmpp.data.database.dao.HomeSlotDao;
+import dev.thezexquex.yasmpp.data.database.dao.LocationDao;
 import dev.thezexquex.yasmpp.data.service.HomeService;
 import dev.thezexquex.yasmpp.data.service.LocationService;
 import dev.thezexquex.yasmpp.data.service.SmpPlayerService;
@@ -31,6 +31,7 @@ import dev.thezexquex.yasmpp.modules.spawnelytra.ElytraManager;
 import dev.thezexquex.yasmpp.modules.spawnelytra.listener.*;
 
 import java.nio.file.Path;
+import java.util.logging.Logger;
 
 public class YasmpPlugin extends PaperAstraPlugin {
     private YasmppConfiguration configuration;
@@ -39,6 +40,7 @@ public class YasmpPlugin extends PaperAstraPlugin {
     private HomeService homeService;
     private SmpPlayerService smpPlayerService;
     private ElytraManager elytraManager;
+    public static final Logger LOGGER = Logger.getLogger("Yasmpp");
 
     @Override
     public void onPluginEnable() {
@@ -125,12 +127,14 @@ public class YasmpPlugin extends PaperAstraPlugin {
                 getDataPath()
         );
 
-        var locationDao = new SqliteLocationDao(queryConfig);
+        var locationDao = new LocationDao(queryConfig);
         locationService = new LocationService(locationDao);
+        locationService.loadLocations();
 
-        var homeDao = new SqliteHomeDao(queryConfig);
-        homeService = new HomeService(homeDao);
+        var homeDao = new HomeDao(queryConfig);
+        var homeSlotDao = new HomeSlotDao(queryConfig);
         smpPlayerService = new SmpPlayerService(this);
+        homeService = new HomeService(homeDao, homeSlotDao, smpPlayerService);
     }
 
     public HookRegistry<PaperAstraPlugin, PaperPluginHook> hookRegistry() {

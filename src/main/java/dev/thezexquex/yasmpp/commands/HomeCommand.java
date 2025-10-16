@@ -8,12 +8,13 @@ import dev.thezexquex.yasmpp.configuration.settings.CountDownEntry;
 import dev.thezexquex.yasmpp.data.adapter.LocationAdapter;
 import dev.thezexquex.yasmpp.data.entity.Home;
 import dev.thezexquex.yasmpp.data.entity.SmpPlayer;
-import dev.thezexquex.yasmpp.modules.shop.HomeShop;
+import dev.thezexquex.yasmpp.homes.gui.HomeSlotShop;
 import dev.thezexquex.yasmpp.util.timer.aborttrigger.MovementAbortTrigger;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.context.CommandContext;
 import org.incendo.cloud.suggestion.Suggestion;
@@ -59,6 +60,17 @@ public class HomeCommand extends PaperCommand<YasmpPlugin> {
                 .senderType(Player.class)
                 .handler(this::handleHomes)
         );
+
+        commandManager.command(commandManager.commandBuilder("homeshop")
+                .permission("yasmpp.command.homeshop")
+                .senderType(Player.class)
+                .handler(this::handleHomeShop)
+        );
+    }
+
+    private void handleHomeShop(@NonNull CommandContext<Player> context) {
+        var sender = context.sender();
+        HomeSlotShop.open(sender, plugin);
     }
 
     private void handleHomes(CommandContext<Player> context) {
@@ -117,25 +129,26 @@ public class HomeCommand extends PaperCommand<YasmpPlugin> {
                 );
             } else if ((smpPlayer.hasHome(homeName) && contex.flags().hasFlag("override")) ||
                     (!smpPlayer.hasHome(homeName) && !contex.flags().hasFlag("override"))) {
-                var maxHomes = HomeShop.getCurrentMaxHomes(player);
-                var currHomes = smpPlayer.getHomeCache().size();
+                plugin.homeService().getHomeSlots(player.getUniqueId()).thenAccept(homeSlots -> {
+                    var currHomes = smpPlayer.getHomeCache().size();
 
-                if (maxHomes == -1 || maxHomes > currHomes || contex.flags().hasFlag("override")) {
-                    smpPlayer.createOrUpdateHome(homeName, player.getLocation());
-                    plugin.messenger().sendMessage(player,
-                            NodePath.path("command", "sethome", "success"),
-                            Placeholder.parsed("home-name", homeName),
-                            Placeholder.parsed("curr-homes", String.valueOf(currHomes + 1)),
-                            Placeholder.parsed("max-homes", String.valueOf(maxHomes))
-                    );
-                } else {
-                    plugin.messenger().sendMessage(player,
-                            NodePath.path("command", "sethome", "max-homes-reached"),
-                            Placeholder.parsed("home-name", homeName),
-                            Placeholder.parsed("curr-homes", String.valueOf(currHomes)),
-                            Placeholder.parsed("max-homes", String.valueOf(maxHomes))
-                    );
-                }
+                    if (homeSlots == -1 || homeSlots > currHomes || contex.flags().hasFlag("override")) {
+                        smpPlayer.createOrUpdateHome(homeName, player.getLocation());
+                        plugin.messenger().sendMessage(player,
+                                NodePath.path("command", "sethome", "success"),
+                                Placeholder.parsed("home-name", homeName),
+                                Placeholder.parsed("curr-homes", String.valueOf(currHomes + 1)),
+                                Placeholder.parsed("max-homes", String.valueOf(homeSlots))
+                        );
+                    } else {
+                        plugin.messenger().sendMessage(player,
+                                NodePath.path("command", "sethome", "max-homes-reached"),
+                                Placeholder.parsed("home-name", homeName),
+                                Placeholder.parsed("curr-homes", String.valueOf(currHomes)),
+                                Placeholder.parsed("max-homes", String.valueOf(homeSlots))
+                        );
+                    }
+                });
             } else {
                 plugin.messenger().sendMessage(player,
                         NodePath.path("command", "sethome", "tztz"),

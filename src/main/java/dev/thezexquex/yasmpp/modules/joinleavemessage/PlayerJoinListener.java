@@ -42,10 +42,10 @@ public class PlayerJoinListener implements Listener {
         event.joinMessage(messageComponent);
 
         var locationService = plugin.locationService();
-        plugin.locationService().getLocation("spawn").whenComplete((location, throwable) -> {
-           location.ifPresentOrElse(worldPosition -> {
-               player.teleport(LocationAdapter.adapt(worldPosition.locationContainer(), player.getServer()));
-           }, () -> plugin.messenger().sendMessage(player, NodePath.path("command", "spawn", "no-spawn")));
-        });
+        var spawnLocation = locationService.getLocation("spawn");
+
+        spawnLocation.ifPresentOrElse(worldPosition -> {
+            player.teleport(LocationAdapter.adapt(worldPosition.locationContainer(), player.getServer()));
+        }, () -> plugin.messenger().sendMessage(player, NodePath.path("command", "spawn", "no-spawn")));
     }
 }

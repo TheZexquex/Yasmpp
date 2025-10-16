@@ -1,6 +1,27 @@
 prefix: "<white>[<gradient:#18edad:#18edea>SurvivalProjekt</gradient><white>] "
 chat-format: "<yellow><player><white>: <gray><message>"
+gui:
+  homeslotshop:
+    title: "<green>Home Shop"
+    item:
+      locked-name: "<!i><red>Noch nicht Freigeschaltet"
+      locked-lore:
+        - ""
+        - "<!i><gray>Dieser Slot kostet <yellow><amount> <gray>x <yellow><material>"
+        - ""
+        - "<!i><gray>Klicke um ihn freizuschalten, während du"
+        - "<!i><gray>genügend Währung im Inventar hast"
+      unlocked-name: "<!i><green>Freigeschaltet"
+      unlocked-lore:
+        - ""
+        - "<!i><gray>Dieser Slot ist bereits freigeschaltet!"
+
 command:
+  homeslot:
+    error: "<prefix><red>Es ist ein Fehler aufgetreten. Bitte melde das der Projektleitung!"
+    not-enough-currency: "<prefix><red>Du hast nicht genügend <yellow><material></yellow>. Du hast <yellow><has> <red>von <yellow><needs>"
+    out-of-order: "<prefix><red>Du must erst die Slots davor freischalten!"
+    success: "<prefix><green>Du hast einen neuen Homeslot freiigechaltet und hast nun <yellow><total>"
   home:
     success: "<prefix><green>Du wurdest zu <yellow><home-name> <green>teleportiert!"
     notfound: "<prefix><red>Es wurde kein Home namens <yellow><home-name> <red>gefunden"

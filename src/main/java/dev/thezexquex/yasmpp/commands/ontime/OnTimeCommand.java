@@ -29,13 +29,13 @@ public class OnTimeCommand extends PaperCommand<YasmpPlugin> {
     public void apply(CommandManager<CommandSender> commandManager) {
         commandManager.command(commandManager.commandBuilder("ontime")
                 .senderType(Player.class)
-                .permission("ucessentials.command.ontime.self")
+                .permission("yasmpp.command.ontime.self")
                 .handler(this::handlePlayTime)
         );
 
         commandManager.command(commandManager.commandBuilder("ontime")
                 .senderType(Player.class)
-                .permission("ucessentials.command.ontime.self")
+                .permission("yasmpp.command.ontime.self")
                 .required("player_name", stringParser(), (context, input) -> CompletableFuture.completedFuture(suggestions))
                 .handler(this::handlePlayTime)
         );

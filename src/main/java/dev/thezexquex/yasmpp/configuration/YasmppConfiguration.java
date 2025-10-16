@@ -4,10 +4,7 @@ import de.unknowncity.astralib.common.configuration.YamlAstraConfiguration;
 import de.unknowncity.astralib.common.configuration.annotation.Config;
 import de.unknowncity.astralib.common.configuration.setting.defaults.ModernDataBaseSetting;
 import de.unknowncity.astralib.libs.com.fasterxml.jackson.annotation.JsonProperty;
-import dev.thezexquex.yasmpp.configuration.settings.ChatSettings;
-import dev.thezexquex.yasmpp.configuration.settings.CountDownSettings;
-import dev.thezexquex.yasmpp.configuration.settings.GeneralSettings;
-import dev.thezexquex.yasmpp.configuration.settings.TeleportSettings;
+import dev.thezexquex.yasmpp.configuration.settings.*;
 
 @Config(targetFile = "plugins/Yasmpp/config.yml")
 public class YasmppConfiguration extends YamlAstraConfiguration {
@@ -26,6 +23,9 @@ public class YasmppConfiguration extends YamlAstraConfiguration {
 
     @JsonProperty
     private CountDownSettings countDownSettings = new CountDownSettings();
+
+    @JsonProperty
+    private HomeSettings homeSettings = new HomeSettings();
 
     public YasmppConfiguration() {
 
@@ -48,5 +48,9 @@ public class YasmppConfiguration extends YamlAstraConfiguration {
 
     public ModernDataBaseSetting modernDataBaseSetting() {
         return modernDataBaseSetting;
+    }
+
+    public HomeSettings homeSettings() {
+        return homeSettings;
     }
 }

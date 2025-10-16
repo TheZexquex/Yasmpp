@@ -44,5 +44,5 @@ CREATE TABLE IF NOT EXISTS staff_player
 CREATE TABLE IF NOT EXISTS game
 (
     is_spawn_set INTEGER NOT NULL DEFAULT 0,
-    game_state TEXT NOT NULL DEFAULT "SETUP"
+    game_state TEXT NOT NULL DEFAULT 'SETUP'
 );

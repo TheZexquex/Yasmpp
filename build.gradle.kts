@@ -23,7 +23,6 @@ repositories {
 }
 
 dependencies {
-    implementation("de.chojo.sadu", "sadu", "2.3.2")
     implementation("xyz.xenondevs.invui", "invui", "2.0.0-alpha.20")
 
     compileOnly("io.papermc.paper", "paper-api", "1.21.10-R0.1-SNAPSHOT")
