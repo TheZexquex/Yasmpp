@@ -4,6 +4,8 @@ import de.unknowncity.astralib.libs.com.fasterxml.jackson.annotation.JsonPropert
 
 public class TeleportSettings {
     @JsonProperty
+    private int teleportPrice = 3;
+    @JsonProperty
     private int teleportCoolDownInSeconds = 3;
     @JsonProperty
     private boolean cancelOnMove = true;
@@ -36,5 +38,9 @@ public class TeleportSettings {
 
     public void setPermissionBypassesCoolDown(boolean permissionBypassesCoolDown) {
         this.permissionBypassesCoolDown = permissionBypassesCoolDown;
+    }
+
+    public int teleportPrice() {
+        return teleportPrice;
     }
 }

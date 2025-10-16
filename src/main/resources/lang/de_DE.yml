@@ -199,8 +199,10 @@ event:
   elytra-boost:
     all-used: "<prefix><red>Du hast alle deine Boosts aufgebraucht!"
     remaining: "<prefix><green>Du kannst noch <yellow><boosts>x <green>boosten!"
+    firework: "<prefix><red>Raketen sind mit der Spawnelytra deaktiviert!"
   open-crafting-table: "<prefix><gray>Du hast <yellow><type> <gray>geöffnet"
   teleport:
+    not-enough-currency: "<prefix><red>Du hast nicht genug Diamanten. Preis: <yellow><price>"
     already-teleporting: "<prefix><red>Du teleportierst dich bereits"
     success: "<prefix><green>Du wurdest zu Spawn teleportiert"
     cancel: "<prefix><red>Da du dich bewegt hast wurde der Teleportvorgang abgebrochen"

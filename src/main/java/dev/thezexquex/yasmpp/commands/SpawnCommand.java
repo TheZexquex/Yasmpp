@@ -2,6 +2,7 @@ package dev.thezexquex.yasmpp.commands;
 
 import de.unknowncity.astralib.common.timer.Countdown;
 import de.unknowncity.astralib.paper.api.command.PaperCommand;
+import de.unknowncity.astralib.paper.api.inventory.InventoryUtil;
 import dev.thezexquex.yasmpp.YasmpPlugin;
 import dev.thezexquex.yasmpp.commands.util.CountDownMessenger;
 import dev.thezexquex.yasmpp.configuration.settings.CountDownEntry;
@@ -9,9 +10,12 @@ import dev.thezexquex.yasmpp.data.adapter.LocationAdapter;
 import dev.thezexquex.yasmpp.data.entity.SmpPlayer;
 import dev.thezexquex.yasmpp.data.entity.WorldPosition;
 import dev.thezexquex.yasmpp.util.timer.aborttrigger.MovementAbortTrigger;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.context.CommandContext;
 import org.spongepowered.configurate.NodePath;
@@ -51,13 +55,25 @@ public class SpawnCommand extends PaperCommand<YasmpPlugin> {
 
                 var spawnLocation = locationService.getLocation("spawn");
 
-                spawnLocation.ifPresentOrElse(worldPosition -> {
-                    plugin.getServer().getScheduler().runTask(plugin, () -> startSpawnTeleport(smpPlayer, worldPosition));
-                }, () -> {
+                if (spawnLocation.isEmpty()) {
                     plugin.messenger().sendMessage(
                             player,
                             NodePath.path("command", "spawn", "no-spawn")
                     );
+                    return;
+                }
+
+                plugin.getServer().getScheduler().runTask(plugin, () -> {
+
+                    var price = plugin.configuration().teleportSettings().teleportPrice();
+                    if (!InventoryUtil.hasEnoughItems(player, ItemStack.of(Material.DIAMOND), price)) {
+                        plugin.messenger().sendMessage(player, NodePath.path("event", "teleport", "not-enough-currency"),
+                                Placeholder.parsed("price", String.valueOf(price)));
+                        return;
+                    }
+                    InventoryUtil.removeSpecificItemCount(player, ItemStack.of(Material.DIAMOND), price);
+
+                    startSpawnTeleport(smpPlayer, spawnLocation.get());
                 });
             }, () -> {
                 plugin.messenger().sendMessage(player, NodePath.path("event", "teleport", "not-logged-in"));
