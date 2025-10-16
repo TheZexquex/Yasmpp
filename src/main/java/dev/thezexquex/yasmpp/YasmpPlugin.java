@@ -65,7 +65,7 @@ public class YasmpPlugin extends PaperAstraPlugin {
 
         var papiHook = hookRegistry.getRegistered(PlaceholderApiHook.class);
 
-        this.messenger = PaperMessenger.builder(localization)
+        this.messenger = PaperMessenger.builder(localization, getPluginMeta())
                 .withPlaceHolderAPI(papiHook)
                 .withDefaultLanguage(Language.GERMAN)
                 .build();

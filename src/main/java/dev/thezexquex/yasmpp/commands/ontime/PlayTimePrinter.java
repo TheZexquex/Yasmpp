@@ -43,7 +43,7 @@ public class PlayTimePrinter {
         var onTimeYear = serverName != null ? planUser.getOnTimeYearServer(serverName) : planUser.getOnTimeYear();
         var onTimeAll = serverName != null ? planUser.getOnTimeTotalServer(serverName) : planUser.getOnTimeTotal();
         var year = LocalDate.now().getYear();
-        var empty = messenger.getString(Language.GERMAN, NodePath.path("command", "ontime", "empty"));
+        var empty = messenger.getStringOrNotAvailable(Language.GERMAN, NodePath.path("command", "ontime", "empty"));
 
         var node = NodePath.path("command", "ontime", "global");
 

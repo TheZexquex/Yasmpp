@@ -57,7 +57,7 @@ public class ChatListener implements Listener {
             return ChatUtil.getFormattedChatMessage(
                     source,
                     messageAsString,
-                    plugin.messenger().getString(Language.GERMAN, NodePath.path("chat-format"))
+                    plugin.messenger().getStringOrNotAvailable(Language.GERMAN, NodePath.path("chat-format"))
             );
         });
     }
