@@ -2,7 +2,7 @@ prefix: "<white>[<gradient:#18edad:#18edea>SurvivalProjekt</gradient><white>] "
 chat-format: "<yellow><player><white>: <gray><message>"
 gui:
   homeslotshop:
-    title: "<green>Home Shop"
+    title: "              <gradient:#00bbff:#0055ff:#00bbff>Hᴏᴍᴇ Sʜᴏᴘ"
     item:
       locked-name: "<!i><red>Noch nicht Freigeschaltet"
       locked-lore:

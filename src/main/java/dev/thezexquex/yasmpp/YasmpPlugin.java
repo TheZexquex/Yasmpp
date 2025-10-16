@@ -97,6 +97,7 @@ public class YasmpPlugin extends PaperAstraPlugin {
         pluginManager.registerEvents(new FlightAttemptListener(this), this);
         pluginManager.registerEvents(new PlayerMoveListener(this), this);
         pluginManager.registerEvents(new ElytraSavetyPlayerJoinListener(this), this);
+        pluginManager.registerEvents(new ElytraBoostListener(this), this);
 
         // Lock end
         pluginManager.registerEvents(new LockEndListener(this), this);
