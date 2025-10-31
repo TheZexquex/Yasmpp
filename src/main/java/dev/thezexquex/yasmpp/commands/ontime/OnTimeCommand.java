@@ -67,7 +67,7 @@ public class OnTimeCommand extends PaperCommand<YasmpPlugin> {
                 .anyMatch(player -> player.getUniqueId().equals(planUser.uniqueId()));
 
         PlayTimePrinter.printPlayTime(
-                sender, planUser, plugin.configuration().generalSettings().planServerName(), online, plugin.messenger()
+                sender, planUser, plugin.configuration().general().planServerName(), online, plugin.messenger()
         );
     }
 }

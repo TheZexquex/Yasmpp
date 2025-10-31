@@ -33,7 +33,7 @@ public class HomeSlotItem extends AbstractItem {
 
     @Override
     public @NotNull ItemProvider getItemProvider(@NotNull Player player) {
-        var lockedItem = ItemBuilder.of(Material.valueOf(plugin.configuration().homeSettings().lockedHomeSlotMaterial()))
+        var lockedItem = ItemBuilder.of(Material.valueOf(plugin.configuration().homes().lockedHomeSlotMaterial()))
                 .name(plugin.messenger().component(player, NodePath.path("gui", "homeslotshop", "item", "locked-name")))
                 .lore(plugin.messenger().componentList(player, NodePath.path("gui", "homeslotshop", "item", "locked-lore"),
                         Placeholder.unparsed("homeslot", String.valueOf(homeSlot.index())),
@@ -42,7 +42,7 @@ public class HomeSlotItem extends AbstractItem {
                 ))
                 .item();
 
-        var unlockedItem = ItemBuilder.of(Material.valueOf(plugin.configuration().homeSettings().unlockedHomeSlotMaterial()))
+        var unlockedItem = ItemBuilder.of(Material.valueOf(plugin.configuration().homes().unlockedHomeSlotMaterial()))
                 .name(plugin.messenger().component(player, NodePath.path("gui", "homeslotshop", "item", "unlocked-name")))
                 .lore(plugin.messenger().componentList(player, NodePath.path("gui", "homeslotshop", "item", "unlocked-lore"),
                         Placeholder.unparsed("homeslot", String.valueOf(homeSlot.index())),

@@ -19,7 +19,7 @@ public class LockEndListener implements Listener {
         if (event.getCause() != PlayerTeleportEvent.TeleportCause.END_PORTAL) {
             return;
         }
-        if (!plugin.configuration().generalSettings().generalEndSettings().lockEnd()) {
+        if (!plugin.configuration().general().generalEndSettings().lockEnd()) {
             return;
         }
 

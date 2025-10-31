@@ -1,6 +1,8 @@
 package dev.thezexquex.yasmpp.configuration.settings;
 
 import de.unknowncity.astralib.libs.com.fasterxml.jackson.annotation.JsonProperty;
+import dev.thezexquex.yasmpp.modules.chat.method.BlockMethod;
+import dev.thezexquex.yasmpp.modules.chat.method.ReplaceMethod;
 
 import java.util.List;
 
@@ -9,7 +11,10 @@ public final class ChatSettings {
     private boolean handleChat = true;
 
     @JsonProperty
-    private List<String> forbiddenWords = List.of("[s,S].*[p,P].*[e,E,3].*[e,E,3].*[d,D].*[k,K].*[i,I].*[n,N].*[g,G].*?[s,S]");
+    private List<ChatFilterRule> filter = List.of(
+            new ChatFilterRule("[s,S].*[p,P].*[e,E,3].*[e,E,3].*[d,D].*[k,K].*[i,I].*[n,N].*[g,G].*?[s,S]", ChatFilterRule.Type.FORBIDDEN, new BlockMethod()),
+            new ChatFilterRule("/(TheZexquex ist) .*/gmi", ChatFilterRule.Type.FORBIDDEN, new ReplaceMethod("$1 ein cooler Typ"))
+    );
 
     public ChatSettings() {
 
@@ -19,15 +24,7 @@ public final class ChatSettings {
         return handleChat;
     }
 
-    public void setHandleChat(boolean handleChat) {
-        this.handleChat = handleChat;
-    }
-
-    public List<String> forbiddenWords() {
-        return forbiddenWords;
-    }
-
-    public void forbiddenWords(List<String> forbiddenWords) {
-        this.forbiddenWords = forbiddenWords;
+    public List<ChatFilterRule> filter() {
+        return filter;
     }
 }

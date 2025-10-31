@@ -10,47 +10,41 @@ import dev.thezexquex.yasmpp.configuration.settings.*;
 public class YasmppConfiguration extends YamlAstraConfiguration {
 
     @JsonProperty
-    private ModernDataBaseSetting modernDataBaseSetting = new ModernDataBaseSetting();
+    private ModernDataBaseSetting database = new ModernDataBaseSetting();
 
     @JsonProperty
-    private GeneralSettings generalSettings = new GeneralSettings();
+    private GeneralSettings general = new GeneralSettings();
 
     @JsonProperty
-    private TeleportSettings teleportSettings = new TeleportSettings();
+    private TeleportSettings teleport = new TeleportSettings();
 
     @JsonProperty
-    private final ChatSettings chatSettings = new ChatSettings();
+    private final ChatSettings chat = new ChatSettings();
 
     @JsonProperty
-    private CountDownSettings countDownSettings = new CountDownSettings();
-
-    @JsonProperty
-    private HomeSettings homeSettings = new HomeSettings();
+    private HomeSettings homes = new HomeSettings();
 
     public YasmppConfiguration() {
 
     }
-    public GeneralSettings generalSettings() {
-        return generalSettings;
+    public GeneralSettings general() {
+        return general;
     }
 
-    public TeleportSettings teleportSettings() {
-        return teleportSettings;
+    public TeleportSettings teleport() {
+        return teleport;
     }
 
-    public ChatSettings chatSettings() {
-        return chatSettings;
+    public ChatSettings chat() {
+        return chat;
     }
 
-    public CountDownSettings countDownSettings() {
-        return countDownSettings;
+
+    public ModernDataBaseSetting database() {
+        return database;
     }
 
-    public ModernDataBaseSetting modernDataBaseSetting() {
-        return modernDataBaseSetting;
-    }
-
-    public HomeSettings homeSettings() {
-        return homeSettings;
+    public HomeSettings homes() {
+        return homes;
     }
 }

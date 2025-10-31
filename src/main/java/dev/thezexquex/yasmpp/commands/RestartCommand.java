@@ -75,7 +75,7 @@ public class RestartCommand extends PaperCommand<YasmpPlugin> {
         var sender = commandSenderCommandContext.sender();
         var duration = (Duration) commandSenderCommandContext.get("time");
         var reason = (String) commandSenderCommandContext.get("reason");
-        var countDownSettings = plugin.configuration().countDownSettings().restartCountDown();
+        var countDownSettings = plugin.countdownConfiguration().countdown().restart();
         if (countdown == null || !countdown.isRunning()) {
             countdown = Countdown.builder()
                     .withRunOnFinish(() -> handleCountDownFinish(reason))

@@ -4,7 +4,6 @@ import de.unknowncity.astralib.paper.api.item.ItemBuilder;
 import dev.thezexquex.yasmpp.YasmpPlugin;
 import dev.thezexquex.yasmpp.homes.gui.item.HomeSlotItem;
 import net.kyori.adventure.text.Component;
-import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.spongepowered.configurate.NodePath;
@@ -23,7 +22,7 @@ public class HomeSlotShop {
 
         var title = plugin.messenger().component(player, NodePath.path("gui", "homeslotshop", "title"));
 
-        var homeSlots = plugin.configuration().homeSettings().homeSlots();
+        var homeSlots = plugin.configuration().homes().homeSlots();
 
         var smpPlayer = plugin.smpPlayerService().getSmpPlayer(player);
         if (smpPlayer.isEmpty()) {
@@ -37,7 +36,7 @@ public class HomeSlotShop {
                 .toList();
 
         var structure = new Structure(
-                plugin.configuration().homeSettings().homeShopGuiStructure().toArray(String[]::new)
+                plugin.configuration().homes().homeShopGuiStructure().toArray(String[]::new)
         )
                 .addIngredient('x', Item.simple(borderItem))
                 .addIngredient('.', Markers.CONTENT_LIST_SLOT_HORIZONTAL);

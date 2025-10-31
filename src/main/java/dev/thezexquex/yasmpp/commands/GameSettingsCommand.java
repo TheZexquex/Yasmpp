@@ -87,7 +87,7 @@ public class GameSettingsCommand extends PaperCommand<YasmpPlugin> {
 
         var value = (int) commandSenderCommandContext.get("cooldown");
 
-        plugin.configuration().generalSettings().generalSpawnElytraSettings().setMaxBoosts(value);
+        plugin.configuration().general().generalSpawnElytraSettings().setMaxBoosts(value);
         plugin.configuration().save();
 
         plugin.messenger().sendMessage(
@@ -102,7 +102,7 @@ public class GameSettingsCommand extends PaperCommand<YasmpPlugin> {
 
         var value = (boolean) commandSenderCommandContext.get("bypasses");
 
-        if (plugin.configuration().teleportSettings().permissionBypassesCoolDown() == value) {
+        if (plugin.configuration().teleport().permissionBypassesCoolDown() == value) {
             plugin.messenger().sendMessage(
                     sender,
                     NodePath.path("command", "settings", "teleport", "permission-bypass", "already", value ? "enabled" : "disabled")
@@ -110,7 +110,7 @@ public class GameSettingsCommand extends PaperCommand<YasmpPlugin> {
             return;
         }
 
-        plugin.configuration().teleportSettings().setPermissionBypassesCoolDown(value);
+        plugin.configuration().teleport().setPermissionBypassesCoolDown(value);
         plugin.configuration().save();
 
 
@@ -125,7 +125,7 @@ public class GameSettingsCommand extends PaperCommand<YasmpPlugin> {
 
         var value = (boolean) commandSenderCommandContext.get("cancel");
 
-        if (plugin.configuration().teleportSettings().cancelOnMove() == value) {
+        if (plugin.configuration().teleport().cancelOnMove() == value) {
             plugin.messenger().sendMessage(
                     sender,
                     NodePath.path("command", "settings", "teleport", "cancel-on-move", "already", value ? "enabled" : "disabled")
@@ -133,7 +133,7 @@ public class GameSettingsCommand extends PaperCommand<YasmpPlugin> {
             return;
         }
 
-        plugin.configuration().teleportSettings().setCancelOnMove(value);
+        plugin.configuration().teleport().setCancelOnMove(value);
         plugin.configuration().save();
 
         plugin.messenger().sendMessage(
@@ -147,7 +147,7 @@ public class GameSettingsCommand extends PaperCommand<YasmpPlugin> {
 
         var value = (int) commandSenderCommandContext.get("max-boosts");
 
-        plugin.configuration().generalSettings().generalSpawnElytraSettings().setMaxBoosts(value);
+        plugin.configuration().general().generalSpawnElytraSettings().setMaxBoosts(value);
         plugin.configuration().save();
 
         plugin.messenger().sendMessage(
@@ -162,7 +162,7 @@ public class GameSettingsCommand extends PaperCommand<YasmpPlugin> {
 
         var value = (int) commandSenderCommandContext.get("radius");
 
-        plugin.configuration().generalSettings().generalSpawnElytraSettings().setRadius(value);
+        plugin.configuration().general().generalSpawnElytraSettings().setRadius(value);
         plugin.configuration().save();
 
         plugin.messenger().sendMessage(
@@ -177,7 +177,7 @@ public class GameSettingsCommand extends PaperCommand<YasmpPlugin> {
 
         var value = (boolean) commandSenderCommandContext.get("lock-end");
 
-        if (plugin.configuration().generalSettings().generalEndSettings().lockEnd() == value) {
+        if (plugin.configuration().general().generalEndSettings().lockEnd() == value) {
             plugin.messenger().sendMessage(
                     sender,
                     NodePath.path("command", "settings", "lockend", "already", value ? "enabled" : "disabled")
@@ -185,7 +185,7 @@ public class GameSettingsCommand extends PaperCommand<YasmpPlugin> {
             return;
         }
 
-        plugin.configuration().generalSettings().generalEndSettings().setLockEnd(value);
+        plugin.configuration().general().generalEndSettings().setLockEnd(value);
         plugin.configuration().save();
 
         plugin.messenger().sendMessage(
@@ -201,7 +201,7 @@ public class GameSettingsCommand extends PaperCommand<YasmpPlugin> {
         var type = (DamageType) commandSenderCommandContext.get("type");
 
         if (type == DamageType.TNT) {
-            if (plugin.configuration().generalSettings().generalExplosionDamageSettings().doTntDamage() == value) {
+            if (plugin.configuration().general().generalExplosionDamageSettings().doTntDamage() == value) {
                 plugin.messenger().sendMessage(
                         sender,
                         NodePath.path("command", "settings", "blockdamage", "already", value ? "enabled" : "disabled"),
@@ -210,7 +210,7 @@ public class GameSettingsCommand extends PaperCommand<YasmpPlugin> {
                 return;
             }
 
-            plugin.configuration().generalSettings().generalExplosionDamageSettings().setDoTntDamage(value);
+            plugin.configuration().general().generalExplosionDamageSettings().setDoTntDamage(value);
             plugin.configuration().save();
 
             plugin.messenger().sendMessage(
@@ -219,7 +219,7 @@ public class GameSettingsCommand extends PaperCommand<YasmpPlugin> {
                     TagResolver.resolver("type", Tag.preProcessParsed("Tnt"))
             );
         } else if (type == DamageType.CREEPER) {
-            if (plugin.configuration().generalSettings().generalExplosionDamageSettings().doCreeperDamage() == value) {
+            if (plugin.configuration().general().generalExplosionDamageSettings().doCreeperDamage() == value) {
                 plugin.messenger().sendMessage(
                         sender,
                         NodePath.path("command", "settings", "blockdamage", "already", value ? "enabled" : "disabled"),
@@ -228,7 +228,7 @@ public class GameSettingsCommand extends PaperCommand<YasmpPlugin> {
                 return;
             }
 
-            plugin.configuration().generalSettings().generalExplosionDamageSettings().setDoCreeperDamage(value);
+            plugin.configuration().general().generalExplosionDamageSettings().setDoCreeperDamage(value);
             plugin.configuration().save();
 
             plugin.messenger().sendMessage(

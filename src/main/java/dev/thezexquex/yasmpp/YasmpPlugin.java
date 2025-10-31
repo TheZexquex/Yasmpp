@@ -12,6 +12,7 @@ import dev.thezexquex.yasmpp.commands.*;
 import dev.thezexquex.yasmpp.commands.admin.GameCommand;
 import dev.thezexquex.yasmpp.commands.admin.GameModeCommand;
 import dev.thezexquex.yasmpp.commands.admin.SpeedCommand;
+import dev.thezexquex.yasmpp.configuration.CountdownConfiguration;
 import dev.thezexquex.yasmpp.configuration.YasmppConfiguration;
 import dev.thezexquex.yasmpp.data.database.dao.HomeDao;
 import dev.thezexquex.yasmpp.data.database.dao.HomeSlotDao;
@@ -29,12 +30,15 @@ import dev.thezexquex.yasmpp.modules.mobileworkstations.WorkstationInteractListe
 import dev.thezexquex.yasmpp.modules.respawn.RespawnListener;
 import dev.thezexquex.yasmpp.modules.spawnelytra.ElytraManager;
 import dev.thezexquex.yasmpp.modules.spawnelytra.listener.*;
+import org.bukkit.Bukkit;
+import org.bukkit.permissions.Permission;
 
 import java.nio.file.Path;
 import java.util.logging.Logger;
 
 public class YasmpPlugin extends PaperAstraPlugin {
     private YasmppConfiguration configuration;
+    private CountdownConfiguration countdownConfiguration;
     private PaperMessenger messenger;
     private LocationService locationService;
     private HomeService homeService;
@@ -51,6 +55,8 @@ public class YasmpPlugin extends PaperAstraPlugin {
         hookRegistry.register(new PlanHook(this));
         applyCommands();
         elytraManager = new ElytraManager(this);
+
+        Permissions.ALL_PERMISSIONS.forEach(permission -> Bukkit.getPluginManager().addPermission(new Permission(permission)));
     }
 
     public void reloadPlugin() {
@@ -76,6 +82,10 @@ public class YasmpPlugin extends PaperAstraPlugin {
 
         this.configuration = configOpt.orElseGet(YasmppConfiguration::new);
         this.configuration.save();
+
+        var countdownConfigOpt = CountdownConfiguration.loadFromFile(CountdownConfiguration.class);
+        this.countdownConfiguration = countdownConfigOpt.orElseGet(CountdownConfiguration::new);
+        this.countdownConfiguration.save();
     }
 
     private void applyListeners() {
@@ -102,7 +112,6 @@ public class YasmpPlugin extends PaperAstraPlugin {
         // Lock end
         pluginManager.registerEvents(new LockEndListener(this), this);
 
-        //Teleport
         pluginManager.registerEvents(new ChatListener(this), this);
     }
 
@@ -123,7 +132,7 @@ public class YasmpPlugin extends PaperAstraPlugin {
 
     private void initDataServices() {
         var queryConfig = StandardDataBaseProvider.updateAndConnectToDataBase(
-                configuration.modernDataBaseSetting(),
+                configuration.database(),
                 getClassLoader(),
                 getDataPath()
         );
@@ -144,6 +153,10 @@ public class YasmpPlugin extends PaperAstraPlugin {
 
     public YasmppConfiguration configuration() {
         return configuration;
+    }
+
+    public CountdownConfiguration countdownConfiguration() {
+        return countdownConfiguration;
     }
 
     public PaperMessenger messenger() {

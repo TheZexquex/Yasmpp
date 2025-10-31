@@ -22,7 +22,6 @@ import org.spongepowered.configurate.NodePath;
 
 import java.time.Duration;
 import java.util.List;
-import java.util.logging.Level;
 
 public class SpawnCommand extends PaperCommand<YasmpPlugin> {
     public SpawnCommand(YasmpPlugin plugin) {
@@ -65,7 +64,7 @@ public class SpawnCommand extends PaperCommand<YasmpPlugin> {
 
                 plugin.getServer().getScheduler().runTask(plugin, () -> {
 
-                    var price = plugin.configuration().teleportSettings().teleportPrice();
+                    var price = plugin.configuration().teleport().teleportPrice();
                     if (!InventoryUtil.hasEnoughItems(player, ItemStack.of(Material.DIAMOND), price)) {
                         plugin.messenger().sendMessage(player, NodePath.path("event", "teleport", "not-enough-currency"),
                                 Placeholder.parsed("price", String.valueOf(price)));
@@ -83,10 +82,10 @@ public class SpawnCommand extends PaperCommand<YasmpPlugin> {
     }
 
     private void startSpawnTeleport(SmpPlayer player, WorldPosition worldPosition) {
-        var countDownInSec = plugin.configuration().teleportSettings().teleportCoolDownInSeconds();
-        var countDownSettings = plugin.configuration().countDownSettings().teleportCountDown();
+        var countDownInSec = plugin.configuration().teleport().teleportCoolDownInSeconds();
+        var countDownSettings = plugin.countdownConfiguration().countdown().teleport();
 
-        if (plugin.configuration().teleportSettings().permissionBypassesCoolDown()
+        if (plugin.configuration().teleport().permissionBypassesCoolDown()
                 && player.toBukkitPlayer().hasPermission("yasmpp.teleport.cooldown.bypass")) {
             countDownInSec = 0;
         }

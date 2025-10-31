@@ -6,7 +6,7 @@ import java.util.List;
 
 public class CountDownSettings {
     @JsonProperty
-    private List<CountDownEntry> restartCountDown = List.of(
+    private List<CountDownEntry> restart = List.of(
             new CountDownEntry(600, true, false, true, "entity.experience_orb.pickup"),
             new CountDownEntry(300, true, false, true, "entity.experience_orb.pickup"),
             new CountDownEntry(120, true, false, true, "entity.experience_orb.pickup"),
@@ -24,7 +24,7 @@ public class CountDownSettings {
     );
 
     @JsonProperty
-    private List<CountDownEntry> gameStartCountDown = List.of(
+    private List<CountDownEntry> gamestart = List.of(
             new CountDownEntry(15, true, true, true, "entity.experience_orb.pickup"),
             new CountDownEntry(10, true, true, true, "entity.experience_orb.pickup"),
             new CountDownEntry(5, true, true, true, "entity.experience_orb.pickup"),
@@ -36,7 +36,7 @@ public class CountDownSettings {
     );
 
     @JsonProperty
-    private List<CountDownEntry> teleportCountDown = List.of(
+    private List<CountDownEntry> teleport = List.of(
             new CountDownEntry(5, false, true, true, "entity.experience_orb.pickup"),
             new CountDownEntry(4, false, true, true, "entity.experience_orb.pickup"),
             new CountDownEntry(3, false, true, true, "entity.experience_orb.pickup"),
@@ -46,7 +46,7 @@ public class CountDownSettings {
     );
 
     @JsonProperty
-    private List<CountDownEntry> openEndCountDown = List.of(
+    private List<CountDownEntry> openportal = List.of(
             new CountDownEntry(15, true, true, true, "entity.experience_orb.pickup"),
             new CountDownEntry(10, true, true, true, "entity.experience_orb.pickup"),
             new CountDownEntry(5, true, true, true, "entity.experience_orb.pickup"),
@@ -61,19 +61,19 @@ public class CountDownSettings {
 
     }
 
-    public List<CountDownEntry> restartCountDown() {
-        return restartCountDown;
+    public List<CountDownEntry> restart() {
+        return restart;
     }
 
-    public List<CountDownEntry> gameStartCountDown() {
-        return gameStartCountDown;
+    public List<CountDownEntry> gamestart() {
+        return gamestart;
     }
 
-    public List<CountDownEntry> teleportCountDown() {
-        return teleportCountDown;
+    public List<CountDownEntry> teleport() {
+        return teleport;
     }
 
-    public List<CountDownEntry> openEndCountDown() {
-        return openEndCountDown;
+    public List<CountDownEntry> openportal() {
+        return openportal;
     }
 }

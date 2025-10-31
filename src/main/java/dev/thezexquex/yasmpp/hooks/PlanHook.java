@@ -23,7 +23,7 @@ public class PlanHook extends PaperPluginHook {
 
         plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
             planQueryService.refreshPlanCache(QueryService.getInstance());
-        }, 0, ((YasmpPlugin) plugin).configuration().generalSettings().planDataRefreshInterval() * 20L);
+        }, 0, ((YasmpPlugin) plugin).configuration().general().planDataRefreshInterval() * 20L);
     }
 
     public PlanQueryService planQueryService() {

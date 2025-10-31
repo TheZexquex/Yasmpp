@@ -1,64 +1,73 @@
 package dev.thezexquex.yasmpp.modules.chat;
 
 import de.unknowncity.astralib.common.message.lang.Language;
+import dev.thezexquex.yasmpp.Permissions;
 import dev.thezexquex.yasmpp.YasmpPlugin;
 import io.papermc.paper.event.player.AsyncChatEvent;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.spongepowered.configurate.NodePath;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.regex.Pattern;
 
 public class ChatListener implements Listener {
 
     private final YasmpPlugin plugin;
-    private final List<Pattern> badWordPatterns = new ArrayList<>();
+    private final ChatFilter chatFilter;
 
     public ChatListener(YasmpPlugin plugin) {
         this.plugin = plugin;
-        plugin.configuration()
-                .chatSettings()
-                .forbiddenWords()
-                .forEach(string -> badWordPatterns.add(Pattern.compile(string)));
+        this.chatFilter = new ChatFilter(plugin);
     }
 
     @EventHandler()
     public void onChat(AsyncChatEvent event) {
         // Check if the plugin should touch the chat logic or if another plugin is used for chat
-        var handleChat = plugin.configuration().chatSettings().handleChat();
+        var handleChat = plugin.configuration().chat().handleChat();
         if (!handleChat) {
             return;
         }
 
-        event.renderer((source, sourceDisplayName, message, viewer) -> {
-            var messageAsString = PlainTextComponentSerializer.plainText().serialize(message);
-            // Check for not allowed text in chat
-            if (!source.hasPermission("yasmpp.chat.filter.bypass")) {
-                var result = ChatUtil.containsBadWords(messageAsString, badWordPatterns);
-                if (result.key()) {
-                    plugin.messenger().sendMessage(
-                            source,
-                            NodePath.path("event", "chat", "not-allowed-string"),
-                            Placeholder.parsed("match", result.value())
-                    );
-                    event.setCancelled(true);
-                    return Component.empty();
-                }
-            }
+        event.setCancelled(true);
 
-            return ChatUtil.getFormattedChatMessage(
+        var message = event.message();
+        var source = event.getPlayer();
+        var messageAsString = PlainTextComponentSerializer.plainText().serialize(message);
+
+        var result = chatFilter.applyFilter(source, messageAsString);
+
+        if (result.outcome() == ChatFilter.ChatFilterResult.Outcome.BLOCK) {
+            plugin.messenger().sendMessage(
                     source,
-                    messageAsString,
-                    plugin.messenger().getStringOrNotAvailable(Language.GERMAN, NodePath.path("chat-format"))
+                    NodePath.path("event", "chat", "filter", "block"),
+                    Placeholder.parsed("input", messageAsString)
             );
+            notifyStaff(source, result);
+            return;
+        }
+
+        var formattedMessage = ChatUtil.getFormattedChatMessage(
+                source,
+                result.message(),
+                plugin.messenger().getStringOrNotAvailable(Language.GERMAN, NodePath.path("chat-format"))
+        );
+
+        plugin.getServer().getOnlinePlayers().forEach(player -> player.sendMessage(formattedMessage));
+    }
+
+    public void notifyStaff(Player violator, ChatFilter.ChatFilterResult result) {
+        plugin.getServer().getOnlinePlayers()
+                .stream()
+                .filter(player -> player.hasPermission(Permissions.CHAT_VIOLATION_NOTIFY))
+                .forEach(staff -> {
+                    plugin.messenger().sendMessage(
+                            staff,
+                            NodePath.path("event", "chat", "filter", "notify"),
+                            Placeholder.parsed("input", result.message()),
+                            Placeholder.unparsed("violator", violator.getName())
+                    );
         });
     }
 }

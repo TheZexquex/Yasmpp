@@ -240,5 +240,7 @@ event:
       title: "<red>Server Neustart"
       subtitle: "<gray>Grund: <reason>"
   chat:
-    not-allowed-string: "<prefix><red>Deine Chatnachricht enthält verbotene Ausdrücke: <yellow><match>"
+    filter:
+      block: "<prefix><red>Deine Chatnachricht enthält verbotene Ausdrücke!"
+      notify: "<yellow>[<dark_red><bold>Chat Violation<yellow>] <bold><white> von <yellow><violator> <white>-> <input>"
 actionbar: "<yellow>%headblocks_current% von %headblocks_max% Geschenken gefunden"

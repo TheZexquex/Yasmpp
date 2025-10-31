@@ -6,7 +6,6 @@ import dev.thezexquex.yasmpp.YasmpPlugin;
 import dev.thezexquex.yasmpp.commands.util.CountDownMessenger;
 import dev.thezexquex.yasmpp.configuration.settings.CountDownEntry;
 import dev.thezexquex.yasmpp.data.adapter.LocationAdapter;
-import dev.thezexquex.yasmpp.data.database.future.BukkitFutureResult;
 import dev.thezexquex.yasmpp.util.PlayerProgressUtil;
 import net.kyori.adventure.title.Title;
 import org.bukkit.command.CommandSender;
@@ -40,7 +39,7 @@ public class GameCommand extends PaperCommand<YasmpPlugin> {
     }
 
     private void handelStart(CommandContext<CommandSender> commandSenderCommandContext) {
-        var countDownSettings = plugin.configuration().countDownSettings().gameStartCountDown();
+        var countDownSettings = plugin.countdownConfiguration().countdown().gamestart();
 
         var countDown = Countdown.builder()
                 .withRunOnFinish(this::handleCountDownFinish)
@@ -93,7 +92,7 @@ public class GameCommand extends PaperCommand<YasmpPlugin> {
             var worldBorder = loc.getWorld().getWorldBorder();
 
             var borderDiameterInGame = plugin.configuration()
-                    .generalSettings().generalBorderSettings().borderDiameterGamePhase();
+                    .general().generalBorderSettings().borderDiameterGamePhase();
 
             if (borderDiameterInGame == -1) {
                 worldBorder.reset();
@@ -135,7 +134,7 @@ public class GameCommand extends PaperCommand<YasmpPlugin> {
             worldBorder.setCenter(loc);
 
             var borderDiameterInLobby = plugin.configuration()
-                    .generalSettings().generalBorderSettings().borderDiameterLobbyPhase();
+                    .general().generalBorderSettings().borderDiameterLobbyPhase();
             worldBorder.setSize(borderDiameterInLobby);
 
         });

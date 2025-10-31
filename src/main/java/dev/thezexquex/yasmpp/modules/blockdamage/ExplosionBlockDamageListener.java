@@ -6,7 +6,6 @@ import org.bukkit.entity.TNTPrimed;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityExplodeEvent;
-import org.spongepowered.configurate.NodePath;
 
 public class ExplosionBlockDamageListener implements Listener {
     private final YasmpPlugin plugin;
@@ -17,8 +16,8 @@ public class ExplosionBlockDamageListener implements Listener {
 
     @EventHandler
     public void onEntityExplode(EntityExplodeEvent event) {
-        var doCreeperDamage = plugin.configuration().generalSettings().generalExplosionDamageSettings().doCreeperDamage();
-        var doTntDamage = plugin.configuration().generalSettings().generalExplosionDamageSettings().doTntDamage();
+        var doCreeperDamage = plugin.configuration().general().generalExplosionDamageSettings().doCreeperDamage();
+        var doTntDamage = plugin.configuration().general().generalExplosionDamageSettings().doTntDamage();
         if (!doCreeperDamage && event.getEntity() instanceof Creeper) {
             event.blockList().clear();
             return;
