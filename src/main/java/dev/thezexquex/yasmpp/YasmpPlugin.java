@@ -25,7 +25,7 @@ import dev.thezexquex.yasmpp.modules.blockdamage.ExplosionBlockDamageListener;
 import dev.thezexquex.yasmpp.modules.chat.ChatListener;
 import dev.thezexquex.yasmpp.modules.joinleavemessage.PlayerJoinListener;
 import dev.thezexquex.yasmpp.modules.joinleavemessage.PlayerQuitListener;
-import dev.thezexquex.yasmpp.modules.lockend.LockEndListener;
+import dev.thezexquex.yasmpp.modules.lockportal.LockPortalListener;
 import dev.thezexquex.yasmpp.modules.mobileworkstations.WorkstationInteractListener;
 import dev.thezexquex.yasmpp.modules.respawn.RespawnListener;
 import dev.thezexquex.yasmpp.modules.spawnelytra.ElytraManager;
@@ -110,7 +110,7 @@ public class YasmpPlugin extends PaperAstraPlugin {
         pluginManager.registerEvents(new ElytraBoostListener(this), this);
 
         // Lock end
-        pluginManager.registerEvents(new LockEndListener(this), this);
+        pluginManager.registerEvents(new LockPortalListener(this), this);
 
         pluginManager.registerEvents(new ChatListener(this), this);
     }

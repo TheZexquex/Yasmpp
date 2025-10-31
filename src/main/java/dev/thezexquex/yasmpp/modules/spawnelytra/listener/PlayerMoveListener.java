@@ -32,7 +32,7 @@ public class PlayerMoveListener implements Listener {
         var spawnLocation = locationService.getLocation("spawn");
 
         spawnLocation.ifPresent(worldPosition -> {
-            var radius = plugin.configuration().general().generalSpawnElytraSettings().radius();
+            var radius = plugin.configuration().general().spawnElytra().radius();
             var region = new SphericalRegion(LocationAdapter.adapt(worldPosition.locationContainer(), player.getServer()), radius);
 
             if (!region.isInRegion(player)) {

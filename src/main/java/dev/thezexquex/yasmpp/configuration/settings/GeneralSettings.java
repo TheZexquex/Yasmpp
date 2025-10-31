@@ -2,22 +2,23 @@ package dev.thezexquex.yasmpp.configuration.settings;
 
 import de.unknowncity.astralib.libs.com.fasterxml.jackson.annotation.JsonProperty;
 import dev.thezexquex.yasmpp.configuration.settings.general.GeneralBorderSettings;
-import dev.thezexquex.yasmpp.configuration.settings.general.GeneralEndSettings;
+import dev.thezexquex.yasmpp.configuration.settings.general.GeneralPortalSettings;
 import dev.thezexquex.yasmpp.configuration.settings.general.GeneralExplosionDamageSettings;
 import dev.thezexquex.yasmpp.configuration.settings.general.GeneralSpawnElytraSettings;
 
 public class GeneralSettings {
     @JsonProperty
     private String planServerName = "Handwerksangriff";
+    @JsonProperty
     private int planDataRefreshInterval = 120;
     @JsonProperty
-    private GeneralBorderSettings generalBorderSettings = new GeneralBorderSettings();
+    private GeneralBorderSettings border = new GeneralBorderSettings();
     @JsonProperty
-    private GeneralEndSettings generalEndSettings = new GeneralEndSettings();
+    private GeneralPortalSettings portals = new GeneralPortalSettings();
     @JsonProperty
-    private GeneralExplosionDamageSettings generalExplosionDamageSettings = new GeneralExplosionDamageSettings();
+    private GeneralExplosionDamageSettings explosionDamage = new GeneralExplosionDamageSettings();
     @JsonProperty
-    private GeneralSpawnElytraSettings generalSpawnElytraSettings = new GeneralSpawnElytraSettings();
+    private GeneralSpawnElytraSettings spawnElytra = new GeneralSpawnElytraSettings();
 
     public GeneralSettings() {
 
@@ -31,19 +32,19 @@ public class GeneralSettings {
         return planDataRefreshInterval;
     }
 
-    public GeneralBorderSettings generalBorderSettings() {
-        return generalBorderSettings;
+    public GeneralBorderSettings border() {
+        return border;
     }
 
-    public GeneralEndSettings generalEndSettings() {
-        return generalEndSettings;
+    public GeneralPortalSettings portals() {
+        return portals;
     }
 
-    public GeneralExplosionDamageSettings generalExplosionDamageSettings() {
-        return generalExplosionDamageSettings;
+    public GeneralExplosionDamageSettings explosionDamage() {
+        return explosionDamage;
     }
 
-    public GeneralSpawnElytraSettings generalSpawnElytraSettings() {
-        return generalSpawnElytraSettings;
+    public GeneralSpawnElytraSettings spawnElytra() {
+        return spawnElytra;
     }
 }

@@ -3,6 +3,7 @@ package dev.thezexquex.yasmpp.commands;
 import de.unknowncity.astralib.paper.api.command.PaperCommand;
 import dev.thezexquex.yasmpp.YasmpPlugin;
 import net.kyori.adventure.text.minimessage.tag.Tag;
+import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
 import org.bukkit.command.CommandSender;
 import org.incendo.cloud.CommandManager;
@@ -22,13 +23,18 @@ public class GameSettingsCommand extends PaperCommand<YasmpPlugin> {
         TNT, CREEPER
     }
 
+    private enum PortalType {
+        END, NETHER
+    }
+
     @Override
     public void apply(CommandManager<CommandSender> commandManager) {
         commandManager.command(commandManager.commandBuilder("gamesettings")
-                .literal("lockend")
-                .required("lock-end", booleanParser())
+                .literal("lockportal")
+                .required("type", enumParser(PortalType.class))
+                .required("lock", booleanParser())
                 .permission("yasmpp.command.gamesettings")
-                .handler(this::handleLockEnd)
+                .handler(this::handleLockPortal)
         );
 
 
@@ -87,7 +93,7 @@ public class GameSettingsCommand extends PaperCommand<YasmpPlugin> {
 
         var value = (int) commandSenderCommandContext.get("cooldown");
 
-        plugin.configuration().general().generalSpawnElytraSettings().setMaxBoosts(value);
+        plugin.configuration().general().spawnElytra().setMaxBoosts(value);
         plugin.configuration().save();
 
         plugin.messenger().sendMessage(
@@ -147,7 +153,7 @@ public class GameSettingsCommand extends PaperCommand<YasmpPlugin> {
 
         var value = (int) commandSenderCommandContext.get("max-boosts");
 
-        plugin.configuration().general().generalSpawnElytraSettings().setMaxBoosts(value);
+        plugin.configuration().general().spawnElytra().setMaxBoosts(value);
         plugin.configuration().save();
 
         plugin.messenger().sendMessage(
@@ -162,7 +168,7 @@ public class GameSettingsCommand extends PaperCommand<YasmpPlugin> {
 
         var value = (int) commandSenderCommandContext.get("radius");
 
-        plugin.configuration().general().generalSpawnElytraSettings().setRadius(value);
+        plugin.configuration().general().spawnElytra().setRadius(value);
         plugin.configuration().save();
 
         plugin.messenger().sendMessage(
@@ -172,25 +178,40 @@ public class GameSettingsCommand extends PaperCommand<YasmpPlugin> {
         );
     }
 
-    private void handleLockEnd(CommandContext<CommandSender> commandSenderCommandContext) {
+    private void handleLockPortal(CommandContext<CommandSender> commandSenderCommandContext) {
         var sender = commandSenderCommandContext.sender();
 
-        var value = (boolean) commandSenderCommandContext.get("lock-end");
+        var value = (boolean) commandSenderCommandContext.get("lock");
+        var type = (PortalType) commandSenderCommandContext.get("type");
 
-        if (plugin.configuration().general().generalEndSettings().lockEnd() == value) {
-            plugin.messenger().sendMessage(
-                    sender,
-                    NodePath.path("command", "settings", "lockend", "already", value ? "enabled" : "disabled")
-            );
-            return;
+        if (type == PortalType.NETHER) {
+            if (plugin.configuration().general().portals().lockNether() == value) {
+                plugin.messenger().sendMessage(
+                        sender,
+                        NodePath.path("command", "settings", "lockportal", "already", value ? "enabled" : "disabled"),
+                        Placeholder.unparsed("type", type.name())
+                );
+                return;
+            }
+            plugin.configuration().general().portals().lockNether(value);
+            plugin.configuration().save();
+        } else if (type == PortalType.END) {
+            if (plugin.configuration().general().portals().lockEnd() == value) {
+                plugin.messenger().sendMessage(
+                        sender,
+                        NodePath.path("command", "settings", "lockportal", "already", value ? "enabled" : "disabled"),
+                        Placeholder.unparsed("type", type.name())
+                );
+                return;
+            }
+            plugin.configuration().general().portals().lockEnd(value);
+            plugin.configuration().save();
         }
-
-        plugin.configuration().general().generalEndSettings().setLockEnd(value);
-        plugin.configuration().save();
 
         plugin.messenger().sendMessage(
                 sender,
-                NodePath.path("command", "settings", "lockend", "success", value ? "enabled" : "disabled")
+                NodePath.path("command", "settings", "lockportal", "success", value ? "enabled" : "disabled"),
+                Placeholder.unparsed("type", type.name())
         );
     }
 
@@ -201,7 +222,7 @@ public class GameSettingsCommand extends PaperCommand<YasmpPlugin> {
         var type = (DamageType) commandSenderCommandContext.get("type");
 
         if (type == DamageType.TNT) {
-            if (plugin.configuration().general().generalExplosionDamageSettings().doTntDamage() == value) {
+            if (plugin.configuration().general().explosionDamage().doTntDamage() == value) {
                 plugin.messenger().sendMessage(
                         sender,
                         NodePath.path("command", "settings", "blockdamage", "already", value ? "enabled" : "disabled"),
@@ -210,7 +231,7 @@ public class GameSettingsCommand extends PaperCommand<YasmpPlugin> {
                 return;
             }
 
-            plugin.configuration().general().generalExplosionDamageSettings().setDoTntDamage(value);
+            plugin.configuration().general().explosionDamage().setDoTntDamage(value);
             plugin.configuration().save();
 
             plugin.messenger().sendMessage(
@@ -219,7 +240,7 @@ public class GameSettingsCommand extends PaperCommand<YasmpPlugin> {
                     TagResolver.resolver("type", Tag.preProcessParsed("Tnt"))
             );
         } else if (type == DamageType.CREEPER) {
-            if (plugin.configuration().general().generalExplosionDamageSettings().doCreeperDamage() == value) {
+            if (plugin.configuration().general().explosionDamage().doCreeperDamage() == value) {
                 plugin.messenger().sendMessage(
                         sender,
                         NodePath.path("command", "settings", "blockdamage", "already", value ? "enabled" : "disabled"),
@@ -228,7 +249,7 @@ public class GameSettingsCommand extends PaperCommand<YasmpPlugin> {
                 return;
             }
 
-            plugin.configuration().general().generalExplosionDamageSettings().setDoCreeperDamage(value);
+            plugin.configuration().general().explosionDamage().setDoCreeperDamage(value);
             plugin.configuration().save();
 
             plugin.messenger().sendMessage(

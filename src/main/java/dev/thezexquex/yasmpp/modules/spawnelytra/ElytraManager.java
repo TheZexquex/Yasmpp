@@ -21,7 +21,7 @@ public class ElytraManager {
     public ElytraManager(YasmpPlugin plugin) {
         this.plugin = plugin;
         this.flyingPlayers = new HashMap<>();
-        this.maxBoosts = plugin.configuration().general().generalSpawnElytraSettings().maxBoosts();
+        this.maxBoosts = plugin.configuration().general().spawnElytra().maxBoosts();
         this.firework = new ItemStack(Material.FIREWORK_ROCKET);
         var fireworkMeta = (FireworkMeta) firework.getItemMeta();
         fireworkMeta.setPower(3);

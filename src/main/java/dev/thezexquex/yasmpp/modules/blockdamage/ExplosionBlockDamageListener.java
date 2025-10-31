@@ -16,8 +16,8 @@ public class ExplosionBlockDamageListener implements Listener {
 
     @EventHandler
     public void onEntityExplode(EntityExplodeEvent event) {
-        var doCreeperDamage = plugin.configuration().general().generalExplosionDamageSettings().doCreeperDamage();
-        var doTntDamage = plugin.configuration().general().generalExplosionDamageSettings().doTntDamage();
+        var doCreeperDamage = plugin.configuration().general().explosionDamage().doCreeperDamage();
+        var doTntDamage = plugin.configuration().general().explosionDamage().doTntDamage();
         if (!doCreeperDamage && event.getEntity() instanceof Creeper) {
             event.blockList().clear();
             return;

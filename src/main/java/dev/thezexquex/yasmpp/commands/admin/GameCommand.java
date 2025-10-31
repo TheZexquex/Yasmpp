@@ -92,7 +92,7 @@ public class GameCommand extends PaperCommand<YasmpPlugin> {
             var worldBorder = loc.getWorld().getWorldBorder();
 
             var borderDiameterInGame = plugin.configuration()
-                    .general().generalBorderSettings().borderDiameterGamePhase();
+                    .general().border().borderDiameterGamePhase();
 
             if (borderDiameterInGame == -1) {
                 worldBorder.reset();
@@ -134,7 +134,7 @@ public class GameCommand extends PaperCommand<YasmpPlugin> {
             worldBorder.setCenter(loc);
 
             var borderDiameterInLobby = plugin.configuration()
-                    .general().generalBorderSettings().borderDiameterLobbyPhase();
+                    .general().border().borderDiameterLobbyPhase();
             worldBorder.setSize(borderDiameterInLobby);
 
         });

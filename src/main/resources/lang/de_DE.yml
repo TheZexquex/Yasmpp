@@ -75,13 +75,13 @@ command:
         success:
           enabled: "<prefix><green>TP Cooldown Permission Bypass angeschaltet"
           disabled: "<prefix><green>TP Cooldown Permission Bypass ausgeschaltet"
-    lockend:
+    lockportal:
       success:
-        disabled: "<prefix><gray>Du hast das End <green>entsperrt"
-        enabled: "<prefix><gray>Du hast das End <red>gesperrt"
+        disabled: "<prefix><gray>Du hast das <yellow><type></yellow> <green>entsperrt"
+        enabled: "<prefix><gray>Du hast das <yellow><type></yellow> <red>gesperrt"
       already:
-        enabled: "<prefix><red>Das End ist breits <yellow>gesperrt"
-        disabled: "<prefix><red>Das End ist breits <green>entsperrt"
+        enabled: "<prefix><red>Das <yellow><type></yellow> ist breits <yellow>gesperrt"
+        disabled: "<prefix><red>Das <yellow><type></yellow> ist breits <green>entsperrt"
   restartcountdown:
     start:
       success: "<prefix><green>Restart Countdown gestartet"
@@ -195,7 +195,7 @@ event:
   death:
     no-bed: "<prefix><red>Du bist gestorben und wurdest zum Spawn teleportiert, da du kein Bett platziert hast!"
     bed: "<prefix><red>Du bist gestorben und wurdest an den Bett teleportiert"
-    coords: "<prefix><red>Du bist gestorben <white>☠ <br><red>Todespunkt <gray>world: <yellow><world> <gray>x: <yellow><x> <gray>y: <yellow><y> <gray>z: <yellow><x> <gray>yaw: <yellow><yaw> <gray>pitch: <yellow><pitch> <green>"
+    coords: "<prefix><red>Du bist gestorben <white>☠ <br><red>Todespunkt <gray>world: <yellow><world> <gray>x: <yellow><x> <gray>y: <yellow><y> <gray>z: <yellow><z> <gray>yaw: <yellow><yaw> <gray>pitch: <yellow><pitch> <green>"
   elytra-boost:
     all-used: "<prefix><red>Du hast alle deine Boosts aufgebraucht!"
     remaining: "<prefix><green>Du kannst noch <yellow><boosts>x <green>boosten!"
@@ -209,6 +209,14 @@ event:
     title: "<green>Teleportiere in <yellow><seconds>"
     subtitle: ""
     chat: ""
+  nether:
+    enter-portal-locked: "<prefix><red>Das Nether ist bis zum <yellow>xx.xx.xx <red>gesperrt"
+    unlock:
+      message: "<prefix><green><bold>Das Nether wurde entsperrt!"
+      title: "<green>Das Nether wurde freigeschaltet!"
+    lock:
+      message: "<prefix><yellow><bold>Das Nether ist nun gesperrt"
+      title: "<green>Das Nether wurde <red>gesperrt!"
   end:
     unlock:
       message: "<prefix><green><bold>Das Ende wurde entsperrt!!!!"
