@@ -1,0 +1,29 @@
+package dev.thezexquex.yasmpp.modules.lockportal.nether;
+
+import org.bukkit.Location;
+
+public class PortalScanSession {
+    private Location pos1;
+    private Location pos2;
+
+    public PortalScanSession(Location location, Location location1) {
+        pos1 = location;
+        pos2 = location1;
+    }
+
+    public Location pos1() {
+        return pos1;
+    }
+
+    public Location pos2() {
+        return pos2;
+    }
+
+    public void pos1(Location pos1) {
+        this.pos1 = pos1;
+    }
+
+    public void pos2(Location pos2) {
+        this.pos2 = pos2;
+    }
+}

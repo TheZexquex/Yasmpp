@@ -11,8 +11,10 @@ import de.unknowncity.astralib.paper.api.plugin.PaperAstraPlugin;
 import dev.thezexquex.yasmpp.commands.*;
 import dev.thezexquex.yasmpp.commands.admin.GameCommand;
 import dev.thezexquex.yasmpp.commands.admin.GameModeCommand;
+import dev.thezexquex.yasmpp.commands.admin.PortalCommand;
 import dev.thezexquex.yasmpp.commands.admin.SpeedCommand;
 import dev.thezexquex.yasmpp.configuration.CountdownConfiguration;
+import dev.thezexquex.yasmpp.configuration.PortalConfiguration;
 import dev.thezexquex.yasmpp.configuration.YasmppConfiguration;
 import dev.thezexquex.yasmpp.data.database.dao.HomeDao;
 import dev.thezexquex.yasmpp.data.database.dao.HomeSlotDao;
@@ -26,6 +28,8 @@ import dev.thezexquex.yasmpp.modules.chat.ChatListener;
 import dev.thezexquex.yasmpp.modules.joinleavemessage.PlayerJoinListener;
 import dev.thezexquex.yasmpp.modules.joinleavemessage.PlayerQuitListener;
 import dev.thezexquex.yasmpp.modules.lockportal.LockPortalListener;
+import dev.thezexquex.yasmpp.modules.lockportal.nether.NetherPortalManager;
+import dev.thezexquex.yasmpp.modules.lockportal.nether.PlayerInteractListener;
 import dev.thezexquex.yasmpp.modules.mobileworkstations.WorkstationInteractListener;
 import dev.thezexquex.yasmpp.modules.respawn.RespawnListener;
 import dev.thezexquex.yasmpp.modules.spawnelytra.ElytraManager;
@@ -39,11 +43,13 @@ import java.util.logging.Logger;
 public class YasmpPlugin extends PaperAstraPlugin {
     private YasmppConfiguration configuration;
     private CountdownConfiguration countdownConfiguration;
+    private PortalConfiguration portalConfiguration;
     private PaperMessenger messenger;
     private LocationService locationService;
     private HomeService homeService;
     private SmpPlayerService smpPlayerService;
     private ElytraManager elytraManager;
+    private NetherPortalManager netherPortalManager;
     public static final Logger LOGGER = Logger.getLogger("Yasmpp");
 
     @Override
@@ -55,6 +61,7 @@ public class YasmpPlugin extends PaperAstraPlugin {
         hookRegistry.register(new PlanHook(this));
         applyCommands();
         elytraManager = new ElytraManager(this);
+        netherPortalManager = new NetherPortalManager(this);
 
         Permissions.ALL_PERMISSIONS.forEach(permission -> Bukkit.getPluginManager().addPermission(new Permission(permission)));
     }
@@ -86,6 +93,10 @@ public class YasmpPlugin extends PaperAstraPlugin {
         var countdownConfigOpt = CountdownConfiguration.loadFromFile(CountdownConfiguration.class);
         this.countdownConfiguration = countdownConfigOpt.orElseGet(CountdownConfiguration::new);
         this.countdownConfiguration.save();
+
+        var portalConfigOpt = PortalConfiguration.loadFromFile(PortalConfiguration.class);
+        this.portalConfiguration = portalConfigOpt.orElseGet(PortalConfiguration::new);
+        this.portalConfiguration.save();
     }
 
     private void applyListeners() {
@@ -113,6 +124,9 @@ public class YasmpPlugin extends PaperAstraPlugin {
         pluginManager.registerEvents(new LockPortalListener(this), this);
 
         pluginManager.registerEvents(new ChatListener(this), this);
+
+        // Nether Portal
+        pluginManager.registerEvents(new PlayerInteractListener(this), this);
     }
 
     private void applyCommands() {
@@ -128,6 +142,8 @@ public class YasmpPlugin extends PaperAstraPlugin {
 
         new RestartCommand(this).apply(commandManager);
         new ReloadCommand(this).apply(commandManager);
+
+        new PortalCommand(this).apply(commandManager);
     }
 
     private void initDataServices() {
@@ -159,6 +175,10 @@ public class YasmpPlugin extends PaperAstraPlugin {
         return countdownConfiguration;
     }
 
+    public PortalConfiguration portalConfiguration() {
+        return portalConfiguration;
+    }
+
     public PaperMessenger messenger() {
         return messenger;
     }
@@ -177,5 +197,9 @@ public class YasmpPlugin extends PaperAstraPlugin {
 
     public ElytraManager elytraManager() {
         return elytraManager;
+    }
+
+    public NetherPortalManager netherPortalManager() {
+        return netherPortalManager;
     }
 }

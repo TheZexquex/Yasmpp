@@ -88,6 +88,7 @@ tasks {
             //url("https://ci.unknowncity.de/job/AstraLib/56/artifact/astralib-paper-plugin/build/libs/AstraLib-Paper-0.7.0-SNAPSHOT-%2356.jar")
             url("https://github.com/plan-player-analytics/Plan/releases/download/5.7.3123/Plan-5.7-dev-build-3123.jar")
             url("https://ci.extendedclip.com/job/PlaceholderAPI/212/artifact/build/libs/PlaceholderAPI-2.11.7-DEV-212.jar")
+            url("https://ci.athion.net/job/FastAsyncWorldEdit/1215/artifact/artifacts/FastAsyncWorldEdit-Paper-2.14.1-SNAPSHOT-1215.jar")
         }
 
         jvmArgs("-Dcom.mojang.eula.agree=true")
