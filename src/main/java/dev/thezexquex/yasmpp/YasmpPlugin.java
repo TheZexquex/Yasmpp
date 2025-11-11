@@ -9,10 +9,7 @@ import de.unknowncity.astralib.paper.api.hook.defaulthooks.PlaceholderApiHook;
 import de.unknowncity.astralib.paper.api.message.PaperMessenger;
 import de.unknowncity.astralib.paper.api.plugin.PaperAstraPlugin;
 import dev.thezexquex.yasmpp.commands.*;
-import dev.thezexquex.yasmpp.commands.admin.GameCommand;
-import dev.thezexquex.yasmpp.commands.admin.GameModeCommand;
-import dev.thezexquex.yasmpp.commands.admin.PortalCommand;
-import dev.thezexquex.yasmpp.commands.admin.SpeedCommand;
+import dev.thezexquex.yasmpp.commands.admin.*;
 import dev.thezexquex.yasmpp.configuration.CountdownConfiguration;
 import dev.thezexquex.yasmpp.configuration.PortalConfiguration;
 import dev.thezexquex.yasmpp.configuration.YasmppConfiguration;
@@ -144,6 +141,7 @@ public class YasmpPlugin extends PaperAstraPlugin {
         new ReloadCommand(this).apply(commandManager);
 
         new PortalCommand(this).apply(commandManager);
+        new CaptchaCommand(this).apply(commandManager);
     }
 
     private void initDataServices() {

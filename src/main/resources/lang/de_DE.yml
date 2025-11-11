@@ -192,6 +192,10 @@ inventory:
   invsee:
     title: "<yellow>Inventory - %player_displayname%"
 event:
+  cooldown:
+    on-cooldown: "<prefix><red>Bitte warte noch <yellow><duration> <red>um das wieder zu tun!"
+  captcha:
+    failed: "<prefix><red>Du scheinst ein Roboter zu sein! >:("
   death:
     no-bed: "<prefix><red>Du bist gestorben und wurdest zum Spawn teleportiert, da du kein Bett platziert hast!"
     bed: "<prefix><red>Du bist gestorben und wurdest an den Bett teleportiert"
