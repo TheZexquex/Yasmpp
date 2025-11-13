@@ -59,8 +59,14 @@ public class YasmpPlugin extends PaperAstraPlugin {
         applyCommands();
         elytraManager = new ElytraManager(this);
         netherPortalManager = new NetherPortalManager(this);
+        netherPortalManager.respawnPortalOnServerStart();
 
         Permissions.ALL_PERMISSIONS.forEach(permission -> Bukkit.getPluginManager().addPermission(new Permission(permission)));
+    }
+
+    @Override
+    public void onPluginDisable() {
+        netherPortalManager.onDisable();
     }
 
     public void reloadPlugin() {

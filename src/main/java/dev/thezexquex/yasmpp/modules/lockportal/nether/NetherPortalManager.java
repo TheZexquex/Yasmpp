@@ -7,7 +7,6 @@ import net.kyori.adventure.title.Title;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.scheduler.BukkitTask;
 import org.spongepowered.configurate.NodePath;
 
 import java.time.Duration;
@@ -16,7 +15,6 @@ public class NetherPortalManager {
     private final YasmpPlugin plugin;
     private PortalRenderer portalRenderer;
     private BossBarManager bossBarManager;
-    private BukkitTask task;
     private PortalProgress progress = PortalProgress.NOT_STARTED;
     private final PortalScanSession scanSession = new PortalScanSession(null, null);
 
@@ -107,20 +105,31 @@ public class NetherPortalManager {
             return;
         }
         this.progress = PortalProgress.NOT_STARTED;
-        portalRenderer.render(state);
+        portalRenderer.render();
         this.bossBarManager.startShowingBossBar();
     }
 
     public void respawnPortalOnServerStart() {
         var state = plugin.portalConfiguration().state();
         if (state == null || state.origin() == null || state.blocks() == null || state.blocks().isEmpty()) {
+            plugin.getLogger().warning("No portal state found. Skipping respawn.");
             return;
         }
+
         if (portalRenderer != null) {
             portalRenderer.despawn();
         }
+
         portalRenderer = new PortalRenderer(this, plugin.portalConfiguration().blueprint(), state);
-        portalRenderer.render(state);
+        if (portalRenderer.isCompleted(state)) {
+            return;
+        }
+        portalRenderer.render();
+        this.bossBarManager.startShowingBossBar();
+    }
+
+    public void onDisable() {
+        portalRenderer.despawn();
     }
 
     public void updateBossBarProgress(PortalState portalState) {

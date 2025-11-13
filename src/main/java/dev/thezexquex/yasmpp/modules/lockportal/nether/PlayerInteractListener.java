@@ -32,14 +32,14 @@ public class PlayerInteractListener implements Listener {
         if (portalRenderer == null) return;
 
         if (portalRenderer.isPortalBlock(clicked)) {
-            var portalBlock = portalRenderer.getPortalBlock((Interaction) clicked);
+            var portalBlock = portalRenderer.getPortalBlock(clicked);
 
             if (handItem.getType() == portalBlock.getMaterial()) {
                 handItem.setAmount(handItem.getAmount() - 1);
                 var blockLoc = clicked.getLocation().getBlock().getLocation();
                 blockLoc.getBlock().setType(portalBlock.getMaterial());
 
-                portalRenderer.completePortalBlock((Interaction) clicked);
+                portalRenderer.completePortalBlock(clicked);
 
                 event.getPlayer().playSound(blockLoc, "minecraft:block.end_portal_frame.fill", 1, 0.1f);
                 event.getPlayer().playSound(blockLoc, "minecraft:block.amethyst_block.place", 1, 2f);
