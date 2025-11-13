@@ -34,6 +34,9 @@ public class NetherPortalManager {
                     NodePath.path("event", "nether", "unlock", "subtitlle"),
                     Title.Times.times(Duration.ofSeconds(1), Duration.ofSeconds(3), Duration.ofSeconds(3)));
         });
+
+        plugin.configuration().general().portals().lockNether(false);
+        plugin.portalConfiguration().save();
     }
 
     public void lightPortal(PortalState state) {
