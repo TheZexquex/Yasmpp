@@ -22,7 +22,7 @@ public class NetherPortalManager {
 
     public NetherPortalManager(YasmpPlugin plugin) {
         this.plugin = plugin;
-        this.bossBarManager = new BossBarManager(plugin);
+        this.bossBarManager = new BossBarManager(plugin, this);
     }
 
     public void onPortalComplete() {
@@ -107,13 +107,24 @@ public class NetherPortalManager {
             return;
         }
         this.progress = PortalProgress.NOT_STARTED;
-        portalRenderer.render(originLoc.getWorld(), originLoc);
+        portalRenderer.render(state);
         this.bossBarManager.startShowingBossBar();
+    }
+
+    public void respawnPortalOnServerStart() {
+        var state = plugin.portalConfiguration().state();
+        if (state == null || state.origin() == null || state.blocks() == null || state.blocks().isEmpty()) {
+            return;
+        }
+        if (portalRenderer != null) {
+            portalRenderer.despawn();
+        }
+        portalRenderer = new PortalRenderer(this, plugin.portalConfiguration().blueprint(), state);
+        portalRenderer.render(state);
     }
 
     public void updateBossBarProgress(PortalState portalState) {
         if (this.progress == PortalProgress.COMPLETED) {
-            bossBarManager.stopShowingBossBar();
             return;
         }
         var completedBlocks = portalState.blocks().stream()
@@ -128,5 +139,9 @@ public class NetherPortalManager {
 
     public PortalRenderer portalRenderer() {
         return portalRenderer;
+    }
+
+    public PortalProgress progress() {
+        return progress;
     }
 }

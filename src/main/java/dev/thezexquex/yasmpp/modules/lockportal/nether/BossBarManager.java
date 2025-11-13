@@ -12,10 +12,12 @@ import org.jetbrains.annotations.NotNull;
 public class BossBarManager {
     private BukkitTask task;
     private final Plugin plugin;
+    private final NetherPortalManager netherPortalManager;
     private final BossBar bossBar = BossBar.bossBar(Component.empty(), 0f, BossBar.Color.PURPLE, BossBar.Overlay.PROGRESS);
 
-    public BossBarManager(Plugin plugin) {
+    public BossBarManager(Plugin plugin, NetherPortalManager netherPortalManager) {
         this.plugin = plugin;
+        this.netherPortalManager = netherPortalManager;
     }
 
     public void updateBossBar(long completed, long total) {
@@ -26,25 +28,22 @@ public class BossBarManager {
 
     public void startShowingBossBar() {
         task = plugin.getServer().getScheduler().runTaskTimer(plugin, () -> {
+            if (netherPortalManager.progress() == NetherPortalManager.PortalProgress.COMPLETED) {
+                task.cancel();
+                plugin.getServer().getOnlinePlayers().forEach(player -> {
+                    player.hideBossBar(bossBar);
+                });
+                return;
+            }
             plugin.getServer().getOnlinePlayers().forEach(player -> {
                 player.showBossBar(bossBar);
             });
         }, 0, 20);
     }
 
-    public void stopShowingBossBar() {
-        if (task != null) {
-            task.cancel();
-        }
-        plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-            plugin.getServer().getOnlinePlayers().forEach(player -> {
-                player.hideBossBar(bossBar);
-            });
-        }, 21);
-    }
-
     public @NotNull ComponentLike getBossBarTitle(long completed, long total) {
         return Component.text("Netherportal (" + completed + "/" + total + ")")
                 .color(NamedTextColor.LIGHT_PURPLE);
     }
+
 }

@@ -26,10 +26,12 @@ public class PortalRenderer {
         this.netherPortalManager = netherPortalManager;
     }
 
-    public void render(World world, Location base) {
-        for (var block : blueprint.blocks()) {
-            if (block.isFrameBlock()) {
-                spawnBlueprintBlock(world, base, block);
+    public void render(PortalState state) {
+        var origin = state.origin().toLocation();
+        for (var block : state.blocks() ) {
+            var placedBlock = block.block();
+            if (placedBlock.isFrameBlock() && !block.completed()) {
+                spawnBlueprintBlock(origin.getWorld(), origin, placedBlock);
             }
         }
         netherPortalManager.updateBossBarProgress(state);
