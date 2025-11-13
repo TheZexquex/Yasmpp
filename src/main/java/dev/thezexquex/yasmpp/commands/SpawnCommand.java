@@ -36,7 +36,7 @@ public class SpawnCommand extends PaperCommand<YasmpPlugin> {
     public SpawnCommand(YasmpPlugin plugin) {
         super(plugin);
     }
-    private PlayerBoundCooldownAction playerBoundCooldownAction = new PlayerBoundCooldownAction(Duration.ofSeconds(30));
+    private PlayerBoundCooldownAction playerBoundCooldownAction = new PlayerBoundCooldownAction(Duration.ofSeconds(10));
 
     @Override
     public void apply(CommandManager<CommandSender> commandManager) {
@@ -74,6 +74,7 @@ public class SpawnCommand extends PaperCommand<YasmpPlugin> {
 
                     new CaptchaGui().open(player, plugin, captchaResult -> {
                         if (captchaResult == CaptchaResult.SUCCESS) {
+                            plugin.messenger().sendMessage(player, NodePath.path("event", "captcha", "passed"));
                             plugin.getServer().getScheduler().runTask(plugin, () -> {
 //
 //                           var price = plugin.configuration().teleport().teleportPrice();

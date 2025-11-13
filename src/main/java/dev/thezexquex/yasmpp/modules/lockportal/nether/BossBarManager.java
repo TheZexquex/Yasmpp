@@ -4,6 +4,7 @@ import net.kyori.adventure.bossbar.BossBar;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.ComponentLike;
 import net.kyori.adventure.text.format.NamedTextColor;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.scheduler.BukkitTask;
 import org.jetbrains.annotations.NotNull;
@@ -35,9 +36,11 @@ public class BossBarManager {
         if (task != null) {
             task.cancel();
         }
-        plugin.getServer().getOnlinePlayers().forEach(player -> {
-            player.hideBossBar(bossBar);
-        });
+        plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
+            plugin.getServer().getOnlinePlayers().forEach(player -> {
+                player.hideBossBar(bossBar);
+            });
+        }, 21);
     }
 
     public @NotNull ComponentLike getBossBarTitle(long completed, long total) {
