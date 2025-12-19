@@ -3,8 +3,10 @@ package dev.thezexquex.yasmpp.modules.chat;
 import de.unknowncity.astralib.common.message.lang.Language;
 import dev.thezexquex.yasmpp.Permissions;
 import dev.thezexquex.yasmpp.YasmpPlugin;
+import github.scarsz.discordsrv.DiscordSRV;
+import github.scarsz.discordsrv.dependencies.kyori.adventure.text.Component;
+import io.lettuce.core.output.JsonTypeListOutput;
 import io.papermc.paper.event.player.AsyncChatEvent;
-import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import net.kyori.adventure.text.serializer.plain.PlainTextComponentSerializer;
 import org.bukkit.entity.Player;
@@ -30,8 +32,6 @@ public class ChatListener implements Listener {
             return;
         }
 
-        event.setCancelled(true);
-
         var message = event.message();
         var source = event.getPlayer();
         var messageAsString = PlainTextComponentSerializer.plainText().serialize(message);
@@ -54,7 +54,9 @@ public class ChatListener implements Listener {
                 plugin.messenger().getStringOrNotAvailable(Language.GERMAN, NodePath.path("chat-format"))
         );
 
+        DiscordSRV.getPlugin().processChatMessage(source, PlainTextComponentSerializer.plainText().serialize(event.originalMessage()), null, false, event);
         plugin.getServer().getOnlinePlayers().forEach(player -> player.sendMessage(formattedMessage));
+        event.setCancelled(true);
     }
 
     public void notifyStaff(Player violator, ChatFilter.ChatFilterResult result) {

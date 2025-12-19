@@ -20,6 +20,7 @@ repositories {
     maven("https://repo.xenondevs.xyz/releases")
     maven("https://repo.unknowncity.de/snapshots")
     maven("https://jitpack.io")
+    maven("https://nexus.scarsz.me/content/groups/public/")
 }
 
 dependencies {
@@ -29,6 +30,7 @@ dependencies {
     compileOnly("me.clip", "placeholderapi", "2.11.6")
     compileOnly("de.unknowncity.astralib", "astralib-paper-api", "0.7.0-SNAPSHOT")
     compileOnly("com.github.plan-player-analytics:Plan:5.6.2906")
+    compileOnly("com.discordsrv:discordsrv:1.28.0")
 
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
@@ -50,7 +52,7 @@ bukkit {
     load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
 
     softDepend = listOf("PlaceholderAPI", "My_Worlds")
-    depend = listOf("AstraLib", "Plan", "PlaceholderAPI")
+    depend = listOf("AstraLib", "Plan", "PlaceholderAPI", "DiscordSRV")
 
     defaultPermission = BukkitPluginDescription.Permission.Default.OP
 }
