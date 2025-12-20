@@ -127,6 +127,7 @@ public class NetherPortalManager {
         if (portalRenderer.isCompleted(state)) {
             return;
         }
+        portalRenderer.despawn();
         portalRenderer.render();
         this.bossBarManager.startShowingBossBar();
     }
