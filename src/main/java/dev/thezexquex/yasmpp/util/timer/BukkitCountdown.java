@@ -103,7 +103,9 @@ public class BukkitCountdown extends Timer {
         }
 
         if (timeSpan <= 0) {
-            runOnFinish.ifPresent(Runnable::run);
+            Bukkit.getScheduler().runTaskLater(plugin, () -> {
+                runOnFinish.ifPresent(Runnable::run);
+            }, 1);
             running = false;
             return;
         }

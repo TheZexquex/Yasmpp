@@ -19,6 +19,7 @@ import dev.thezexquex.yasmpp.util.timer.aborttrigger.MovementAbortTrigger;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
@@ -127,9 +128,12 @@ public class SpawnCommand extends PaperCommand<YasmpPlugin> {
     private void handleCountDownFinish(WorldPosition spawn, SmpPlayer smpPlayer) {
         var player = smpPlayer.toBukkitPlayer();
         smpPlayer.currentlyInTeleport(false);
+
         plugin.getServer().getScheduler().runTask(plugin, () -> player.teleport(
                 LocationAdapter.adapt(spawn.locationContainer(), player.getServer())
         ));
+
+        player.playSound(player, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
 
         plugin.messenger().sendMessage(player,
                 NodePath.path("command", "spawn", "success")

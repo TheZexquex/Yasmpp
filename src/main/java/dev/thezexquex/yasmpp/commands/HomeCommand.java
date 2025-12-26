@@ -12,6 +12,7 @@ import dev.thezexquex.yasmpp.util.timer.BukkitCountdown;
 import dev.thezexquex.yasmpp.util.timer.aborttrigger.MovementAbortTrigger;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.checkerframework.checker.nullness.qual.NonNull;
@@ -233,6 +234,8 @@ public class HomeCommand extends PaperCommand<YasmpPlugin> {
         plugin.getServer().getScheduler().runTask(plugin, () -> player.teleport(
                 LocationAdapter.adapt(home.locationContainer(), player.getServer())
         ));
+
+        player.playSound(player, Sound.ENTITY_ENDERMAN_TELEPORT, 1, 1);
 
         plugin.messenger().sendMessage(player,
                 NodePath.path("command", "home", "success"),
