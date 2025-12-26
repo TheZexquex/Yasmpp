@@ -17,10 +17,15 @@ public class SmpPlayerService {
     }
 
     public SmpPlayer getOrCreate(Player player) {
-        return players.computeIfAbsent(
+        var smpPlayer = players.computeIfAbsent(
                 player.getUniqueId(),
                 uuid -> new SmpPlayer(player.getUniqueId(), plugin.homeService())
         );
+
+        smpPlayer.loadHomeSlots();
+        smpPlayer.loadHomes();
+
+        return smpPlayer;
     }
 
     public Optional<SmpPlayer> get(Player player) {
