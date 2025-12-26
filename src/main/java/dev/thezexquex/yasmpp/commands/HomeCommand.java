@@ -183,7 +183,7 @@ public class HomeCommand extends PaperCommand<YasmpPlugin> {
                     return;
                 }
 
-                var countDownSettings = plugin.countdownConfiguration().countdown().gamestart();
+                var countDownSettings = plugin.countdownConfiguration().countdown().teleport();
 
                 smpPlayer.getHome(homeName).ifPresent(home -> {
                     var countDownInSec = plugin.configuration().teleport().teleportCoolDownInSeconds();
