@@ -7,6 +7,7 @@ import dev.thezexquex.yasmpp.commands.util.CountDownMessenger;
 import dev.thezexquex.yasmpp.configuration.settings.CountDownEntry;
 import dev.thezexquex.yasmpp.data.adapter.LocationAdapter;
 import dev.thezexquex.yasmpp.util.PlayerProgressUtil;
+import dev.thezexquex.yasmpp.util.timer.BukkitCountdown;
 import net.kyori.adventure.title.Title;
 import org.bukkit.command.CommandSender;
 import org.incendo.cloud.CommandManager;
@@ -41,7 +42,7 @@ public class GameCommand extends PaperCommand<YasmpPlugin> {
     private void handelStart(CommandContext<CommandSender> commandSenderCommandContext) {
         var countDownSettings = plugin.countdownConfiguration().countdown().gamestart();
 
-        var countDown = Countdown.builder()
+        var countDown = BukkitCountdown.builder(plugin)
                 .withRunOnFinish(this::handleCountDownFinish)
                 .withRunOnStep(duration -> handleCountDownStep(duration, countDownSettings))
                 .withTimeUnit(TimeUnit.SECONDS)

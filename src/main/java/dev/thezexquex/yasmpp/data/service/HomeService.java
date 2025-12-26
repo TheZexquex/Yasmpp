@@ -59,7 +59,7 @@ public class HomeService {
     }
 
     public CompletableFuture<Boolean> incrementHomeSlots(UUID playerId, int additionalSlots) {
-        smpPlayerService.getSmpPlayer(playerId).ifPresent(smpPlayer -> smpPlayer.maxHomeSlots(smpPlayer.maxHomeSlots() + additionalSlots));
+        smpPlayerService.get(playerId).ifPresent(smpPlayer -> smpPlayer.maxHomeSlots(smpPlayer.maxHomeSlots() + additionalSlots));
         return CompletableFuture.supplyAsync(() -> homeSlotDao.incrementHomeSlot(playerId, additionalSlots))
                 .exceptionally(throwable -> {
                     YasmpPlugin.LOGGER.log(Level.SEVERE, "Failed to increment home slots ", throwable);

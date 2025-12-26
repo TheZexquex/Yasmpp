@@ -6,21 +6,21 @@ import org.bukkit.entity.Player;
 
 public class MovementAbortTrigger extends AbortTrigger {
     private final Player player;
-    private Location prevoiusLocation;
+    private Location previousLocation;
     private Runnable runOnTrigger;
     public MovementAbortTrigger(Player player, Runnable runOnTrigger) {
         this.player = player;
-        this.prevoiusLocation = player.getLocation();
+        this.previousLocation = player.getLocation();
         this.runOnTrigger = runOnTrigger;
     }
 
     @Override
     public boolean checkForPotentialTrigger() {
-        if (prevoiusLocation.distanceSquared(player.getLocation()) > 0.05) {
+        if (previousLocation.distanceSquared(player.getLocation()) > 0.05) {
             runOnTrigger.run();
             return true;
         }
-        prevoiusLocation = player.getLocation();
+        previousLocation = player.getLocation().clone();
         return false;
     }
 }

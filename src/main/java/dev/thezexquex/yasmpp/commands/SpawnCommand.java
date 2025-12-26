@@ -14,6 +14,7 @@ import dev.thezexquex.yasmpp.data.entity.WorldPosition;
 import dev.thezexquex.yasmpp.modules.captcha.CaptchaGui;
 import dev.thezexquex.yasmpp.modules.captcha.CaptchaResult;
 import dev.thezexquex.yasmpp.util.DurationFormatter;
+import dev.thezexquex.yasmpp.util.timer.BukkitCountdown;
 import dev.thezexquex.yasmpp.util.timer.aborttrigger.MovementAbortTrigger;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
@@ -36,6 +37,7 @@ public class SpawnCommand extends PaperCommand<YasmpPlugin> {
     public SpawnCommand(YasmpPlugin plugin) {
         super(plugin);
     }
+
     private PlayerBoundCooldownAction playerBoundCooldownAction = new PlayerBoundCooldownAction(Duration.ofSeconds(10));
 
     @Override
@@ -50,54 +52,30 @@ public class SpawnCommand extends PaperCommand<YasmpPlugin> {
     private void handleSpawn(CommandContext<Player> commandSenderCommandContext) {
         Bukkit.getServer().getScheduler().runTask(plugin, () -> {
             var player = commandSenderCommandContext.sender();
-            playerBoundCooldownAction.executeBoundToPlayer(player.getUniqueId(), () -> {
-                plugin.smpPlayerService().getSmpPlayer(player).ifPresentOrElse(smpPlayer -> {
-                    if (smpPlayer.isCurrentlyInTeleport()) {
-                        plugin.messenger().sendMessage(
-                                player,
-                                NodePath.path("event", "teleport", "already-teleporting")
-                        );
-                        return;
-                    }
 
-                    var locationService = plugin.locationService();
+            plugin.smpPlayerService().get(player).ifPresentOrElse(smpPlayer -> {
+                if (smpPlayer.isCurrentlyInTeleport()) {
+                    plugin.messenger().sendMessage(
+                            player,
+                            NodePath.path("event", "teleport", "already-teleporting")
+                    );
+                    return;
+                }
 
-                    var spawnLocation = locationService.getLocation("spawn");
+                var locationService = plugin.locationService();
 
-                    if (spawnLocation.isEmpty()) {
-                        plugin.messenger().sendMessage(
-                                player,
-                                NodePath.path("command", "spawn", "no-spawn")
-                        );
-                        return;
-                    }
-
-                    new CaptchaGui().open(player, plugin, captchaResult -> {
-                        if (captchaResult == CaptchaResult.SUCCESS) {
-                            plugin.messenger().sendMessage(player, NodePath.path("event", "captcha", "passed"));
-                            plugin.getServer().getScheduler().runTask(plugin, () -> {
-//
-//                           var price = plugin.configuration().teleport().teleportPrice();
-//                           if (!InventoryUtil.hasEnoughItems(player, ItemStack.of(Material.DIAMOND), price)) {
-//                               plugin.messenger().sendMessage(player, NodePath.path("event", "teleport", "not-enough-currency"),
-//                                       Placeholder.parsed("price", String.valueOf(price)));
-//                               return;
-//                           }
-//                           InventoryUtil.removeSpecificItemCount(player, ItemStack.of(Material.DIAMOND), price);
-
-                                startSpawnTeleport(smpPlayer, spawnLocation.get());
-                            });
-                        } else {
-                            plugin.messenger().sendMessage(player, NodePath.path("event", "captcha", "failed"));
-                        }
-                    });
+                var locationOpt = locationService.getLocation("spawn");
+                locationOpt.ifPresentOrElse(worldPosition -> {
+                    plugin.getLogger().info("worldPosition: " + worldPosition);
+                    plugin.getServer().getScheduler().runTask(plugin, () -> startSpawnTeleport(smpPlayer, worldPosition));
                 }, () -> {
-                    plugin.messenger().sendMessage(player, NodePath.path("event", "teleport", "not-logged-in"));
-                    plugin.getLogger().info("virtueller Account existiert nicht");
+                    plugin.messenger().sendMessage(
+                            player,
+                            NodePath.path("command", "spawn", "no-spawn")
+                    );
                 });
-            }, (duration) -> {
-                plugin.messenger().sendMessage(player, NodePath.path("event", "cooldown", "on-cooldown"), Placeholder.parsed("duration", DurationFormatter.formatDuration(duration, "")));
-                return;
+            }, () -> {
+                plugin.getLogger().info("virtueller Account existiert nicht");
             });
         });
     }
@@ -111,11 +89,14 @@ public class SpawnCommand extends PaperCommand<YasmpPlugin> {
             countDownInSec = 0;
         }
         player.currentlyInTeleport(true);
-        var countDown = Countdown.builder()
+        plugin.getLogger().info("countDownInSec: " + countDownInSec);
+
+        var countDown = BukkitCountdown.builder(plugin)
                 .withAbortTriggers(new MovementAbortTrigger(player.toBukkitPlayer(), () -> {
                     player.currentlyInTeleport(false);
                     plugin.messenger().sendMessage(player.toBukkitPlayer(), NodePath.path("event", "teleport", "cancel"));
                 }))
+                .withRunOnAbort(() -> player.currentlyInTeleport(false))
                 .withRunOnStep(duration -> handleCountDownStep(duration, countDownSettings, player.toBukkitPlayer()))
                 .withRunOnFinish(() -> handleCountDownFinish(worldPosition, player))
                 .build();
@@ -129,6 +110,7 @@ public class SpawnCommand extends PaperCommand<YasmpPlugin> {
                 .findFirst();
 
         if (currCountDownEntry.isEmpty()) {
+            plugin.getLogger().info("Countdown Entry Empty");
             return;
         }
 

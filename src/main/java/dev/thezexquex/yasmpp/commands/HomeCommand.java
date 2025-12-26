@@ -1,6 +1,5 @@
 package dev.thezexquex.yasmpp.commands;
 
-import de.unknowncity.astralib.common.timer.Countdown;
 import de.unknowncity.astralib.paper.api.command.PaperCommand;
 import dev.thezexquex.yasmpp.YasmpPlugin;
 import dev.thezexquex.yasmpp.commands.util.CountDownMessenger;
@@ -9,6 +8,7 @@ import dev.thezexquex.yasmpp.data.adapter.LocationAdapter;
 import dev.thezexquex.yasmpp.data.entity.Home;
 import dev.thezexquex.yasmpp.data.entity.SmpPlayer;
 import dev.thezexquex.yasmpp.homes.gui.HomeSlotShop;
+import dev.thezexquex.yasmpp.util.timer.BukkitCountdown;
 import dev.thezexquex.yasmpp.util.timer.aborttrigger.MovementAbortTrigger;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
@@ -75,7 +75,7 @@ public class HomeCommand extends PaperCommand<YasmpPlugin> {
 
     private void handleHomes(CommandContext<Player> context) {
         var player = context.sender();
-        var smpPlayerOpt = plugin.smpPlayerService().getSmpPlayer(player);
+        var smpPlayerOpt = plugin.smpPlayerService().get(player);
         smpPlayerOpt.ifPresent(smpPlayer -> {
             if (smpPlayer.getHomeCache().isEmpty()) {
                 plugin.messenger().sendMessage(player, NodePath.path("command", "homes", "empty"));
@@ -96,7 +96,7 @@ public class HomeCommand extends PaperCommand<YasmpPlugin> {
         var player = context.sender();
         var homeName = (String) context.get("homeName");
 
-        var smpPlayerOpt = plugin.smpPlayerService().getSmpPlayer(player);
+        var smpPlayerOpt = plugin.smpPlayerService().get(player);
 
         smpPlayerOpt.ifPresent(smpPlayer -> {
             if (smpPlayer.hasHome(homeName)) {
@@ -118,7 +118,7 @@ public class HomeCommand extends PaperCommand<YasmpPlugin> {
         var player = contex.sender();
         var homeName = (String) contex.get("homeName");
 
-        var smpPlayerOpt = plugin.smpPlayerService().getSmpPlayer(player);
+        var smpPlayerOpt = plugin.smpPlayerService().get(player);
         if (smpPlayerOpt.isPresent()) {
             var smpPlayer = smpPlayerOpt.get();
 
@@ -163,7 +163,7 @@ public class HomeCommand extends PaperCommand<YasmpPlugin> {
             var player = commandSenderCommandContext.sender();
             var homeName = (String) commandSenderCommandContext.get("homeName");
 
-            var smpPlayerOpt = plugin.smpPlayerService().getSmpPlayer(player);
+            var smpPlayerOpt = plugin.smpPlayerService().get(player);
 
             smpPlayerOpt.ifPresent(smpPlayer -> {
 
@@ -186,9 +186,10 @@ public class HomeCommand extends PaperCommand<YasmpPlugin> {
 
                 smpPlayer.getHome(homeName).ifPresent(home -> {
                     var countDownInSec = plugin.configuration().teleport().teleportCoolDownInSeconds();
-                    var countDown = Countdown.builder()
+                    var countDown = BukkitCountdown.builder(plugin)
                             .withRunOnFinish(() -> handleCountDownFinish(home, smpPlayer))
                             .withRunOnStep(duration -> handleCountDownStep(duration, countDownSettings, player))
+                            .withRunOnAbort(() -> smpPlayer.currentlyInTeleport(false))
                             .withAbortTriggers(new MovementAbortTrigger(player, () -> {
                                 plugin.messenger().sendMessage(player, NodePath.path("event", "teleport", "cancel"));
                             }))
@@ -242,7 +243,7 @@ public class HomeCommand extends PaperCommand<YasmpPlugin> {
     private CompletableFuture<List<Suggestion>> getHomeSuggestions(Player player) {
         return CompletableFuture.completedFuture(
                 plugin.smpPlayerService()
-                        .getSmpPlayer(player)
+                        .get(player)
                         .get()
                         .getHomeCache()
                         .stream()

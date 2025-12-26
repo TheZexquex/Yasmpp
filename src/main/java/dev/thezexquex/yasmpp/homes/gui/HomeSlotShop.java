@@ -24,7 +24,7 @@ public class HomeSlotShop {
 
         var homeSlots = plugin.configuration().homes().homeSlots();
 
-        var smpPlayer = plugin.smpPlayerService().getSmpPlayer(player);
+        var smpPlayer = plugin.smpPlayerService().get(player);
         if (smpPlayer.isEmpty()) {
             plugin.messenger().sendMessage(player, NodePath.path("command", "homeslot", "error"));
             player.playSound(player.getLocation(), "minecraft:block.note_block.bass", 1, 0);

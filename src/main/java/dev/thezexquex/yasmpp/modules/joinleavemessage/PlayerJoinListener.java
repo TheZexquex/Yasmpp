@@ -40,7 +40,7 @@ public class PlayerJoinListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         var player = event.getPlayer();
 
-        plugin.smpPlayerService().addSmpPlayer(player);
+        plugin.smpPlayerService().getOrCreate(player);
         boolean isFirstTime = firstTimeJoiners.remove(player.getUniqueId());
 
         if (!isFirstTime) {

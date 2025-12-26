@@ -4,33 +4,34 @@ import dev.thezexquex.yasmpp.YasmpPlugin;
 import dev.thezexquex.yasmpp.data.entity.SmpPlayer;
 import org.bukkit.entity.Player;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class SmpPlayerService {
 
     private final YasmpPlugin plugin;
-    private final Set<SmpPlayer> players;
+    private final Map<UUID, SmpPlayer> players = new ConcurrentHashMap<>();
 
     public SmpPlayerService(YasmpPlugin plugin) {
-        this.players = new HashSet<>();
         this.plugin = plugin;
     }
 
-    public void addSmpPlayer(Player player) {
-        var smpPlayer = new SmpPlayer(player, plugin.homeService());
-        players.add(smpPlayer);
-        smpPlayer.loadHomes();
-        smpPlayer.loadHomeSlots();
+    public SmpPlayer getOrCreate(Player player) {
+        return players.computeIfAbsent(
+                player.getUniqueId(),
+                uuid -> new SmpPlayer(player.getUniqueId(), plugin.homeService())
+        );
     }
 
-    public Optional<SmpPlayer> getSmpPlayer(Player player) {
-        return players.stream().filter(smpPlayer -> smpPlayer.toBukkitPlayer().getUniqueId().equals(player.getUniqueId())).findFirst();
+    public Optional<SmpPlayer> get(Player player) {
+        return Optional.ofNullable(players.get(player.getUniqueId()));
     }
 
-    public Optional<SmpPlayer> getSmpPlayer(UUID player) {
-        return players.stream().filter(smpPlayer -> smpPlayer.toBukkitPlayer().getUniqueId().equals(player)).findFirst();
+    public Optional<SmpPlayer> get(UUID player) {
+        return Optional.ofNullable(players.get(player));
+    }
+
+    public void remove(Player player) {
+        players.remove(player.getUniqueId());
     }
 }
