@@ -78,11 +78,11 @@ public class HomeCommand extends PaperCommand<YasmpPlugin> {
         var player = context.sender();
         var smpPlayerOpt = plugin.smpPlayerService().get(player);
         smpPlayerOpt.ifPresent(smpPlayer -> {
-            if (smpPlayer.getHomeCache().isEmpty()) {
+            if (smpPlayer.getHomes().isEmpty()) {
                 plugin.messenger().sendMessage(player, NodePath.path("command", "homes", "empty"));
             } else {
                 plugin.messenger().sendMessage(player, NodePath.path("command", "homes", "header"));
-                smpPlayer.getHomeCache().forEach((home -> plugin.messenger().sendMessage(
+                smpPlayer.getHomes().forEach((home -> plugin.messenger().sendMessage(
                         player,
                         NodePath.path("command", "homes", "entry"),
                         home.tagResolvers()
@@ -100,7 +100,7 @@ public class HomeCommand extends PaperCommand<YasmpPlugin> {
         var smpPlayerOpt = plugin.smpPlayerService().get(player);
 
         smpPlayerOpt.ifPresent(smpPlayer -> {
-            if (smpPlayer.hasHome(homeName)) {
+            if (smpPlayer.hasHomeWithName(homeName)) {
                 smpPlayer.deleteHome(homeName);
                 plugin.messenger().sendMessage(player,
                         NodePath.path("command", "delhome", "success"),
@@ -123,15 +123,15 @@ public class HomeCommand extends PaperCommand<YasmpPlugin> {
         if (smpPlayerOpt.isPresent()) {
             var smpPlayer = smpPlayerOpt.get();
 
-            if (smpPlayer.hasHome(homeName) && !contex.flags().hasFlag("override")) {
+            if (smpPlayer.hasHomeWithName(homeName) && !contex.flags().hasFlag("override")) {
                 plugin.messenger().sendMessage(player,
                         NodePath.path("command", "sethome", "already-exists"),
                         Placeholder.parsed("home-name", homeName)
                 );
-            } else if ((smpPlayer.hasHome(homeName) && contex.flags().hasFlag("override")) ||
-                    (!smpPlayer.hasHome(homeName) && !contex.flags().hasFlag("override"))) {
+            } else if ((smpPlayer.hasHomeWithName(homeName) && contex.flags().hasFlag("override")) ||
+                    (!smpPlayer.hasHomeWithName(homeName) && !contex.flags().hasFlag("override"))) {
                 plugin.homeService().getHomeSlots(player.getUniqueId()).thenAccept(homeSlots -> {
-                    var currHomes = smpPlayer.getHomeCache().size();
+                    var currHomes = smpPlayer.getHomes().size();
 
                     if (homeSlots == -1 || homeSlots > currHomes || contex.flags().hasFlag("override")) {
                         smpPlayer.createOrUpdateHome(homeName, player.getLocation());
@@ -175,7 +175,7 @@ public class HomeCommand extends PaperCommand<YasmpPlugin> {
                     return;
                 }
 
-                if (!smpPlayer.hasHome(homeName)) {
+                if (!smpPlayer.hasHomeWithName(homeName)) {
                     plugin.messenger().sendMessage(player,
                             NodePath.path("command", "home", "notfound"),
                             Placeholder.parsed("home-name", homeName)
@@ -248,7 +248,7 @@ public class HomeCommand extends PaperCommand<YasmpPlugin> {
                 plugin.smpPlayerService()
                         .get(player)
                         .get()
-                        .getHomeCache()
+                        .getHomes()
                         .stream()
                         .map(home -> Suggestion.suggestion(home.name()))
                         .toList()

@@ -2,16 +2,16 @@ package dev.thezexquex.yasmpp.data.entity;
 
 import dev.thezexquex.yasmpp.data.adapter.LocationAdapter;
 import dev.thezexquex.yasmpp.data.service.HomeService;
-import dev.thezexquex.yasmpp.util.timer.BukkitCountdown;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class SmpPlayer {
     private final UUID uuid;
-    private final List<Home> homeCache;
+    private final Map<String, Home> homeCache;
     private int maxHomeSlots;
     private final HomeService homeService;
     private boolean isCurrentlyInTeleport;
@@ -19,40 +19,41 @@ public class SmpPlayer {
     public SmpPlayer(UUID uuid, HomeService homeService) {
         this.isCurrentlyInTeleport = false;
         this.uuid = uuid;
-        this.homeCache = new ArrayList<>();
+        this.homeCache = new HashMap<>();
         this.homeService = homeService;
     }
 
-    public List<Home> getHomeCache() {
-        return homeCache;
+    public List<Home> getHomes() {
+        return homeCache.values().stream().toList();
     }
 
     public Optional<Home> getHome(String id) {
-        return homeCache.stream().filter(home -> home.name().equalsIgnoreCase(id)).findFirst();
+        return Optional.ofNullable(homeCache.get(id));
     }
 
     public void deleteHome(String id) {
-        homeCache.removeIf(home -> home.name().equalsIgnoreCase(id));
+        homeCache.remove(id);
         homeService.deleteHome(uuid, id);
     }
 
     public void createOrUpdateHome(String id, Location location) {
         var home = new Home(uuid, id, LocationAdapter.asData(location));
-        homeCache.removeIf(home1 -> home1.name().equalsIgnoreCase(id));
-        homeCache.add(home);
+        homeCache.put(id, home);
         homeService.insertHome(uuid, id, location);
     }
 
     public void loadHomes() {
-        homeService.getHomes(uuid).whenComplete((homes, throwable) -> homeCache.addAll(homes));
+        homeService.getHomes(uuid).whenComplete((
+                homes, throwable) -> homeCache.putAll(homes.stream().collect(Collectors.toMap(Home::name, home -> home)))
+        );
     }
 
     public void loadHomeSlots() {
         homeService.getHomeSlots(uuid).whenComplete((homeSlots, throwable) -> maxHomeSlots(homeSlots));
     }
 
-    public boolean hasHome(String id) {
-        return homeCache.stream().anyMatch(home -> home.name().equalsIgnoreCase(id));
+    public boolean hasHomeWithName(String id) {
+        return homeCache.containsKey(id);
     }
 
     public UUID uuid() {

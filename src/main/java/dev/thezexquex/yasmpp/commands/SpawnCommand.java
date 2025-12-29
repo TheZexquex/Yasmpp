@@ -1,38 +1,25 @@
 package dev.thezexquex.yasmpp.commands;
 
 import de.unknowncity.astralib.common.temporal.PlayerBoundCooldownAction;
-import de.unknowncity.astralib.common.timer.Countdown;
 import de.unknowncity.astralib.paper.api.command.PaperCommand;
-import de.unknowncity.astralib.paper.api.inventory.InventoryUtil;
 import dev.thezexquex.yasmpp.YasmpPlugin;
-import dev.thezexquex.yasmpp.commands.admin.CaptchaCommand;
 import dev.thezexquex.yasmpp.commands.util.CountDownMessenger;
 import dev.thezexquex.yasmpp.configuration.settings.CountDownEntry;
 import dev.thezexquex.yasmpp.data.adapter.LocationAdapter;
 import dev.thezexquex.yasmpp.data.entity.SmpPlayer;
 import dev.thezexquex.yasmpp.data.entity.WorldPosition;
-import dev.thezexquex.yasmpp.modules.captcha.CaptchaGui;
-import dev.thezexquex.yasmpp.modules.captcha.CaptchaResult;
-import dev.thezexquex.yasmpp.util.DurationFormatter;
 import dev.thezexquex.yasmpp.util.timer.BukkitCountdown;
 import dev.thezexquex.yasmpp.util.timer.aborttrigger.MovementAbortTrigger;
-import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
-import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.incendo.cloud.CommandManager;
-import org.incendo.cloud.SenderMapper;
 import org.incendo.cloud.context.CommandContext;
 import org.spongepowered.configurate.NodePath;
 
 import java.time.Duration;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class SpawnCommand extends PaperCommand<YasmpPlugin> {
     public SpawnCommand(YasmpPlugin plugin) {
