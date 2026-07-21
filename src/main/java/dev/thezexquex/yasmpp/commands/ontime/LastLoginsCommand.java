@@ -39,7 +39,7 @@ public class LastLoginsCommand extends PaperCommand<YasmpPlugin> {
         var page = (int) commandSourceCommandContext.getOrDefault("page", 1);
 
         HashMap<String, Duration> lastLogins = new HashMap<>();
-        var planQueryService = plugin.hookRegistry().getRegistered(PlanHook.class).planQueryService();
+        var planQueryService = plugin.hookRegistry().getRegistered(PlanHook.class).get().planQueryService();
 
         for (PlanUser planUser : planQueryService.planUsers()) {
             if (planUser.lastSessionGlobal().isEmpty()) {

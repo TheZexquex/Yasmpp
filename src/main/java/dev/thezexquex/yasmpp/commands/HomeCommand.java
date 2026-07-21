@@ -1,5 +1,6 @@
 package dev.thezexquex.yasmpp.commands;
 
+import de.unknowncity.astralib.common.timer.Countdown;
 import de.unknowncity.astralib.paper.api.command.PaperCommand;
 import dev.thezexquex.yasmpp.YasmpPlugin;
 import dev.thezexquex.yasmpp.commands.util.CountDownMessenger;
@@ -8,7 +9,6 @@ import dev.thezexquex.yasmpp.data.adapter.LocationAdapter;
 import dev.thezexquex.yasmpp.data.entity.Home;
 import dev.thezexquex.yasmpp.data.entity.SmpPlayer;
 import dev.thezexquex.yasmpp.homes.gui.HomeSlotShop;
-import dev.thezexquex.yasmpp.util.timer.BukkitCountdown;
 import dev.thezexquex.yasmpp.util.timer.aborttrigger.MovementAbortTrigger;
 import net.kyori.adventure.text.minimessage.tag.resolver.Placeholder;
 import org.bukkit.Bukkit;
@@ -187,12 +187,12 @@ public class HomeCommand extends PaperCommand<YasmpPlugin> {
 
                 smpPlayer.getHome(homeName).ifPresent(home -> {
                     var countDownInSec = plugin.configuration().teleport().teleportCoolDownInSeconds();
-                    var countDown = BukkitCountdown.builder(plugin)
+                    var countDown = Countdown.builder()
                             .withRunOnFinish(() -> handleCountDownFinish(home, smpPlayer))
                             .withRunOnStep(duration -> handleCountDownStep(duration, countDownSettings, player))
-                            .withRunOnAbort(() -> smpPlayer.currentlyInTeleport(false))
                             .withAbortTriggers(new MovementAbortTrigger(player, () -> {
                                 plugin.messenger().sendMessage(player, NodePath.path("event", "teleport", "cancel"));
+                                smpPlayer.currentlyInTeleport(false);
                             }))
                             .build();
 

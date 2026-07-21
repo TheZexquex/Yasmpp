@@ -9,15 +9,14 @@ public class MovementAbortTrigger extends AbortTrigger {
     private Location previousLocation;
     private Runnable runOnTrigger;
     public MovementAbortTrigger(Player player, Runnable runOnTrigger) {
+        super(runOnTrigger);
         this.player = player;
-        this.previousLocation = player.getLocation();
-        this.runOnTrigger = runOnTrigger;
+        previousLocation = player.getLocation().clone();
     }
 
     @Override
     public boolean checkForPotentialTrigger() {
         if (previousLocation.distanceSquared(player.getLocation()) > 0.05) {
-            runOnTrigger.run();
             return true;
         }
         previousLocation = player.getLocation().clone();

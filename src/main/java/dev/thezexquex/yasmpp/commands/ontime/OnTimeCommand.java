@@ -21,7 +21,7 @@ public class OnTimeCommand extends PaperCommand<YasmpPlugin> {
     private PlanQueryService planQueryService;
     public OnTimeCommand(YasmpPlugin plugin) {
         super(plugin);
-        planQueryService = plugin.hookRegistry().getRegistered(PlanHook.class).planQueryService();
+        planQueryService = plugin.hookRegistry().getRegistered(PlanHook.class).get().planQueryService();
         suggestions = planQueryService.planUsers().stream().map(planUser -> Suggestion.suggestion(planUser.name())).toList();
     }
 

@@ -2,13 +2,13 @@ import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 
 plugins {
     id("java")
-    id("com.gradleup.shadow") version "9.0.0"
-    id("de.eldoria.plugin-yml.bukkit") version "0.8.0"
+    id("com.gradleup.shadow") version "9.5.0"
+    id("de.eldoria.plugin-yml.bukkit") version "0.9.0"
     id("xyz.jpenilla.run-paper") version "3.0.2"
 }
 
 group = "dev.thezexquex"
-version = "0.3.0"
+version = "0.3.1"
 
 val mainClass = "${group}.${rootProject.name.lowercase()}.YasmpPlugin"
 val shadeBasePath = "${group}.${rootProject.name.lowercase()}.libs."
@@ -24,11 +24,11 @@ repositories {
 }
 
 dependencies {
-    implementation("xyz.xenondevs.invui", "invui", "2.0.0-alpha.20")
+    implementation("xyz.xenondevs.invui:invui:2.2.0")
 
-    compileOnly("io.papermc.paper", "paper-api", "1.21.10-R0.1-SNAPSHOT")
-    compileOnly("me.clip", "placeholderapi", "2.11.6")
-    compileOnly("de.unknowncity.astralib", "astralib-paper-api", "0.7.0-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:26.2.build.+")
+    compileOnly("me.clip:placeholderapi:2.12.2")
+    compileOnly("de.unknowncity.astralib:astralib-paper-api:0.8.0-SNAPSHOT")
     compileOnly("com.github.plan-player-analytics:Plan:5.6.2906")
     compileOnly("com.discordsrv:discordsrv:1.28.0")
 
@@ -47,7 +47,7 @@ bukkit {
 
     foliaSupported = false
 
-    apiVersion = "1.21"
+    apiVersion = "26.2"
 
     load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
 
@@ -55,12 +55,7 @@ bukkit {
     depend = listOf("AstraLib", "Plan", "PlaceholderAPI", "DiscordSRV")
 
     defaultPermission = BukkitPluginDescription.Permission.Default.OP
-}
-
-
-java {
-    toolchain.languageVersion.set(JavaLanguageVersion.of(21))
-}
+}43
 
 tasks {
     shadowJar {
@@ -81,22 +76,24 @@ tasks {
     }
 
     runServer {
-        minecraftVersion("1.21.10")
+        minecraftVersion("26.2")
 
         downloadPlugins {
             // ADD plugins needed for testing
             //url("https://github.com/EssentialsX/Essentials/releases/download/2.20.1/EssentialsX-2.20.1.jar")
             //url("https://ci.unknowncity.de/job/AstraLib/37/artifact/astralib-paper-plugin/build/libs/AstraLib-Paper-0.5.0-SNAPSHOT-%2337.jar")
             //url("https://ci.unknowncity.de/job/AstraLib/56/artifact/astralib-paper-plugin/build/libs/AstraLib-Paper-0.7.0-SNAPSHOT-%2356.jar")
-            url("https://github.com/plan-player-analytics/Plan/releases/download/5.7.3123/Plan-5.7-dev-build-3123.jar")
-            url("https://ci.extendedclip.com/job/PlaceholderAPI/212/artifact/build/libs/PlaceholderAPI-2.11.7-DEV-212.jar")
-            url("https://ci.athion.net/job/FastAsyncWorldEdit/1215/artifact/artifacts/FastAsyncWorldEdit-Paper-2.14.1-SNAPSHOT-1215.jar")
+            modrinth("plan", "5.7+build.3558")
+            modrinth("PlaceholderAPI", "pIvQcXW8")
+            modrinth("DiscordSRV", "1.30.5")
+            modrinth("FastAsyncWorldEdit", "2.15.2")
         }
 
         jvmArgs("-Dcom.mojang.eula.agree=true")
     }
 
     register<Copy>("copyToServer") {
+        description = "Copies the jar to the server directory"
         val path = System.getenv("SERVER_DIR")
         if (path.toString().isEmpty()) {
             println("No SERVER_DIR env variable set")

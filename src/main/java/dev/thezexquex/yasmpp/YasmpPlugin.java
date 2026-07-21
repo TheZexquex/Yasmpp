@@ -29,12 +29,14 @@ import dev.thezexquex.yasmpp.modules.lockportal.nether.NetherPortalManager;
 import dev.thezexquex.yasmpp.modules.lockportal.nether.PlayerInteractListener;
 import dev.thezexquex.yasmpp.modules.mobileworkstations.WorkstationInteractListener;
 import dev.thezexquex.yasmpp.modules.respawn.RespawnListener;
+import dev.thezexquex.yasmpp.modules.signedit.SignEditListener;
 import dev.thezexquex.yasmpp.modules.spawnelytra.ElytraManager;
 import dev.thezexquex.yasmpp.modules.spawnelytra.listener.*;
 import org.bukkit.Bukkit;
 import org.bukkit.permissions.Permission;
 
 import java.nio.file.Path;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class YasmpPlugin extends PaperAstraPlugin {
@@ -81,7 +83,7 @@ public class YasmpPlugin extends PaperAstraPlugin {
                 .withLogger(getLogger())
                 .buildAndLoad();
 
-        var papiHook = hookRegistry.getRegistered(PlaceholderApiHook.class);
+        var papiHook = hookRegistry.getRegistered(PlaceholderApiHook.class).orElse(null);
 
         this.messenger = PaperMessenger.builder(localization, getPluginMeta())
                 .withPlaceHolderAPI(papiHook)
@@ -130,6 +132,8 @@ public class YasmpPlugin extends PaperAstraPlugin {
 
         // Nether Portal
         pluginManager.registerEvents(new PlayerInteractListener(this), this);
+
+        pluginManager.registerEvents(new SignEditListener(), this);
     }
 
     private void applyCommands() {

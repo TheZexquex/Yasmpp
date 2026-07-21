@@ -34,7 +34,7 @@ public class OnTimeTopCommand extends PaperCommand<YasmpPlugin> {
         var page = (int) commandSourceCommandContext.getOrDefault("page", 1);
 
         HashMap<String, Duration> playTimeForPlayers = new HashMap<>();
-        var planQueryService = plugin.hookRegistry().getRegistered(PlanHook.class).planQueryService();
+        var planQueryService = plugin.hookRegistry().getRegistered(PlanHook.class).get().planQueryService();
 
         for (PlanUser planUser : planQueryService.planUsers()) {
             playTimeForPlayers.put(planUser.name(), planUser.getOnTimeTotal());

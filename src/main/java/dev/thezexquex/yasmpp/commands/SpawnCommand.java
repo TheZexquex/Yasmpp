@@ -1,6 +1,7 @@
 package dev.thezexquex.yasmpp.commands;
 
 import de.unknowncity.astralib.common.temporal.PlayerBoundCooldownAction;
+import de.unknowncity.astralib.common.timer.Countdown;
 import de.unknowncity.astralib.paper.api.command.PaperCommand;
 import dev.thezexquex.yasmpp.YasmpPlugin;
 import dev.thezexquex.yasmpp.commands.util.CountDownMessenger;
@@ -8,7 +9,6 @@ import dev.thezexquex.yasmpp.configuration.settings.CountDownEntry;
 import dev.thezexquex.yasmpp.data.adapter.LocationAdapter;
 import dev.thezexquex.yasmpp.data.entity.SmpPlayer;
 import dev.thezexquex.yasmpp.data.entity.WorldPosition;
-import dev.thezexquex.yasmpp.util.timer.BukkitCountdown;
 import dev.thezexquex.yasmpp.util.timer.aborttrigger.MovementAbortTrigger;
 import org.bukkit.Bukkit;
 import org.bukkit.Sound;
@@ -54,7 +54,6 @@ public class SpawnCommand extends PaperCommand<YasmpPlugin> {
 
                 var locationOpt = locationService.getLocation("spawn");
                 locationOpt.ifPresentOrElse(worldPosition -> {
-                    plugin.getLogger().info("worldPosition: " + worldPosition);
                     plugin.getServer().getScheduler().runTask(plugin, () -> startSpawnTeleport(smpPlayer, worldPosition));
                 }, () -> {
                     plugin.messenger().sendMessage(
@@ -77,14 +76,12 @@ public class SpawnCommand extends PaperCommand<YasmpPlugin> {
             countDownInSec = 0;
         }
         player.currentlyInTeleport(true);
-        plugin.getLogger().info("countDownInSec: " + countDownInSec);
 
-        var countDown = BukkitCountdown.builder(plugin)
+        var countDown = Countdown.builder()
                 .withAbortTriggers(new MovementAbortTrigger(player.toBukkitPlayer(), () -> {
                     player.currentlyInTeleport(false);
                     plugin.messenger().sendMessage(player.toBukkitPlayer(), NodePath.path("event", "teleport", "cancel"));
                 }))
-                .withRunOnAbort(() -> player.currentlyInTeleport(false))
                 .withRunOnStep(duration -> handleCountDownStep(duration, countDownSettings, player.toBukkitPlayer()))
                 .withRunOnFinish(() -> handleCountDownFinish(worldPosition, player))
                 .build();
