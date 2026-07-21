@@ -1,6 +1,7 @@
 package dev.thezexquex.yasmpp.commands.ontime;
 
 import de.unknowncity.astralib.common.message.lang.Language;
+import de.unknowncity.astralib.common.util.DurationFormatter;
 import de.unknowncity.astralib.paper.api.message.PaperMessenger;
 import dev.thezexquex.yasmpp.data.plan.PlanUser;
 import dev.thezexquex.yasmpp.util.MapUtil;
@@ -15,22 +16,15 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 
-import static dev.thezexquex.yasmpp.util.DurationFormatter.formatDuration;
-import static dev.thezexquex.yasmpp.util.DurationFormatter.formatLastLogoutDuration;
-
 public class PlayTimePrinter {
 
     public static void printPlayTime(CommandSender receiver, PlanUser planUser, String serverName, boolean online, PaperMessenger messenger) {
         var firstSession = planUser.firstSessionServer(serverName == null ? "" : serverName);
         var onTimeCurrentSession = planUser.sessionPlayTime();
 
-        var firstJoinedServer =  LocalDateTime.MIN;
-        if (firstSession.isPresent()) {
+        var firstJoinedServer = planUser.globalFirstLogin();
+        if (serverName != null && firstSession.isPresent()) {
             firstJoinedServer = firstSession.get().sessionStartTime();
-        }
-
-        if (serverName == null) {
-            firstJoinedServer = planUser.globalFirstLogin();
         }
 
         var lastSession = serverName != null ? planUser.lastSessionServer(serverName) : planUser.lastSessionGlobal();
@@ -51,7 +45,7 @@ public class PlayTimePrinter {
 
         if (!online) {
             node = NodePath.path("command", "ontime", "global-offline");
-            time = lastSession.isEmpty() ? empty : formatLastLogoutDuration(Duration.between(lastSession.get().sessionEndTime(), LocalDateTime.now()), empty);
+            time = lastSession.isEmpty() ? empty : durationOrEmpty(Duration.between(lastSession.get().sessionEndTime(), LocalDateTime.now()), empty);
         }
 
         messenger.sendMessage(
@@ -61,12 +55,12 @@ public class PlayTimePrinter {
                 Placeholder.parsed("player", planUser.name()),
                 Placeholder.parsed("first_joined", firstJoinedServer.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"))),
                 Placeholder.parsed("first_joined_ago", String.valueOf(firstJoinedAgo)),
-                Placeholder.parsed("ontime_session", online ? formatDuration(onTimeCurrentSession, empty) : time),
-                Placeholder.parsed("ontime_day", formatDuration(onTimeDay, empty)),
-                Placeholder.parsed("ontime_week", formatDuration(onTimeWeek, empty)),
-                Placeholder.parsed("ontime_month", formatDuration(onTimeMonth, empty)),
-                Placeholder.parsed("ontime_year", formatDuration(onTimeYear, empty)),
-                Placeholder.parsed("ontime_all", formatDuration(onTimeAll, empty)),
+                Placeholder.parsed("ontime_session", online ? durationOrEmpty(onTimeCurrentSession, empty) : time),
+                Placeholder.parsed("ontime_day", durationOrEmpty(onTimeDay, empty)),
+                Placeholder.parsed("ontime_week", durationOrEmpty(onTimeWeek, empty)),
+                Placeholder.parsed("ontime_month", durationOrEmpty(onTimeMonth, empty)),
+                Placeholder.parsed("ontime_year", durationOrEmpty(onTimeYear, empty)),
+                Placeholder.parsed("ontime_all", durationOrEmpty(onTimeAll, empty)),
                 Placeholder.parsed("year", String.valueOf(year))
 
         );
@@ -96,7 +90,7 @@ public class PlayTimePrinter {
             messenger.sendMessage(receiver, NodePath.path("command", "ontimetop", "list-self"),
                     Placeholder.parsed("player", receiver.getName()),
                     Placeholder.parsed("count", String.valueOf(receiverIndex + 1)),
-                    Placeholder.parsed("ontime", formatDuration(values.get(receiverIndex), "N/A")));
+                    Placeholder.parsed("ontime", durationOrEmpty(values.get(receiverIndex), "N/A")));
         }
 
         for (int i = lowerBoundInclusive - 1; i <= upperBoundInclusive; i++) {
@@ -106,13 +100,13 @@ public class PlayTimePrinter {
                 messenger.sendMessage(receiver, NodePath.path("command", "ontimetop", "list-self"),
                         Placeholder.parsed("count", String.valueOf(i + 1)),
                         Placeholder.parsed("player", playerName),
-                        Placeholder.parsed("ontime", formatDuration(values.get(i), "N/A"))
+                        Placeholder.parsed("ontime", durationOrEmpty(values.get(i), "N/A"))
                 );
             } else {
                 messenger.sendMessage(receiver, NodePath.path("command", "ontimetop", "list"),
                         Placeholder.parsed("count", String.valueOf(i + 1)),
                         Placeholder.parsed("player", playerName),
-                        Placeholder.parsed("ontime", formatDuration(values.get(i), "N/A"))
+                        Placeholder.parsed("ontime", durationOrEmpty(values.get(i), "N/A"))
                 );
             }
         }
@@ -121,7 +115,7 @@ public class PlayTimePrinter {
             messenger.sendMessage(receiver, NodePath.path("command", "ontimetop", "list-self"),
                     Placeholder.parsed("count", String.valueOf(receiverIndex + 1)),
                     Placeholder.parsed("player", receiver.getName()),
-                    Placeholder.parsed("ontime", formatDuration(values.get(receiverIndex), "N/A"))
+                    Placeholder.parsed("ontime", durationOrEmpty(values.get(receiverIndex), "N/A"))
             );
         }
 
@@ -161,5 +155,10 @@ public class PlayTimePrinter {
                     Placeholder.parsed("max-page", String.valueOf(maxPage))
             );
         }
+    }
+
+    public static String durationOrEmpty(Duration duration, String fallback) {
+        var formatted = DurationFormatter.formatDuration(duration);
+        return formatted.isEmpty() ? fallback : formatted;
     }
 }

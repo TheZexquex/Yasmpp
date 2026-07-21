@@ -8,6 +8,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.context.CommandContext;
+import org.spongepowered.configurate.NodePath;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -34,10 +35,21 @@ public class OnTimeTopCommand extends PaperCommand<YasmpPlugin> {
         var page = (int) commandSourceCommandContext.getOrDefault("page", 1);
 
         HashMap<String, Duration> playTimeForPlayers = new HashMap<>();
-        var planQueryService = plugin.hookRegistry().getRegistered(PlanHook.class).get().planQueryService();
+        var planQueryService = plugin.hookRegistry().getRegistered(PlanHook.class).orElseThrow().planQueryService();
 
-        for (PlanUser planUser : planQueryService.planUsers()) {
+        var users = planQueryService.planUsers();
+        if (users.isEmpty()) {
+            plugin.messenger().sendMessage(sender, NodePath.path("command", "ontimetop", "empty"));
+            return;
+        }
+
+        for (PlanUser planUser : users) {
             playTimeForPlayers.put(planUser.name(), planUser.getOnTimeTotal());
+        }
+
+        if (playTimeForPlayers.isEmpty()) {
+            plugin.messenger().sendMessage(sender, NodePath.path("command", "ontimetop", "empty"));
+            return;
         }
 
         PlayTimePrinter.printPlayTimeTop(sender, playTimeForPlayers, page, plugin.messenger());

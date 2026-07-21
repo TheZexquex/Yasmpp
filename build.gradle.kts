@@ -29,7 +29,7 @@ dependencies {
     compileOnly("io.papermc.paper:paper-api:26.2.build.+")
     compileOnly("me.clip:placeholderapi:2.12.2")
     compileOnly("de.unknowncity.astralib:astralib-paper-api:0.8.0-SNAPSHOT")
-    compileOnly("com.github.plan-player-analytics:Plan:5.6.2906")
+    compileOnly("com.github.plan-player-analytics:Plan:5.8.3579")
     compileOnly("com.discordsrv:discordsrv:1.28.0")
 
     testImplementation(platform("org.junit:junit-bom:5.9.1"))

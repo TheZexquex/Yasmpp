@@ -20,7 +20,7 @@ public class PlanUser {
         this.name = name;
         this.globalFirstLogin = firstLogin;
         this.serverFirstJoins = new HashMap<>();
-        this.sessions = new HashSet<>();
+        this.sessions = Collections.synchronizedSet(new HashSet<>());
     }
 
     public void addSession(PlaySession session) {
@@ -81,13 +81,19 @@ public class PlanUser {
     }
 
     public Duration getOnTimeTill(LocalDateTime dateTime) {
-        return sessions.stream().filter(playSession -> playSession.sessionStartTime().isAfter(dateTime))
-                .map(playSession -> Duration.between(playSession.sessionStartTime(), playSession.sessionEndTime()))
-                .reduce(Duration::plus).orElse(Duration.ZERO);
+        synchronized (sessions) {
+            return sessions.stream()
+                    .filter(playSession -> playSession.sessionStartTime().isAfter(dateTime) || (playSession.sessionStartTime().isBefore(dateTime) && playSession.sessionEndTime().isAfter(dateTime)))
+                    .map(playSession -> {
+                        var start = playSession.sessionStartTime().isBefore(dateTime) ? dateTime : playSession.sessionStartTime();
+                        return Duration.between(start, playSession.sessionEndTime());
+                    })
+                    .reduce(Duration::plus).orElse(Duration.ZERO);
+        }
     }
 
     public Duration getOnTimeDay() {
-        return getOnTimeTill(LocalDate.now().atTime(0, 1));
+        return getOnTimeTill(LocalDate.now().atStartOfDay());
     }
 
     public Duration getOnTimeWeek() {
@@ -99,23 +105,28 @@ public class PlanUser {
     }
 
     public Duration getOnTimeYear() {
-        return getOnTimeTill(LocalDate.ofYearDay(LocalDate.now().getYear(), 1).atTime(0, 0));
+        return getOnTimeTill(LocalDate.now().withDayOfYear(1).atStartOfDay());
     }
 
     public Duration getOnTimeTotal() {
-        return getOnTimeTill(LocalDateTime.MIN);
+        return getOnTimeTill(LocalDateTime.of(2000, 1, 1, 0, 0));
     }
 
 
     public Duration getOnTimeTillServer(LocalDateTime dateTime, String server) {
-        return sessions.stream()
-                .filter(playSession -> playSession.serverName().equals(server) && playSession.sessionStartTime().isAfter(dateTime))
-                .map(playSession -> Duration.between(playSession.sessionStartTime(), playSession.sessionEndTime()))
-                .reduce(Duration::plus).orElse(Duration.ZERO);
+        synchronized (sessions) {
+            return sessions.stream()
+                    .filter(playSession -> playSession.serverName().equals(server) && (playSession.sessionStartTime().isAfter(dateTime) || (playSession.sessionStartTime().isBefore(dateTime) && playSession.sessionEndTime().isAfter(dateTime))))
+                    .map(playSession -> {
+                        var start = playSession.sessionStartTime().isBefore(dateTime) ? dateTime : playSession.sessionStartTime();
+                        return Duration.between(start, playSession.sessionEndTime());
+                    })
+                    .reduce(Duration::plus).orElse(Duration.ZERO);
+        }
     }
 
     public Duration getOnTimeDayServer(String server) {
-        return getOnTimeTillServer(LocalDate.now().atTime(0, 1), server);
+        return getOnTimeTillServer(LocalDate.now().atStartOfDay(), server);
     }
 
     public Duration getOnTimeWeekServer(String server) {
@@ -127,10 +138,10 @@ public class PlanUser {
     }
 
     public Duration getOnTimeYearServer(String server) {
-        return getOnTimeTillServer(LocalDate.ofYearDay(LocalDate.now().getYear(), 1).atTime(0, 0), server);
+        return getOnTimeTillServer(LocalDate.now().withDayOfYear(1).atStartOfDay(), server);
     }
 
     public Duration getOnTimeTotalServer(String server) {
-        return getOnTimeTillServer(LocalDateTime.MIN, server);
+        return getOnTimeTillServer(LocalDateTime.of(2000, 1, 1, 0, 0), server);
     }
 }

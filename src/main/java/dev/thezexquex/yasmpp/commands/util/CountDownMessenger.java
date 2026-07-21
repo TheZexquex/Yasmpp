@@ -1,6 +1,7 @@
 package dev.thezexquex.yasmpp.commands.util;
 
 import com.google.common.collect.Streams;
+import de.unknowncity.astralib.common.message.CommonPlaceholders;
 import de.unknowncity.astralib.paper.api.message.PaperMessenger;
 import dev.thezexquex.yasmpp.configuration.settings.CountDownEntry;
 import net.kyori.adventure.text.minimessage.tag.resolver.TagResolver;
@@ -26,7 +27,7 @@ public class CountDownMessenger {
             messenger.broadcastMessage(
                     messagePath,
                     Streams.concat(
-                            Arrays.stream(DurationPlaceholders.forDuration(Duration.ofSeconds(countDownEntry.second()))),
+                            Arrays.stream(CommonPlaceholders.duration(Duration.ofSeconds(countDownEntry.second()))),
                             Arrays.stream(tagResolvers)
                     ).toArray(TagResolver[]::new)
             );
@@ -38,7 +39,7 @@ public class CountDownMessenger {
                     subtitlePath,
                     Title.Times.times(Duration.ZERO, Duration.ofSeconds(1), Duration.ZERO),
                     Streams.concat(
-                            Arrays.stream(DurationPlaceholders.forDuration(Duration.ofSeconds(countDownEntry.second()))),
+                            Arrays.stream(CommonPlaceholders.duration(Duration.ofSeconds(countDownEntry.second()))),
                             Arrays.stream(tagResolvers)
                     ).toArray(TagResolver[]::new)
             );
@@ -65,7 +66,7 @@ public class CountDownMessenger {
                     player,
                     messagePath,
                     Streams.concat(
-                            Arrays.stream(DurationPlaceholders.forDuration(Duration.ofSeconds(countDownEntry.second()))),
+                            Arrays.stream(CommonPlaceholders.duration(Duration.ofSeconds(countDownEntry.second()))),
                             Arrays.stream(tagResolvers)
                     ).toArray(TagResolver[]::new)
             );
@@ -78,7 +79,7 @@ public class CountDownMessenger {
                     subtitlePath,
                     Title.Times.times(Duration.ZERO, Duration.ofSeconds(1), Duration.ZERO),
                     Streams.concat(
-                            Arrays.stream(DurationPlaceholders.forDuration(Duration.ofSeconds(countDownEntry.second()))),
+                            Arrays.stream(CommonPlaceholders.duration(Duration.ofSeconds(countDownEntry.second()))),
                             Arrays.stream(tagResolvers)
                     ).toArray(TagResolver[]::new)
             );

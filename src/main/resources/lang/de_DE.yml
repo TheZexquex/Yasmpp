@@ -136,6 +136,7 @@ command:
     empty: "N/A"
     never-joined: "<prefix><red>Dieser Spieler war noch nie auf diesem Server"
   ontimetop:
+    empty: "<prefix><red>Keine Daten gefunden"
     max-pages-reached: "<prefix><red>Diese Seite existiert nicht!"
     header: "<gold>Top <gray>Spielzeiten auf <gold>Handwerksangriff"
     list-self: "<gold><count> <yellow><player> <gold><ontime> <gray>(Du)"
@@ -145,6 +146,7 @@ command:
     footer-no-prev-no-next: "<gray>=============[<#dea459><current-page><gray>/<#dea459><max-page><gray>]==========="
     footer-no-next: "<gray><click:run_command:'/ontimetop <previous>'>[<#dea459><<<gray>]</click>==========[<#dea459><current-page><gray>/<#dea459><max-page><gray>]==========="
   lastonline:
+    empty: "<prefix><red>Keine Daten gefunden"
     max-pages-reached: "<prefix><red>Diese Seite existiert nicht!"
     header: "<gold>Zuletzt Online <gray>auf <gold>Handwerksangriff"
     list-self: "<gold><count> <yellow><player> <gold><lastonline> <gray>(Du)"
