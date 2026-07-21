@@ -1,9 +1,11 @@
 # Yet Another Survival Multiplayer Plugin
 
 ### Dependencies
-- Java 21
-- Paper 1.21.3 
+- Java 25
+- Paper 26.2 
 - [AstraLib](https://github.com/UnknownCityMC/AstraLib)
+- DiscordSRV
+- PlayerAnalytics (Optional)
 - PlaceholderAPI (Optional)
 
 ### How to build from source
@@ -13,6 +15,9 @@
 
 ### Adds following features:
 - Spawn-Elytra (Works in a configurable radius around the spawn)
+- Playtime statistics powered by [PlayerAnalytics](https://github.com/UnknownCityMC/PlayerAnalytics)
+- Lock the Nether by requiring your players to complete a Nether portal holgram that can be fully customized and positioned where you want
+- Player homes with the option to buy more homes via the home shop
 - Open every crafting table (Craftingtable, Smithingtable,and Ender-Chest and so on and so on) without placing (Sneak + right click)
 - Disable explosion block damage for Creepers and/or TNT. It's your choice!
 - Lock End access for a joint event
@@ -34,4 +39,4 @@
 | `/gamesettings <setting> [args]`              | `yasmpp.command.gamesettings`                                                 | `Changes a configuration setting to the given value`               |🟨Add missing settings  |
 | `/game <start\|reset> (--hard)`               | `yasmpp.command.game.<start\|reset>`                                          | `Doesn't do much at the moment except change the worldborder size` |🟨Add more functionality|
 | `/restartcountdown start <duration> <reason>` | `yasmpp.command.reload`                                                       | `Schedules a server restart an broadcasts warings`                 |✅Done                  |
-| `/yasmpp reload`                              | `yasmpp.command.reload`                                                       | `Reloads the plugin`                                               |✅Done                  |
+| `/astralib reload Yasmpp`                     | `astralib.command.reload`                                                     | `Reloads the plugin`                                               |✅Done                  |
