@@ -19,6 +19,9 @@ import dev.thezexquex.yasmpp.data.database.dao.LocationDao;
 import dev.thezexquex.yasmpp.data.service.HomeService;
 import dev.thezexquex.yasmpp.data.service.LocationService;
 import dev.thezexquex.yasmpp.data.service.SmpPlayerService;
+import dev.thezexquex.yasmpp.gamesettings.BooleanGameSetting;
+import dev.thezexquex.yasmpp.gamesettings.GameSettingRegistry;
+import dev.thezexquex.yasmpp.gamesettings.IntegerGameSetting;
 import dev.thezexquex.yasmpp.hooks.PlanHook;
 import dev.thezexquex.yasmpp.modules.blockdamage.ExplosionBlockDamageListener;
 import dev.thezexquex.yasmpp.modules.chat.ChatListener;
@@ -36,10 +39,10 @@ import org.bukkit.Bukkit;
 import org.bukkit.permissions.Permission;
 
 import java.nio.file.Path;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class YasmpPlugin extends PaperAstraPlugin {
+    public static final Logger LOGGER = Logger.getLogger("Yasmpp");
     private YasmppConfiguration configuration;
     private CountdownConfiguration countdownConfiguration;
     private PortalConfiguration portalConfiguration;
@@ -49,21 +52,36 @@ public class YasmpPlugin extends PaperAstraPlugin {
     private SmpPlayerService smpPlayerService;
     private ElytraManager elytraManager;
     private NetherPortalManager netherPortalManager;
-    public static final Logger LOGGER = Logger.getLogger("Yasmpp");
+    private GameSettingRegistry gameSettingRegistry;
 
     @Override
     public void onPluginEnable() {
+        gameSettingRegistry = new GameSettingRegistry();
         reloadPlugin();
         initDataServices();
         applyListeners();
-        //new StackSizeChanger(this).changeAllItemStackSizes();
         hookRegistry.register(new PlanHook(this));
+
+        registerGameSettings();
+
         applyCommands();
         elytraManager = new ElytraManager(this);
         netherPortalManager = new NetherPortalManager(this);
         netherPortalManager.respawnPortalOnServerStart();
 
         Permissions.ALL_PERMISSIONS.forEach(permission -> Bukkit.getPluginManager().addPermission(new Permission(permission)));
+    }
+
+    private void registerGameSettings() {
+        gameSettingRegistry.register(new BooleanGameSetting("lock-nether", "Lock Nether portals", () -> configuration.general().portals().lockNether(), (val) -> configuration.general().portals().lockNether(val)));
+        gameSettingRegistry.register(new BooleanGameSetting("lock-end", "Lock End portals", () -> configuration.general().portals().lockEnd(), (val) -> configuration.general().portals().lockEnd(val)));
+        gameSettingRegistry.register(new BooleanGameSetting("block-damage-tnt", "TNT block damage", () -> configuration.general().explosionDamage().doTntDamage(), (val) -> configuration.general().explosionDamage().setDoTntDamage(val)));
+        gameSettingRegistry.register(new BooleanGameSetting("block-damage-creeper", "Creeper block damage", () -> configuration.general().explosionDamage().doCreeperDamage(), (val) -> configuration.general().explosionDamage().setDoCreeperDamage(val)));
+        gameSettingRegistry.register(new IntegerGameSetting("elytra-max-boosts", "Max boosts for elytra at spawn", () -> configuration.general().spawnElytra().maxBoosts(), (val) -> configuration.general().spawnElytra().setMaxBoosts(val)));
+        gameSettingRegistry.register(new IntegerGameSetting("elytra-radius", "Radius for elytra boosts at spawn", () -> configuration.general().spawnElytra().radius(), (val) -> configuration.general().spawnElytra().setRadius(val)));
+        gameSettingRegistry.register(new BooleanGameSetting("tp-cancel-on-move", "Cancel teleport on move", () -> configuration.teleport().cancelOnMove(), (val) -> configuration.teleport().setCancelOnMove(val)));
+        gameSettingRegistry.register(new IntegerGameSetting("tp-cooldown", "Teleport cooldown", () -> configuration.teleport().teleportCoolDownInSeconds(), (val) -> configuration.teleport().setTeleportCoolDownInSeconds(val)));
+        gameSettingRegistry.register(new BooleanGameSetting("tp-bypassed-by-permission", "Permission bypasses teleport cooldown", () -> configuration.teleport().permissionBypassesCoolDown(), (val) -> configuration.teleport().setPermissionBypassesCoolDown(val)));
     }
 
     @Override
@@ -213,5 +231,9 @@ public class YasmpPlugin extends PaperAstraPlugin {
 
     public NetherPortalManager netherPortalManager() {
         return netherPortalManager;
+    }
+
+    public GameSettingRegistry gameSettingRegistry() {
+        return gameSettingRegistry;
     }
 }

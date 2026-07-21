@@ -48,40 +48,10 @@ command:
     no-spawn: "<prefix><red>Kein Spawn gesetzt!</red>"
 
   settings:
-    borderradius: "<prefix><green>Borderradius auf <yellow><radius> <green>gesetzt"
-    elytra:
-      radius: "<prefix><green>Elytraaktivierungsradius auf <yellow><radius> <green>gesetzt"
-      max-boosts: "<prefix><green>Elytr Max Boosts auf <yellow><boosts> <green>gesetzt"
-    blockdamage:
-      already:
-        enabled: "<prefix><red>Schaden vom Typ <yellow><type> <red>ist bereits angeschaltet"
-        disabled: "<prefix><red>Schaden vom Typ <yellow><type> <red>ist bereits ausgeschaltet"
-      success:
-        enabled: "<prefix><green>Schaden vom Typ <yellow><type> <green>angeschaltet"
-        disabled: "<prefix><green>Schaden vom Typ <yellow><type> <green>ausgeschaltet"
-    teleport:
-      cooldown: "<prefix><green>Teleportcooldown auf <yellow><cooldown> <green>gesetzt"
-      cance-on-move:
-        already:
-          enabled: "<prefix><red>Teleport Abbruch bei Bewegung ist bereits angeschaltet"
-          disabled: "<prefix><red>Teleport Abbruch bei Bewegung ist bereits ausgeschaltet"
-        success:
-          enabled: "<prefix><green>Teleport Abbruch bei Bewegung angeschaltet"
-          disabled: "<prefix><green>Teleport Abbruch bei Bewegung ausgeschaltet"
-      permission-bypass:
-        already:
-          enabled: "<prefix><red>TP Cooldown Permission Bypass ist bereits angeschaltet"
-          disabled: "<prefix><red>TP Cooldown Permission Bypass ist bereits ausgeschaltet"
-        success:
-          enabled: "<prefix><green>TP Cooldown Permission Bypass angeschaltet"
-          disabled: "<prefix><green>TP Cooldown Permission Bypass ausgeschaltet"
-    lockportal:
-      success:
-        disabled: "<prefix><gray>Du hast das <yellow><type></yellow> <green>entsperrt"
-        enabled: "<prefix><gray>Du hast das <yellow><type></yellow> <red>gesperrt"
-      already:
-        enabled: "<prefix><red>Das <yellow><type></yellow> ist breits <yellow>gesperrt"
-        disabled: "<prefix><red>Das <yellow><type></yellow> ist breits <green>entsperrt"
+    not-found: "<prefix><red>Einstellung <yellow><setting> <red>nicht gefunden!"
+    current-value: "<prefix><gray>Der aktuelle Wert für <yellow><setting> <gray>ist <yellow><value>"
+    success: "<prefix><green>Einstellung <yellow><setting> <green>auf <yellow><value> <green>gesetzt"
+    invalid-value: "<prefix><red>Ungültiger Wert <yellow><value> <red>für Einstellung <yellow><setting>"
   restartcountdown:
     start:
       success: "<prefix><green>Restart Countdown gestartet"
