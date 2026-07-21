@@ -67,6 +67,11 @@ public class YasmpPlugin extends PaperAstraPlugin {
     }
 
     @Override
+    public void onPluginReload() {
+        reloadPlugin();
+    }
+
+    @Override
     public void onPluginDisable() {
         netherPortalManager.onDisable();
     }
@@ -148,7 +153,6 @@ public class YasmpPlugin extends PaperAstraPlugin {
         new GameSettingsCommand(this).apply(commandManager);
 
         new RestartCommand(this).apply(commandManager);
-        new ReloadCommand(this).apply(commandManager);
 
         new PortalCommand(this).apply(commandManager);
         new CaptchaCommand(this).apply(commandManager);
