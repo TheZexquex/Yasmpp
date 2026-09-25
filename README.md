@@ -31,12 +31,57 @@
 
 ### Commands
 
-| Command                                       | Permission                                                                    | Description                                                        | Status                 |
-|-----------------------------------------------|-------------------------------------------------------------------------------|--------------------------------------------------------------------|------------------------|
-| `/spawn`                                      | `yasmpp.command.spawn`                                                        | `Teleports you to the spawn location`                              |✅Done                  |
-| `/home` `/sethome` `/delhome` `/homes`        | `yasmpp.command.<home\|delhome\|sethome\|homes>` <br/>`yasmpp.homes.<amount>` | `Create, delete, list and teleport to player homes`                |✅Done                    |
-| `/setspawn`                                   | `yasmpp.command.setspawn`                                                     | `Sets your current location as the spawn location`                 |✅Done                  |
-| `/gamesettings <setting> [args]`              | `yasmpp.command.gamesettings`                                                 | `Changes a configuration setting to the given value`               |🟨Add missing settings  |
-| `/game <start\|reset> (--hard)`               | `yasmpp.command.game.<start\|reset>`                                          | `Doesn't do much at the moment except change the worldborder size` |🟨Add more functionality|
-| `/restartcountdown start <duration> <reason>` | `yasmpp.command.reload`                                                       | `Schedules a server restart an broadcasts warings`                 |✅Done                  |
-| `/astralib reload Yasmpp`                     | `astralib.command.reload`                                                     | `Reloads the plugin`                                               |✅Done                  |
+- **`/spawn`**
+  - **Permission:** `yasmpp.command.spawn`
+  - **Description:** Teleports you to the spawn location.
+- **`/setspawn`**
+  - **Permission:** `yasmpp.command.setspawn`
+  - **Description:** Sets your current location as the server spawn location.
+- **`/home <homeName>`**
+  - **Permission:** `yasmpp.command.home`
+  - **Description:** Teleports you to a saved home location with a cooldown countdown.
+- **`/sethome <homeName> [--override|-o]`**
+  - **Permission:** `yasmpp.command.sethome`
+  - **Description:** Sets a new home at your current location (or overwrites an existing one if the override flag is used), up to your unlocked home slot limit.
+- **`/delhome <homeName>`**
+  - **Permission:** `yasmpp.command.delhome`
+  - **Description:** Deletes a saved home location.
+- **`/homes`**
+  - **Permission:** `yasmpp.command.homes`
+  - **Description:** Lists all your saved home locations.
+- **`/homeshop`**
+  - **Permission:** `yasmpp.command.homeshop`
+  - **Description:** Opens the interactive GUI shop to purchase additional home slots.
+- **`/gamesettings <setting> [value]`**
+  - **Permission:** `yasmpp.command.gamesettings`
+  - **Description:** Displays the current value or updates a plugin game setting (e.g. portal locks, explosion damage, spawn elytra, teleport cooldowns).
+- **`/game <start|reset> [--hard]`**
+  - **Permission:** `yasmpp.command.game.start`, `yasmpp.command.game.reset`
+  - **Description:** Starts the game with a countdown, teleports players to spawn, and resizes the world border. Or resets the game back to lobby settings (with `--hard` clearing player inventories, Ender Chests, advancements, and recipes).
+- **`/gamemode <gamemode> [player]`** (Alias: `/gm`)
+  - **Permission:** `yasmpp.command.gamemode`
+  - **Description:** Changes the game mode (survival, creative, adventure, spectator) for yourself or a specified player.
+- **`/speed <0-10> [player]`**
+  - **Permission:** `yasmpp.command.speed`
+  - **Description:** Adjusts walk or fly speed (from 0 to 10) for yourself or a specified player.
+- **`/restartcountdown <start <duration> <reason>|abort>`**
+  - **Permission:** `yasmpp.command.restartcountdown`
+  - **Description:** Schedules a server restart with countdown broadcasts (titles/chat) and a reason, or aborts an active restart countdown.
+- **`/captcha <target>`**
+  - **Permission:** `yasmpp.command.captcha`
+  - **Description:** Opens a captcha verification GUI for the target player to verify if they are human.
+- **`/portal <moveHere|fix>`**
+  - **Permission:** `yasmpp.command.portal`
+  - **Description:** Spawns/moves the locked Nether portal structure to the current location or respawns/fixes it.
+- **`/ontime [player]`**
+  - **Permission:** `yasmpp.command.ontime.self`
+  - **Description:** Displays detailed playtime statistics for yourself or the specified player (powered by PlayerAnalytics).
+- **`/ontimetop [page]`**
+  - **Permission:** `yasmpp.command.ontimetop`
+  - **Description:** Displays a leaderboard of players with the highest playtime (powered by PlayerAnalytics).
+- **`/lastonline [page]`**
+  - **Permission:** `yasmpp.command.lastonline`
+  - **Description:** Displays a paginated list of when players were last seen online (powered by PlayerAnalytics).
+- **`/astralib reload Yasmpp`**
+  - **Permission:** `astralib.command.reload`
+  - **Description:** Reloads the plugin configuration and translation files.
