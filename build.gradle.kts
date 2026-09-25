@@ -5,10 +5,16 @@ plugins {
     alias(libs.plugins.shadow)
     alias(libs.plugins.plugin.yml.bukkit)
     alias(libs.plugins.run.paper)
+    alias(libs.plugins.axion.release)
+}
+
+scmVersion {
+    tag.prefix = "v"
+    snapshotCreator { _, _ -> "-SNAPSHOT" }
 }
 
 group = "dev.thezexquex"
-version = "0.3.1"
+version = scmVersion.version
 
 val mainClass = "${group}.${rootProject.name.lowercase()}.YasmpPlugin"
 val shadeBasePath = "${group}.${rootProject.name.lowercase()}.libs."
