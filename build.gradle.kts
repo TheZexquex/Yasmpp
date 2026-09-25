@@ -2,9 +2,9 @@ import net.minecrell.pluginyml.bukkit.BukkitPluginDescription
 
 plugins {
     id("java")
-    id("com.gradleup.shadow") version "9.5.0"
-    id("de.eldoria.plugin-yml.bukkit") version "0.9.0"
-    id("xyz.jpenilla.run-paper") version "3.0.2"
+    alias(libs.plugins.shadow)
+    alias(libs.plugins.plugin.yml.bukkit)
+    alias(libs.plugins.run.paper)
 }
 
 group = "dev.thezexquex"
@@ -24,16 +24,20 @@ repositories {
 }
 
 dependencies {
-    implementation("xyz.xenondevs.invui:invui:2.2.0")
+    implementation(libs.invui)
 
-    compileOnly("io.papermc.paper:paper-api:26.2.build.+")
-    compileOnly("me.clip:placeholderapi:2.12.2")
-    compileOnly("de.unknowncity.astralib:astralib-paper-api:0.8.0-SNAPSHOT")
-    compileOnly("com.github.plan-player-analytics:Plan:5.8.3579")
-    compileOnly("com.discordsrv:discordsrv:1.28.0")
+    compileOnly(libs.paper.api) {
+        // vulnerable transitive dependencies
+        exclude("org.codehaus.plexus")
+        exclude("org.apache.commons", "commons-lang3")
+    }
+    compileOnly(libs.placeholderapi)
+    compileOnly(libs.astralib)
+    compileOnly(libs.plan)
+    compileOnly(libs.discordsrv)
 
-    testImplementation(platform("org.junit:junit-bom:5.9.1"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
+    testImplementation(platform(libs.junit.bom))
+    testImplementation(libs.junit.jupiter)
 }
 
 bukkit {
@@ -52,10 +56,10 @@ bukkit {
     load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
 
     softDepend = listOf("PlaceholderAPI", "My_Worlds")
-    depend = listOf("AstraLib", "Plan", "PlaceholderAPI", "DiscordSRV")
+    depend = listOf("AstraLib", "Plan", "DiscordSRV")
 
     defaultPermission = BukkitPluginDescription.Permission.Default.OP
-}43
+}
 
 tasks {
     shadowJar {
@@ -80,13 +84,11 @@ tasks {
 
         downloadPlugins {
             // ADD plugins needed for testing
-            //url("https://github.com/EssentialsX/Essentials/releases/download/2.20.1/EssentialsX-2.20.1.jar")
-            //url("https://ci.unknowncity.de/job/AstraLib/37/artifact/astralib-paper-plugin/build/libs/AstraLib-Paper-0.5.0-SNAPSHOT-%2337.jar")
-            //url("https://ci.unknowncity.de/job/AstraLib/56/artifact/astralib-paper-plugin/build/libs/AstraLib-Paper-0.7.0-SNAPSHOT-%2356.jar")
-            modrinth("plan", "5.7+build.3558")
+            modrinth("plan", "5.8+build.3638")
             modrinth("PlaceholderAPI", "pIvQcXW8")
             modrinth("DiscordSRV", "1.30.5")
-            modrinth("FastAsyncWorldEdit", "2.15.2")
+            modrinth("FastAsyncWorldEdit", "2.15.4")
+            github("UnknownCityMC", "AstraLib", "v0.8.0", "AstraLib-Paper-0.8.0-SNAPSHOT.jar")
         }
 
         jvmArgs("-Dcom.mojang.eula.agree=true")
