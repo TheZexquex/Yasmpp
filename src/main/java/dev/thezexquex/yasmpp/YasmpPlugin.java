@@ -187,6 +187,7 @@ public class YasmpPlugin extends PaperAstraPlugin {
 
         new PortalCommand(this).apply(commandManager);
         new CaptchaCommand(this).apply(commandManager);
+        new SysInfoCommand(this).apply(commandManager);
     }
 
     private void initDataServices() {

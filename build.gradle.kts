@@ -32,6 +32,10 @@ repositories {
 
 dependencies {
     implementation(libs.invui)
+    implementation(libs.oshi) {
+        // provided by paper
+        exclude("org.slf4j")
+    }
 
     compileOnly(libs.paper.api) {
         // vulnerable transitive dependencies
@@ -75,6 +79,13 @@ tasks {
         relocateDependency("xyz.xenondevs")
         relocateDependency("org.jetbrains")
         relocateDependency("org.intellij")
+        // Minecraft ships its own (older) oshi version with the same packages.
+        // The trailing dot and the kept string constants leave oshi's properties files
+        // (e.g. oshi.properties) and config keys untouched.
+        relocate("oshi.", "${shadeBasePath}oshi.") {
+            skipStringConstants = true
+        }
+        mergeServiceFiles()
     }
 
     compileJava {

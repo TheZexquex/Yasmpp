@@ -155,6 +155,28 @@ command:
     footer-no-prev: "<gray>=============[<#dea459><current-page><gray>/<#dea459><max-page><gray>]========<gray><click:run_command:'/lastonline <next>'>[<#dea459>>><gray>]</click>"
     footer-no-prev-no-next: "<gray>=============[<#dea459><current-page><gray>/<#dea459><max-page><gray>]==========="
     footer-no-next: "<gray><click:run_command:'/lastonline <previous>'>[<#dea459><<<gray>]</click>==========[<#dea459><current-page><gray>/<#dea459><max-page><gray>]==========="
+  sysinfo:
+    header: "<gray>-------------------[<yellow>Systeminfo<gray>]-------------------"
+    footer: "<gray>-----------------------------------------------"
+    os: |
+      <gold>Betriebssystem
+      <gray>» <#dea459>System <gray>⇛ <#de7359><os-manufacturer> <os-family> <os-version> <gray>(<os-codename>, <os-bitness> Bit)
+      <gray>» <#dea459>Build <gray>⇛ <#de7359><os-build>
+      <gray>» <#dea459>Uptime <gray>⇛ <#de7359><os-uptime>
+    cpu: |
+      <gold>Prozessor
+      <gray>» <#dea459>Modell <gray>⇛ <#de7359><cpu-name>
+      <gray>» <#dea459>Kerne <gray>⇛ <#de7359><cpu-physical-cores> <gray>physisch / <#de7359><cpu-logical-cores> <gray>logisch
+      <gray>» <#dea459>Max. Takt <gray>⇛ <#de7359><cpu-max-freq>
+      <gray>» <#dea459>Auslastung <gray>⇛ <#de7359><cpu-load>
+      <gray>» <#dea459>Load (1/5/15m) <gray>⇛ <#de7359><cpu-load-average>
+    memory: |
+      <gold>Arbeitsspeicher
+      <gray>» <#dea459>System <gray>⇛ <#de7359><ram-used> <gray>/ <#de7359><ram-total> <gray>(<ram-percent>)
+      <gray>» <#dea459>Java Heap <gray>⇛ <#de7359><heap-used> <gray>/ <#de7359><heap-max> <gray>(<heap-percent>)
+    disk-header: "<gold>Festplatten"
+    disk-server: "<gray>» <#dea459>Server <gray>(<disk-name>, <disk-type>) ⇛ <#de7359><disk-used> <gray>/ <#de7359><disk-total> <gray>(<disk-percent>, <#de7359><disk-free> <gray>frei)"
+    disk-entry: "<gray>» <#dea459><disk-name> <gray>(<disk-type>) ⇛ <#de7359><disk-used> <gray>/ <#de7359><disk-total> <gray>(<disk-percent>, <#de7359><disk-free> <gray>frei)"
 exception:
   command:
     invalidsender: "<prefix><red>Diesen Command kannst du nur als Spieler ausführen"

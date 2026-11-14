@@ -15,6 +15,7 @@ jackson = "3.2.4"
 plan = "5.8.3638"
 discordsrv = "1.30.5"
 junitBom = "5.14.4"
+oshi = "7.7.3"
 
 [libraries]
 invui = { module = "xyz.xenondevs.invui:invui", version.ref = "invui" }
@@ -28,6 +29,7 @@ plan = { module = "com.github.plan-player-analytics:Plan", version.ref = "plan" 
 discordsrv = { module = "com.discordsrv:discordsrv", version.ref = "discordsrv" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junitBom" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+oshi = { module = "com.github.oshi:oshi-core-ffm", version.ref = "oshi" }
 
 [bundles]
 jackson = ["jackson-core", "jackson-yml"]
