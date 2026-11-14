@@ -82,6 +82,12 @@
 - **`/lastonline [page]`**
   - **Permission:** `yasmpp.command.lastonline`
   - **Description:** Displays a paginated list of when players were last seen online (powered by PlayerAnalytics).
+- **`/sysinfo [os|cpu|memory|disk|server] [--bars|-b] [--detailed|-d]`**
+  - **Permission:** `yasmpp.command.sysinfo`
+  - **Description:** Displays system, CPU, memory and disk usage. `--bars` shows usage as colored bars (thresholds and colors are configurable under `sysInfo.bar`), `--detailed` adds per core load, swap, JVM memory and GC stats as well as TPS/MSPT, worlds and process info.
+- **`/sysinfo live`**
+  - **Permission:** `yasmpp.command.sysinfo`
+  - **Description:** Toggles a live view of CPU, RAM and TPS in your action bar, updated every second.
 - **`/astralib reload Yasmpp`**
   - **Permission:** `astralib.command.reload`
   - **Description:** Reloads the plugin configuration and translation files.

@@ -163,20 +163,80 @@ command:
       <gray>» <#dea459>System <gray>⇛ <#de7359><os-manufacturer> <os-family> <os-version> <gray>(<os-codename>, <os-bitness> Bit)
       <gray>» <#dea459>Build <gray>⇛ <#de7359><os-build>
       <gray>» <#dea459>Uptime <gray>⇛ <#de7359><os-uptime>
-    cpu: |
-      <gold>Prozessor
-      <gray>» <#dea459>Modell <gray>⇛ <#de7359><cpu-name>
-      <gray>» <#dea459>Kerne <gray>⇛ <#de7359><cpu-physical-cores> <gray>physisch / <#de7359><cpu-logical-cores> <gray>logisch
-      <gray>» <#dea459>Max. Takt <gray>⇛ <#de7359><cpu-max-freq>
-      <gray>» <#dea459>Auslastung <gray>⇛ <#de7359><cpu-load>
-      <gray>» <#dea459>Load (1/5/15m) <gray>⇛ <#de7359><cpu-load-average>
-    memory: |
-      <gold>Arbeitsspeicher
-      <gray>» <#dea459>System <gray>⇛ <#de7359><ram-used> <gray>/ <#de7359><ram-total> <gray>(<ram-percent>)
-      <gray>» <#dea459>Java Heap <gray>⇛ <#de7359><heap-used> <gray>/ <#de7359><heap-max> <gray>(<heap-percent>)
-    disk-header: "<gold>Festplatten"
-    disk-server: "<gray>» <#dea459>Server <gray>(<disk-name>, <disk-type>) ⇛ <#de7359><disk-used> <gray>/ <#de7359><disk-total> <gray>(<disk-percent>, <#de7359><disk-free> <gray>frei)"
-    disk-entry: "<gray>» <#dea459><disk-name> <gray>(<disk-type>) ⇛ <#de7359><disk-used> <gray>/ <#de7359><disk-total> <gray>(<disk-percent>, <#de7359><disk-free> <gray>frei)"
+    cpu:
+      info: |
+        <gold>Prozessor
+        <gray>» <#dea459>Modell <gray>⇛ <#de7359><cpu-name>
+        <gray>» <#dea459>Kerne <gray>⇛ <#de7359><cpu-physical-cores> <gray>physisch / <#de7359><cpu-logical-cores> <gray>logisch
+        <gray>» <#dea459>Max. Takt <gray>⇛ <#de7359><cpu-max-freq>
+      load: "<gray>» <#dea459>Auslastung <gray>⇛ <#de7359><percent>"
+      load-bar: |-
+        <gray>» <#dea459>Auslastung <gray>⇛ <#de7359><percent>
+        <dark_gray>[<bar><dark_gray>]
+      load-average: "<gray>» <#dea459>Load (1/5/15m) <gray>⇛ <#de7359><cpu-load-average>"
+      current-freq: "<gray>» <#dea459>Akt. Takt (Ø) <gray>⇛ <#de7359><cpu-current-freq>"
+      core-header: "<gray>» <#dea459>Kerne"
+      core: "<gray>#<core-index> <dark_gray>[<bar><dark_gray>] <#de7359><percent>"
+      core-separator: "   "
+    memory:
+      header: "<gold>Arbeitsspeicher"
+      ram: "<gray>» <#dea459>System <gray>⇛ <#de7359><used> <gray>/ <#de7359><total> <gray>(<percent>)"
+      ram-bar: |-
+        <gray>» <#dea459>System <gray>⇛ <#de7359><percent>
+        <dark_gray>[<bar><dark_gray>]
+        <gray>  <#de7359><used> <gray>/ <#de7359><total>
+      heap: "<gray>» <#dea459>Java Heap <gray>⇛ <#de7359><used> <gray>/ <#de7359><total> <gray>(<percent>)"
+      heap-bar: |-
+        <gray>» <#dea459>Java Heap <gray>⇛ <#de7359><percent>
+        <dark_gray>[<bar><dark_gray>]
+        <gray>  <#de7359><used> <gray>/ <#de7359><total>
+      swap: "<gray>» <#dea459>Swap <gray>⇛ <#de7359><used> <gray>/ <#de7359><total> <gray>(<percent>)"
+      swap-bar: |-
+        <gray>» <#dea459>Swap <gray>⇛ <#de7359><percent>
+        <dark_gray>[<bar><dark_gray>]
+        <gray>  <#de7359><used> <gray>/ <#de7359><total>
+      jvm: |-
+        <gray>» <#dea459>Heap reserviert <gray>⇛ <#de7359><heap-committed>
+        <gray>» <#dea459>Non-Heap <gray>⇛ <#de7359><non-heap-used>
+        <gray>» <#dea459>Metaspace <gray>⇛ <#de7359><metaspace-used>
+      gc: "<gray>» <#dea459>GC <gray>(<gc-name>) ⇛ <#de7359><gc-count> <gray>Läufe, <#de7359><gc-time> <gray>gesamt"
+    disk:
+      header: "<gold>Festplatten"
+      server: "<gray>» <#dea459>Server <gray>(<disk-name>, <disk-type>) ⇛ <#de7359><used> <gray>/ <#de7359><total> <gray>(<percent>, <#de7359><free> <gray>frei)"
+      server-bar: |-
+        <gray>» <#dea459>Server <gray>(<disk-name>, <disk-type>) ⇛ <#de7359><percent>
+        <dark_gray>[<bar><dark_gray>]
+        <gray>  <#de7359><used> <gray>/ <#de7359><total> <gray>(<#de7359><free> <gray>frei)
+      entry: "<gray>» <#dea459><disk-name> <gray>(<disk-type>) ⇛ <#de7359><used> <gray>/ <#de7359><total> <gray>(<percent>, <#de7359><free> <gray>frei)"
+      entry-bar: |-
+        <gray>» <#dea459><disk-name> <gray>(<disk-type>) ⇛ <#de7359><percent>
+        <dark_gray>[<bar><dark_gray>]
+        <gray>  <#de7359><used> <gray>/ <#de7359><total> <gray>(<#de7359><free> <gray>frei)
+    server:
+      header: "<gold>Server"
+      tps: "<gray>» <#dea459>TPS (1/5/15m) <gray>⇛ <#de7359><tps-1m> <gray>/ <#de7359><tps-5m> <gray>/ <#de7359><tps-15m>"
+      tps-bar: |-
+        <gray>» <#dea459>TPS (1/5/15m) <gray>⇛ <#de7359><tps-1m> <gray>/ <#de7359><tps-5m> <gray>/ <#de7359><tps-15m>
+        <dark_gray>[<bar><dark_gray>]
+      mspt: "<gray>» <#dea459>MSPT <gray>⇛ <#de7359><mspt> ms <gray>(<percent>)"
+      mspt-bar: |-
+        <gray>» <#dea459>MSPT <gray>⇛ <#de7359><mspt> ms <gray>(<percent>)
+        <dark_gray>[<bar><dark_gray>]
+      players: "<gray>» <#dea459>Spieler <gray>⇛ <#de7359><players-online> <gray>/ <#de7359><players-max>"
+      world-header: "<gray>» <#dea459>Welten"
+      world: "<gray>  <#de7359><world-name> <gray>⇛ <#de7359><world-chunks> <gray>Chunks, <#de7359><world-entities> <gray>Entities"
+      process: |-
+        <gold>Prozess
+        <gray>» <#dea459>PID <gray>⇛ <#de7359><process-pid>
+        <gray>» <#dea459>CPU <gray>⇛ <#de7359><process-cpu>
+        <gray>» <#dea459>RAM (RSS) <gray>⇛ <#de7359><process-memory>
+        <gray>» <#dea459>Threads <gray>⇛ <#de7359><process-threads>
+        <gray>» <#dea459>Java <gray>⇛ <#de7359><java-version> <gray>(<java-vendor>)
+        <gray>» <#dea459>JVM Uptime <gray>⇛ <#de7359><jvm-uptime>
+    live:
+      enabled: "<prefix><green>Live-Systeminfo in der Actionbar aktiviert"
+      disabled: "<prefix><gray>Live-Systeminfo in der Actionbar deaktiviert"
+      actionbar: "<gray>CPU <dark_gray>[<cpu-bar><dark_gray>] <#de7359><cpu-percent>  <gray>RAM <dark_gray>[<ram-bar><dark_gray>] <#de7359><ram-percent>  <gray>TPS <tps>"
 exception:
   command:
     invalidsender: "<prefix><red>Diesen Command kannst du nur als Spieler ausführen"
