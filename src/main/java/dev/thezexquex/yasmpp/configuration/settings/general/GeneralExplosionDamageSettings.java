@@ -1,17 +1,8 @@
 package dev.thezexquex.yasmpp.configuration.settings.general;
 
-
-import de.unknowncity.astralib.libs.com.fasterxml.jackson.annotation.JsonProperty;
-
 public class GeneralExplosionDamageSettings {
-    @JsonProperty
     private boolean doCreeperDamage = false;
-    @JsonProperty
     private boolean doTntDamage = true;
-
-    public GeneralExplosionDamageSettings() {
-
-    }
 
     public boolean doCreeperDamage() {
         return doCreeperDamage;

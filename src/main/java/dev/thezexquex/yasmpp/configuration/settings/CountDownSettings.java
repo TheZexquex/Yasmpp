@@ -1,11 +1,8 @@
 package dev.thezexquex.yasmpp.configuration.settings;
 
-import de.unknowncity.astralib.libs.com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.List;
 
 public class CountDownSettings {
-    @JsonProperty
     private List<CountDownEntry> restart = List.of(
             new CountDownEntry(600, true, false, true, "entity.experience_orb.pickup"),
             new CountDownEntry(300, true, false, true, "entity.experience_orb.pickup"),
@@ -23,7 +20,6 @@ public class CountDownSettings {
 
     );
 
-    @JsonProperty
     private List<CountDownEntry> gamestart = List.of(
             new CountDownEntry(15, true, true, true, "entity.experience_orb.pickup"),
             new CountDownEntry(10, true, true, true, "entity.experience_orb.pickup"),
@@ -35,7 +31,6 @@ public class CountDownSettings {
             new CountDownEntry(0, false, false, true, "block.end_portal.spawn")
     );
 
-    @JsonProperty
     private List<CountDownEntry> teleport = List.of(
             new CountDownEntry(5, false, true, true, "entity.experience_orb.pickup"),
             new CountDownEntry(4, false, true, true, "entity.experience_orb.pickup"),
@@ -45,7 +40,6 @@ public class CountDownSettings {
             new CountDownEntry(0, false, false, true, "item.chorus_fruit.teleport")
     );
 
-    @JsonProperty
     private List<CountDownEntry> openportal = List.of(
             new CountDownEntry(15, true, true, true, "entity.experience_orb.pickup"),
             new CountDownEntry(10, true, true, true, "entity.experience_orb.pickup"),
@@ -56,10 +50,6 @@ public class CountDownSettings {
             new CountDownEntry(1, true, true, true, "entity.experience_orb.pickup"),
             new CountDownEntry(0, false, false, true, "block.end_portal.spawn")
     );
-
-    public CountDownSettings() {
-
-    }
 
     public List<CountDownEntry> restart() {
         return restart;

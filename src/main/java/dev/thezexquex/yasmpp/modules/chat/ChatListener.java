@@ -27,7 +27,7 @@ public class ChatListener implements Listener {
     @EventHandler()
     public void onChat(AsyncChatEvent event) {
         // Check if the plugin should touch the chat logic or if another plugin is used for chat
-        var handleChat = plugin.configuration().chat().handleChat();
+        var handleChat = plugin.configuration().main().chat().handleChat();
         if (!handleChat) {
             return;
         }

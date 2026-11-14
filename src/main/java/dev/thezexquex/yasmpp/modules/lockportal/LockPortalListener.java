@@ -23,7 +23,7 @@ public class LockPortalListener implements Listener {
     @EventHandler
     public void onPlayerTeleport(PlayerTeleportEvent event) {
         var player = event.getPlayer();
-        var portalSettings = plugin.configuration().general().portals();
+        var portalSettings = plugin.configuration().main().general().portals();
 
         var cause = event.getCause();
         if (cause == PlayerTeleportEvent.TeleportCause.END_PORTAL && portalSettings.lockEnd() ) {

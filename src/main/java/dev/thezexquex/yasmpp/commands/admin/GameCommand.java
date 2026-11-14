@@ -39,7 +39,7 @@ public class GameCommand extends PaperCommand<YasmpPlugin> {
     }
 
     private void handelStart(CommandContext<CommandSender> commandSenderCommandContext) {
-        var countDownSettings = plugin.countdownConfiguration().countdown().gamestart();
+        var countDownSettings = plugin.countdownConfiguration().main().countdown().gamestart();
 
         var countDown = Countdown.builder()
                 .withRunOnFinish(this::handleCountDownFinish)
@@ -92,7 +92,7 @@ public class GameCommand extends PaperCommand<YasmpPlugin> {
             var worldBorder = loc.getWorld().getWorldBorder();
 
             var borderDiameterInGame = plugin.configuration()
-                    .general().border().borderDiameterGamePhase();
+                    .main().general().border().borderDiameterGamePhase();
 
             if (borderDiameterInGame == -1) {
                 worldBorder.reset();
@@ -134,7 +134,7 @@ public class GameCommand extends PaperCommand<YasmpPlugin> {
             worldBorder.setCenter(loc);
 
             var borderDiameterInLobby = plugin.configuration()
-                    .general().border().borderDiameterLobbyPhase();
+                    .main().general().border().borderDiameterLobbyPhase();
             worldBorder.setSize(borderDiameterInLobby);
 
         });

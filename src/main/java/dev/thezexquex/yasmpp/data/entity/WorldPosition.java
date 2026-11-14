@@ -7,7 +7,7 @@ public record WorldPosition(
         String name,
         LocationContainer locationContainer
 ) {
-    @MappingProvider({"location"})
+    @MappingProvider({"id", "world", "x", "y", "z", "yaw", "pitch"})
     public static RowMapping<WorldPosition> map() {
         return row -> new WorldPosition(
                 row.getString("id"),
@@ -21,6 +21,4 @@ public record WorldPosition(
                 )
         );
     }
-
-    ;
 }

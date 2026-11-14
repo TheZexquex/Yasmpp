@@ -1,5 +1,6 @@
 package dev.thezexquex.yasmpp;
 
+import de.unknowncity.astralib.common.config.migration.ConfigMigrator;
 import de.unknowncity.astralib.common.database.StandardDataBaseProvider;
 import de.unknowncity.astralib.common.hook.HookRegistry;
 import de.unknowncity.astralib.common.message.lang.Language;
@@ -8,11 +9,15 @@ import de.unknowncity.astralib.paper.api.hook.PaperPluginHook;
 import de.unknowncity.astralib.paper.api.hook.defaulthooks.PlaceholderApiHook;
 import de.unknowncity.astralib.paper.api.message.PaperMessenger;
 import de.unknowncity.astralib.paper.api.plugin.PaperAstraPlugin;
+import dev.chojo.ocular.Configurations;
+import dev.chojo.ocular.dataformats.YamlDataFormat;
+import dev.chojo.ocular.key.Key;
 import dev.thezexquex.yasmpp.commands.*;
 import dev.thezexquex.yasmpp.commands.admin.*;
 import dev.thezexquex.yasmpp.configuration.CountdownConfiguration;
 import dev.thezexquex.yasmpp.configuration.PortalConfiguration;
 import dev.thezexquex.yasmpp.configuration.YasmppConfiguration;
+import dev.thezexquex.yasmpp.configuration.migrations.V1DatabaseSettingsMigration;
 import dev.thezexquex.yasmpp.data.database.dao.HomeDao;
 import dev.thezexquex.yasmpp.data.database.dao.HomeSlotDao;
 import dev.thezexquex.yasmpp.data.database.dao.LocationDao;
@@ -43,9 +48,11 @@ import java.util.logging.Logger;
 
 public class YasmpPlugin extends PaperAstraPlugin {
     public static final Logger LOGGER = Logger.getLogger("Yasmpp");
-    private YasmppConfiguration configuration;
-    private CountdownConfiguration countdownConfiguration;
-    private PortalConfiguration portalConfiguration;
+
+    private Configurations<YasmppConfiguration> mainConfiguration;
+    private Configurations<CountdownConfiguration> countdownConfiguration;
+    private Configurations<PortalConfiguration> portalConfiguration;
+
     private PaperMessenger messenger;
     private LocationService locationService;
     private HomeService homeService;
@@ -73,15 +80,15 @@ public class YasmpPlugin extends PaperAstraPlugin {
     }
 
     private void registerGameSettings() {
-        gameSettingRegistry.register(new BooleanGameSetting("lock-nether", "Lock Nether portals", () -> configuration.general().portals().lockNether(), (val) -> configuration.general().portals().lockNether(val)));
-        gameSettingRegistry.register(new BooleanGameSetting("lock-end", "Lock End portals", () -> configuration.general().portals().lockEnd(), (val) -> configuration.general().portals().lockEnd(val)));
-        gameSettingRegistry.register(new BooleanGameSetting("block-damage-tnt", "TNT block damage", () -> configuration.general().explosionDamage().doTntDamage(), (val) -> configuration.general().explosionDamage().setDoTntDamage(val)));
-        gameSettingRegistry.register(new BooleanGameSetting("block-damage-creeper", "Creeper block damage", () -> configuration.general().explosionDamage().doCreeperDamage(), (val) -> configuration.general().explosionDamage().setDoCreeperDamage(val)));
-        gameSettingRegistry.register(new IntegerGameSetting("elytra-max-boosts", "Max boosts for elytra at spawn", () -> configuration.general().spawnElytra().maxBoosts(), (val) -> configuration.general().spawnElytra().setMaxBoosts(val)));
-        gameSettingRegistry.register(new IntegerGameSetting("elytra-radius", "Radius for elytra boosts at spawn", () -> configuration.general().spawnElytra().radius(), (val) -> configuration.general().spawnElytra().setRadius(val)));
-        gameSettingRegistry.register(new BooleanGameSetting("tp-cancel-on-move", "Cancel teleport on move", () -> configuration.teleport().cancelOnMove(), (val) -> configuration.teleport().setCancelOnMove(val)));
-        gameSettingRegistry.register(new IntegerGameSetting("tp-cooldown", "Teleport cooldown", () -> configuration.teleport().teleportCoolDownInSeconds(), (val) -> configuration.teleport().setTeleportCoolDownInSeconds(val)));
-        gameSettingRegistry.register(new BooleanGameSetting("tp-bypassed-by-permission", "Permission bypasses teleport cooldown", () -> configuration.teleport().permissionBypassesCoolDown(), (val) -> configuration.teleport().setPermissionBypassesCoolDown(val)));
+        gameSettingRegistry.register(new BooleanGameSetting("lock-nether", "Lock Nether portals", () -> mainConfiguration.main().general().portals().lockNether(), (val) -> mainConfiguration.main().general().portals().lockNether(val)));
+        gameSettingRegistry.register(new BooleanGameSetting("lock-end", "Lock End portals", () -> mainConfiguration.main().general().portals().lockEnd(), (val) -> mainConfiguration.main().general().portals().lockEnd(val)));
+        gameSettingRegistry.register(new BooleanGameSetting("block-damage-tnt", "TNT block damage", () -> mainConfiguration.main().general().explosionDamage().doTntDamage(), (val) -> mainConfiguration.main().general().explosionDamage().setDoTntDamage(val)));
+        gameSettingRegistry.register(new BooleanGameSetting("block-damage-creeper", "Creeper block damage", () -> mainConfiguration.main().general().explosionDamage().doCreeperDamage(), (val) -> mainConfiguration.main().general().explosionDamage().setDoCreeperDamage(val)));
+        gameSettingRegistry.register(new IntegerGameSetting("elytra-max-boosts", "Max boosts for elytra at spawn", () -> mainConfiguration.main().general().spawnElytra().maxBoosts(), (val) -> mainConfiguration.main().general().spawnElytra().setMaxBoosts(val)));
+        gameSettingRegistry.register(new IntegerGameSetting("elytra-radius", "Radius for elytra boosts at spawn", () -> mainConfiguration.main().general().spawnElytra().radius(), (val) -> mainConfiguration.main().general().spawnElytra().setRadius(val)));
+        gameSettingRegistry.register(new BooleanGameSetting("tp-cancel-on-move", "Cancel teleport on move", () -> mainConfiguration.main().teleport().cancelOnMove(), (val) -> mainConfiguration.main().teleport().setCancelOnMove(val)));
+        gameSettingRegistry.register(new IntegerGameSetting("tp-cooldown", "Teleport cooldown", () -> mainConfiguration.main().teleport().teleportCoolDownInSeconds(), (val) -> mainConfiguration.main().teleport().setTeleportCoolDownInSeconds(val)));
+        gameSettingRegistry.register(new BooleanGameSetting("tp-bypassed-by-permission", "Permission bypasses teleport cooldown", () -> mainConfiguration.main().teleport().permissionBypassesCoolDown(), (val) -> mainConfiguration.main().teleport().setPermissionBypassesCoolDown(val)));
     }
 
     @Override
@@ -91,7 +98,9 @@ public class YasmpPlugin extends PaperAstraPlugin {
 
     @Override
     public void onPluginDisable() {
-        netherPortalManager.onDisable();
+        if (netherPortalManager != null) {
+            netherPortalManager.onDisable();
+        }
     }
 
     public void reloadPlugin() {
@@ -113,18 +122,22 @@ public class YasmpPlugin extends PaperAstraPlugin {
                 .withDefaultLanguage(Language.GERMAN)
                 .build();
 
-        var configOpt = YasmppConfiguration.loadFromFile(YasmppConfiguration.class);
+        // Migrations must run before saving the default config / loading the configs
+        var migrator = ConfigMigrator.builder(getDataPath(), getLogger()).migrations(
+                new V1DatabaseSettingsMigration()
+        ).build();
 
-        this.configuration = configOpt.orElseGet(YasmppConfiguration::new);
-        this.configuration.save();
+        migrator.migrate();
 
-        var countdownConfigOpt = CountdownConfiguration.loadFromFile(CountdownConfiguration.class);
-        this.countdownConfiguration = countdownConfigOpt.orElseGet(CountdownConfiguration::new);
-        this.countdownConfiguration.save();
+        var mainKey = Key.builder(Path.of("config.yml"), YasmppConfiguration::new).build();
+        var countdownKey = Key.builder(Path.of("countdowns.yml"), CountdownConfiguration::new).build();
+        var portalKey = Key.builder(Path.of("portal.yml"), PortalConfiguration::new).build();
 
-        var portalConfigOpt = PortalConfiguration.loadFromFile(PortalConfiguration.class);
-        this.portalConfiguration = portalConfigOpt.orElseGet(PortalConfiguration::new);
-        this.portalConfiguration.save();
+        var basePath = getDataPath();
+
+        mainConfiguration = Configurations.builder(mainKey, new YamlDataFormat()).setBase(basePath).build();
+        countdownConfiguration = Configurations.builder(countdownKey, new YamlDataFormat()).setBase(basePath).build();
+        portalConfiguration = Configurations.builder(portalKey, new YamlDataFormat()).setBase(basePath).build();
     }
 
     private void applyListeners() {
@@ -178,7 +191,7 @@ public class YasmpPlugin extends PaperAstraPlugin {
 
     private void initDataServices() {
         var queryConfig = StandardDataBaseProvider.updateAndConnectToDataBase(
-                configuration.database(),
+                mainConfiguration.main().database(),
                 getClassLoader(),
                 getDataPath()
         );
@@ -197,15 +210,15 @@ public class YasmpPlugin extends PaperAstraPlugin {
         return hookRegistry;
     }
 
-    public YasmppConfiguration configuration() {
-        return configuration;
+    public Configurations<YasmppConfiguration> configuration() {
+        return mainConfiguration;
     }
 
-    public CountdownConfiguration countdownConfiguration() {
+    public Configurations<CountdownConfiguration> countdownConfiguration() {
         return countdownConfiguration;
     }
 
-    public PortalConfiguration portalConfiguration() {
+    public Configurations<PortalConfiguration> portalConfiguration() {
         return portalConfiguration;
     }
 

@@ -183,10 +183,10 @@ public class HomeCommand extends PaperCommand<YasmpPlugin> {
                     return;
                 }
 
-                var countDownSettings = plugin.countdownConfiguration().countdown().teleport();
+                var countDownSettings = plugin.countdownConfiguration().main().countdown().teleport();
 
                 smpPlayer.getHome(homeName).ifPresent(home -> {
-                    var countDownInSec = plugin.configuration().teleport().teleportCoolDownInSeconds();
+                    var countDownInSec = plugin.configuration().main().teleport().teleportCoolDownInSeconds();
                     var countDown = Countdown.builder()
                             .withRunOnFinish(() -> handleCountDownFinish(home, smpPlayer))
                             .withRunOnStep(duration -> handleCountDownStep(duration, countDownSettings, player))
@@ -197,7 +197,7 @@ public class HomeCommand extends PaperCommand<YasmpPlugin> {
                             .build();
 
                     // Player is allowed to bypass the teleport warmup time
-                    if (plugin.configuration().teleport().permissionBypassesCoolDown()
+                    if (plugin.configuration().main().teleport().permissionBypassesCoolDown()
                             && player.hasPermission("yasmpp.teleport.cooldown.bypass")) {
                         countDownInSec = 0;
                     }

@@ -1,17 +1,14 @@
 package dev.thezexquex.yasmpp.configuration.settings;
 
-import de.unknowncity.astralib.libs.com.fasterxml.jackson.annotation.JsonCreator;
-import de.unknowncity.astralib.libs.com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import dev.thezexquex.yasmpp.modules.chat.method.FilterMethod;
 
 import java.util.regex.Pattern;
 
 public class ChatFilterRule {
-    @JsonProperty("regex")
     private final Pattern pattern;
-    @JsonProperty
     private final Type type;
-    @JsonProperty
     private final FilterMethod method;
 
     @JsonCreator

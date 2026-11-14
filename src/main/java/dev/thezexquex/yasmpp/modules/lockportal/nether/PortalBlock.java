@@ -1,17 +1,16 @@
 package dev.thezexquex.yasmpp.modules.lockportal.nether;
 
-import de.unknowncity.astralib.libs.com.fasterxml.jackson.annotation.JsonProperty;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
 
 public record PortalBlock(
-        @JsonProperty("x") int x,
-        @JsonProperty("y") int y,
-        @JsonProperty("z") int z,
-        @JsonProperty("material") String material,
-        @JsonProperty("isPortalFill") boolean isPortalFill,
-        @JsonProperty("blockData") String blockData
+        int x,
+        int y,
+        int z,
+        String material,
+        boolean isPortalFill,
+        String blockData
 ) {
 
     public PortalBlock(int x, int y, int z, String material, String blockData) {

@@ -25,7 +25,7 @@ public class NetherPortalManager {
 
     public void onPortalComplete() {
         this.progress = PortalProgress.COMPLETED;
-        lightPortal(plugin.portalConfiguration().state());
+        lightPortal(plugin.portalConfiguration().main().state());
 
         plugin.getServer().getOnlinePlayers().forEach(player -> {
             player.playSound(player, "minecraft:entity.wither.death", 1.0f, 0.1f);
@@ -35,7 +35,7 @@ public class NetherPortalManager {
                     Title.Times.times(Duration.ofSeconds(1), Duration.ofSeconds(3), Duration.ofSeconds(3)));
         });
 
-        plugin.configuration().general().portals().lockNether(false);
+        plugin.configuration().main().general().portals().lockNether(false);
         plugin.portalConfiguration().save();
     }
 
@@ -85,20 +85,20 @@ public class NetherPortalManager {
         scanSession.pos1(null);
         scanSession.pos2(null);
 
-        plugin.portalConfiguration().blueprint(portal);
-        plugin.portalConfiguration().state(null);
+        plugin.portalConfiguration().main().blueprint(portal);
+        plugin.portalConfiguration().main().state(null);
         plugin.portalConfiguration().save();
         player.sendMessage(Component.text("Portal successfully scanned! " + portal.blocks().size() + " blocks found.").color(NamedTextColor.GREEN));
     }
 
     public void spawnPortalAt(Location originLoc) {
-        var blueprint = plugin.portalConfiguration().blueprint();
-        var state = plugin.portalConfiguration().state();
+        var blueprint = plugin.portalConfiguration().main().blueprint();
+        var state = plugin.portalConfiguration().main().state();
         if (state == null || state.origin() == null || state.blocks() == null || state.blocks().isEmpty()) {
             state = new PortalState(Origin.fromLocation(originLoc), blueprint.blocks().stream().map(PortalBlockState::new).toList());
         }
         state.origin(Origin.fromLocation(originLoc));
-        plugin.portalConfiguration().state(state);
+        plugin.portalConfiguration().main().state(state);
         plugin.portalConfiguration().save();
         if (portalRenderer != null) {
             portalRenderer.despawn();
@@ -113,7 +113,7 @@ public class NetherPortalManager {
     }
 
     public void respawnPortalOnServerStart() {
-        var state = plugin.portalConfiguration().state();
+        var state = plugin.portalConfiguration().main().state();
         if (state == null || state.origin() == null || state.blocks() == null || state.blocks().isEmpty()) {
             plugin.getLogger().warning("No portal state found. Skipping respawn.");
             return;
@@ -123,7 +123,7 @@ public class NetherPortalManager {
             portalRenderer.despawn();
         }
 
-        portalRenderer = new PortalRenderer(this, plugin.portalConfiguration().blueprint(), state);
+        portalRenderer = new PortalRenderer(this, plugin.portalConfiguration().main().blueprint(), state);
         if (portalRenderer.isCompleted(state)) {
             return;
         }
@@ -143,7 +143,7 @@ public class NetherPortalManager {
         var completedBlocks = portalState.blocks().stream()
                 .filter(bs -> bs.block().isFrameBlock() && bs.completed())
                 .count();
-        var totalBlocks = plugin.portalConfiguration().blueprint().blocks().stream()
+        var totalBlocks = plugin.portalConfiguration().main().blueprint().blocks().stream()
                 .filter(PortalBlock::isFrameBlock)
                 .count();
 

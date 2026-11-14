@@ -1,7 +1,7 @@
 package dev.thezexquex.yasmpp.modules.chat.method;
 
-import de.unknowncity.astralib.libs.com.fasterxml.jackson.annotation.JsonSubTypes;
-import de.unknowncity.astralib.libs.com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 import java.util.regex.Pattern;
 

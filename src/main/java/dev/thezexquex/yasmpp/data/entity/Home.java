@@ -15,7 +15,7 @@ public record Home(
         LocationContainer locationContainer
 ) implements PlaceHolderProvider {
 
-    @MappingProvider("home")
+    @MappingProvider({"player_id", "id", "world", "x", "y", "z", "yaw", "pitch"})
     public static RowMapping<Home> map() {
         return row -> new Home(
                 row.get("player_id", StandardReader.UUID_FROM_STRING),

@@ -1,20 +1,10 @@
 package dev.thezexquex.yasmpp.configuration.settings;
 
-import de.unknowncity.astralib.libs.com.fasterxml.jackson.annotation.JsonProperty;
-
 public class TeleportSettings {
-    @JsonProperty
     private int teleportPrice = 3;
-    @JsonProperty
     private int teleportCoolDownInSeconds = 3;
-    @JsonProperty
     private boolean cancelOnMove = true;
-    @JsonProperty
     private boolean permissionBypassesCoolDown = false;
-
-    public TeleportSettings() {
-
-    }
 
     public int teleportCoolDownInSeconds() {
         return teleportCoolDownInSeconds;

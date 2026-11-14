@@ -25,6 +25,7 @@ repositories {
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
     maven("https://repo.xenondevs.xyz/releases")
     maven("https://repo.unknowncity.de/snapshots")
+    maven("https://repo.unknowncity.de/releases")
     maven("https://jitpack.io")
     maven("https://nexus.scarsz.me/content/groups/public/")
 }
@@ -57,7 +58,7 @@ bukkit {
 
     foliaSupported = false
 
-    apiVersion = "26.2"
+    apiVersion = "26.3"
 
     load = BukkitPluginDescription.PluginLoadOrder.POSTWORLD
 
@@ -86,15 +87,15 @@ tasks {
     }
 
     runServer {
-        minecraftVersion("26.2")
+        minecraftVersion("26.3")
 
         downloadPlugins {
-            // ADD plugins needed for testing
-            modrinth("plan", "5.8+build.3638")
+            // Add plugins needed for testing
+            modrinth("plan", "5.9+build.3786")
             modrinth("PlaceholderAPI", "pIvQcXW8")
             modrinth("DiscordSRV", "1.30.5")
-            modrinth("FastAsyncWorldEdit", "2.15.4")
-            github("UnknownCityMC", "AstraLib", "v0.8.0", "AstraLib-Paper-0.8.0-SNAPSHOT.jar")
+            modrinth("FastAsyncWorldEdit", "2.16.2")
+            //github("UnknownCityMC", "AstraLib", "v0.9.1", "AstraLib-Paper-0.9.1.jar")
         }
 
         jvmArgs("-Dcom.mojang.eula.agree=true")

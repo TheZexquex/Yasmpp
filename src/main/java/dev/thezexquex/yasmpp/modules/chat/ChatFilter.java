@@ -36,7 +36,7 @@ public class ChatFilter {
 
     public ChatFilterResult applyFilter(Player player, String input) {
         var result = input;
-        for (ChatFilterRule chatFilterRule : plugin.configuration().chat().filter()) {
+        for (ChatFilterRule chatFilterRule : plugin.configuration().main().chat().filter()) {
             if (violatesRule(input, chatFilterRule) && !player.hasPermission(Permissions.CHAT_VIOLATION_BYPASS)) {
                 var ruleResult = chatFilterRule.method().apply(result, chatFilterRule.pattern());
                 if (ruleResult == null) {

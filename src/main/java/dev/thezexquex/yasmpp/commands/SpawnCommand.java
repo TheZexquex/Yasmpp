@@ -68,10 +68,10 @@ public class SpawnCommand extends PaperCommand<YasmpPlugin> {
     }
 
     private void startSpawnTeleport(SmpPlayer player, WorldPosition worldPosition) {
-        var countDownInSec = plugin.configuration().teleport().teleportCoolDownInSeconds();
-        var countDownSettings = plugin.countdownConfiguration().countdown().teleport();
+        var countDownInSec = plugin.configuration().main().teleport().teleportCoolDownInSeconds();
+        var countDownSettings = plugin.countdownConfiguration().main().countdown().teleport();
 
-        if (plugin.configuration().teleport().permissionBypassesCoolDown()
+        if (plugin.configuration().main().teleport().permissionBypassesCoolDown()
                 && player.toBukkitPlayer().hasPermission("yasmpp.teleport.cooldown.bypass")) {
             countDownInSec = 0;
         }

@@ -22,7 +22,7 @@ public class HomeSlotShop {
 
         var title = plugin.messenger().component(player, NodePath.path("gui", "homeslotshop", "title"));
 
-        var homeSlots = plugin.configuration().homes().homeSlots();
+        var homeSlots = plugin.configuration().main().homes().homeSlots();
 
         var smpPlayer = plugin.smpPlayerService().get(player);
         if (smpPlayer.isEmpty()) {
@@ -36,7 +36,7 @@ public class HomeSlotShop {
                 .toList();
 
         var structure = new Structure(
-                plugin.configuration().homes().homeShopGuiStructure().toArray(String[]::new)
+                plugin.configuration().main().homes().homeShopGuiStructure().toArray(String[]::new)
         )
                 .addIngredient('x', Item.simple(borderItem))
                 .addIngredient('.', Markers.CONTENT_LIST_SLOT_HORIZONTAL);

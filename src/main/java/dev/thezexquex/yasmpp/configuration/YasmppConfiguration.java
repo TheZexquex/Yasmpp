@@ -1,32 +1,19 @@
 package dev.thezexquex.yasmpp.configuration;
 
-import de.unknowncity.astralib.common.configuration.YamlAstraConfiguration;
-import de.unknowncity.astralib.common.configuration.annotation.Config;
-import de.unknowncity.astralib.common.configuration.setting.defaults.ModernDataBaseSetting;
-import de.unknowncity.astralib.libs.com.fasterxml.jackson.annotation.JsonProperty;
-import dev.thezexquex.yasmpp.configuration.settings.*;
+import de.unknowncity.astralib.common.config.DatabaseSettings;
+import dev.thezexquex.yasmpp.configuration.settings.ChatSettings;
+import dev.thezexquex.yasmpp.configuration.settings.GeneralSettings;
+import dev.thezexquex.yasmpp.configuration.settings.HomeSettings;
+import dev.thezexquex.yasmpp.configuration.settings.TeleportSettings;
 
-@Config(targetFile = "plugins/Yasmpp/config.yml")
-public class YasmppConfiguration extends YamlAstraConfiguration {
+public class YasmppConfiguration {
 
-    @JsonProperty
-    private ModernDataBaseSetting database = new ModernDataBaseSetting();
-
-    @JsonProperty
+    private DatabaseSettings database = new DatabaseSettings();
     private GeneralSettings general = new GeneralSettings();
-
-    @JsonProperty
     private TeleportSettings teleport = new TeleportSettings();
-
-    @JsonProperty
     private final ChatSettings chat = new ChatSettings();
-
-    @JsonProperty
     private HomeSettings homes = new HomeSettings();
 
-    public YasmppConfiguration() {
-
-    }
     public GeneralSettings general() {
         return general;
     }
@@ -39,8 +26,7 @@ public class YasmppConfiguration extends YamlAstraConfiguration {
         return chat;
     }
 
-
-    public ModernDataBaseSetting database() {
+    public DatabaseSettings database() {
         return database;
     }
 

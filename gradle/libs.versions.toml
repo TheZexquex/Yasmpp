@@ -7,9 +7,11 @@ axionRelease = "1.21.2"
 
 #Dependencies
 invui = "2.5.0"
-paperApi = "26.2.build.+"
+paperApi = "26.3.build.+"
 placeholderapi = "2.12.3"
-astralib = "0.8.0-SNAPSHOT"
+astralib = "0.10.0-SNAPSHOT"
+ocular = "2.4.1"
+jackson = "3.2.4"
 plan = "5.8.3638"
 discordsrv = "1.30.5"
 junitBom = "5.14.4"
@@ -19,10 +21,16 @@ invui = { module = "xyz.xenondevs.invui:invui", version.ref = "invui" }
 paper-api = { module = "io.papermc.paper:paper-api", version.ref = "paperApi" }
 placeholderapi = { module = "me.clip:placeholderapi", version.ref = "placeholderapi" }
 astralib = { module = "de.unknowncity.astralib:astralib-paper-api", version.ref = "astralib" }
+ocular = { module = "dev.chojo:ocular", version.ref = "ocular" }
+jackson-core = { module = "tools.jackson.core:jackson-core", version.ref = "jackson" }
+jackson-yml = { module = "tools.jackson.dataformat :jackson-dataformat-yaml", version.ref = "jackson" }
 plan = { module = "com.github.plan-player-analytics:Plan", version.ref = "plan" }
 discordsrv = { module = "com.discordsrv:discordsrv", version.ref = "discordsrv" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junitBom" }
 junit-jupiter = { module = "org.junit.jupiter:junit-jupiter" }
+
+[bundles]
+jackson = ["jackson-core", "jackson-yml"]
 
 [plugins]
 shadow = { id = "com.gradleup.shadow", version.ref = "shadow" }
