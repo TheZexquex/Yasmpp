@@ -106,7 +106,7 @@ tasks {
             modrinth("PlaceholderAPI", "pIvQcXW8")
             modrinth("DiscordSRV", "1.30.5")
             modrinth("FastAsyncWorldEdit", "2.16.2")
-            //github("UnknownCityMC", "AstraLib", "v0.9.1", "AstraLib-Paper-0.9.1.jar")
+            github("UnknownCityMC", "AstraLib", "v0.10.0", "AstraLib-Paper-0.10.0.jar")
         }
 
         jvmArgs("-Dcom.mojang.eula.agree=true")
