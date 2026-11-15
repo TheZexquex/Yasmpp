@@ -2,8 +2,8 @@
 
 ### Dependencies
 - Java 25
-- Paper 26.2 
-- [AstraLib](https://github.com/UnknownCityMC/AstraLib)
+- Paper 26.3 
+- [AstraLib](https://github.com/UnknownCityMC/AstraLib) v0.10.0
 - DiscordSRV
 - PlayerAnalytics (Optional)
 - PlaceholderAPI (Optional)
