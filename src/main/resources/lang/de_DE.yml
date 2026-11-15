@@ -1,5 +1,5 @@
-prefix: "<white>[<gradient:#18edad:#18edea>SurvivalProjekt</gradient><white>] "
-chat-format: "<yellow><player><white>: <gray><message>"
+prefix: "<white>[<gradient:#18edad:#18edea>Handwerksangriff</gradient><white>] "
+chat-format: "<hover:show_text:'<yellow>Klicke um deinen Status zu ändern!'><click:run_command:'/status'>%eternaltags_tag_stripped%</click></hover> <white><player> <dark_gray>» <gray><message>"
 gui:
   homeslotshop:
     title: "              <gradient:#00bbff:#0055ff:#00bbff>Hᴏᴍᴇ Sʜᴏᴘ"
@@ -115,46 +115,37 @@ command:
       format-line-complete: "<yellow><index> <gray>» <green><step>"
       format-header: "<gray>-------------------[<yellow>Setup]<gray>-------------------"
   ontime:
-    global: |
-      <gold><player>'s <gray>Spielzeit auf gold>Handwerksangriff
-      <gray>» <#dea459>Erster Login <gray>⇛ <#de7359><first_joined> <gray>(<first_joined_ago> Tage)
-      <gray>» <#dea459>Login <gray>⇛ <#de7359> <ontime_session>
-      <gray>» <#dea459>Heute <gray>⇛ <#de7359> <ontime_day>
-      <gray>» <#dea459>Letzte 7 Tage <gray>⇛ <#de7359> <ontime_week>
-      <gray>» <#dea459>Letzte 30 Tage  <gray>⇛ <#de7359> <ontime_month>
-      <gray>» <#dea459><year>  <gray>⇛ <#de7359> <ontime_year>
-      <gray>» <#dea459>Gesamt  <gray>⇛ <#de7359> <ontime_all>
-    global-offline: |
-      <gold><player>'s <gray>Spielzeit auf <gold>Handwerksangriff
-      <gray>» <#dea459>Erster Login <gray>⇛ <#de7359><first_joined> <gray>(<first_joined_ago> Tage)
-      <gray>» <#dea459>Offline <gray>⇛ <#de7359> <ontime_session>
-      <gray>» <#dea459>Heute <gray>⇛ <#de7359> <ontime_day>
-      <gray>» <#dea459>Letzte 7 Tage <gray>⇛ <#de7359> <ontime_week>
-      <gray>» <#dea459>Letzte 30 Tage  <gray>⇛ <#de7359> <ontime_month>
-      <gray>» <#dea459><year>  <gray>⇛ <#de7359> <ontime_year>
-      <gray>» <#dea459>Gesamt  <gray>⇛ <#de7359> <ontime_all>
-    empty: "N/A"
+    online: |
+      <#8A84E2><player>'s <gray>Spielzeit<afk_hint>
+      <gray>├ <#95B8D1>Erster Login <gray>» <#AFAFDC><first_joined> <gray>(vor <first_joined_ago> Tagen)
+      <gray>├ <#95B8D1>Seit Login <gray>» <#AFAFDC><ontime_session>
+      <gray>├ <#95B8D1>Heute <gray>» <#AFAFDC><ontime_day>
+      <gray>├ <#95B8D1>7 Tage <gray>» <#AFAFDC><ontime_week>
+      <gray>├ <#95B8D1>30 Tage <gray>» <#AFAFDC><ontime_month>
+      <gray>├ <#95B8D1><year> <gray>» <#AFAFDC><ontime_year>
+      <gray>└ <#95B8D1>Gesamt <gray>» <#AFAFDC><ontime_total>
+    offline: |
+      <#8A84E2><player>'s <gray>Spielzeit <gray>(<red>Offline<gray>)<afk_hint>
+      <gray>├ <#95B8D1>Erster Login <gray>» <#AFAFDC><first_joined> <gray>(vor <first_joined_ago> Tagen)
+      <gray>├ <#95B8D1>Offline seit <gray>» <#AFAFDC><offline_since>
+      <gray>├ <#95B8D1>Heute <gray>» <#AFAFDC><ontime_day>
+      <gray>├ <#95B8D1>7 Tage <gray>» <#AFAFDC><ontime_week>
+      <gray>├ <#95B8D1>30 Tage <gray>» <#AFAFDC><ontime_month>
+      <gray>├ <#95B8D1><year> <gray>» <#AFAFDC><ontime_year>
+      <gray>└ <#95B8D1>Gesamt <gray>» <#AFAFDC><ontime_total>
+    afk-excluded: " <gray>(ohne AFK)"
     never-joined: "<prefix><red>Dieser Spieler war noch nie auf diesem Server"
   ontimetop:
     empty: "<prefix><red>Keine Daten gefunden"
-    max-pages-reached: "<prefix><red>Diese Seite existiert nicht!"
-    header: "<gold>Top <gray>Spielzeiten auf <gold>Handwerksangriff"
-    list-self: "<gold><count> <yellow><player> <gold><ontime> <gray>(Du)"
-    list: "<gray><count> <#dea459><player> <#de7359><ontime>"
-    footer: "<gray><click:run_command:'/ontimetop <previous>'>[<#dea459><<<gray>]</click>==========[<#dea459><current-page><gray>/<#dea459><max-page><gray>]========<gray><click:run_command:'/ontimetop <next>'>[<#dea459>>><gray>]</click>"
-    footer-no-prev: "<gray>=============[<#dea459><current-page><gray>/<#dea459><max-page><gray>]========<gray><click:run_command:'/ontimetop <next>'>[<#dea459>>><gray>]</click>"
-    footer-no-prev-no-next: "<gray>=============[<#dea459><current-page><gray>/<#dea459><max-page><gray>]==========="
-    footer-no-next: "<gray><click:run_command:'/ontimetop <previous>'>[<#dea459><<<gray>]</click>==========[<#dea459><current-page><gray>/<#dea459><max-page><gray>]==========="
+    header: "<#8A84E2>Top <gray>Spielzeiten auf <#8A84E2>Handwerksangriff<afk_hint>"
+    entry-self: "<#FF5964><count> <#AFAFDC><player> <#FF5964><ontime> <gray>(Du)"
+    entry: "<#AFAFDC><count> <gray><player> <#AFAFDC><ontime>"
   lastonline:
     empty: "<prefix><red>Keine Daten gefunden"
-    max-pages-reached: "<prefix><red>Diese Seite existiert nicht!"
-    header: "<gold>Zuletzt Online <gray>auf <gold>Handwerksangriff"
-    list-self: "<gold><count> <yellow><player> <gold><lastonline> <gray>(Du)"
-    list: "<gray><count> <#dea459><player> <#de7359><lastonline>"
-    footer: "<gray><click:run_command:'/lastonline <previous>'>[<#dea459><<<gray>]</click>==========[<#dea459><current-page><gray>/<#dea459><max-page><gray>]========<gray><click:run_command:'/lastonline <next>'>[<#dea459>>><gray>]</click>"
-    footer-no-prev: "<gray>=============[<#dea459><current-page><gray>/<#dea459><max-page><gray>]========<gray><click:run_command:'/lastonline <next>'>[<#dea459>>><gray>]</click>"
-    footer-no-prev-no-next: "<gray>=============[<#dea459><current-page><gray>/<#dea459><max-page><gray>]==========="
-    footer-no-next: "<gray><click:run_command:'/lastonline <previous>'>[<#dea459><<<gray>]</click>==========[<#dea459><current-page><gray>/<#dea459><max-page><gray>]==========="
+    header: "<#8A84E2>Zuletzt online auf Handwerksangriff"
+    entry-self: "<#FF5964><count> <#AFAFDC><player> <#FF5964><lastonline> <gray>(Du)"
+    entry: "<#AFAFDC><count> <gray><player> <#AFAFDC><lastonline>"
+    online: "<green>Online"
   sysinfo:
     header: "<gray>-------------------[<yellow>Systeminfo<gray>]-------------------"
     footer: "<gray>-----------------------------------------------"
@@ -237,7 +228,16 @@ command:
       enabled: "<prefix><green>Live-Systeminfo in der Actionbar aktiviert"
       disabled: "<prefix><gray>Live-Systeminfo in der Actionbar deaktiviert"
       actionbar: "<gray>CPU <dark_gray>[<cpu-bar><dark_gray>] <#de7359><cpu-percent>  <gray>RAM <dark_gray>[<ram-bar><dark_gray>] <#de7359><ram-percent>  <gray>TPS <tps>"
+pagination:
+  footer: "<gray><previous>==========[<#8A84E2><current-page><gray>/<#8A84E2><max-page><gray>]==========<next>"
+  previous: "<gray><click:run_command:'<command>'>[<#8A84E2><<<gray>]</click>"
+  previous-none: "<gray>===="
+  next: "<gray><click:run_command:'<command>'>[<#8A84E2>>><gray>]</click>"
+  next-none: "<gray>===="
+  page-not-found: "<prefix><red>Diese Seite existiert nicht!"
 exception:
+  player-unknown: "<prefix><red>Dieser Spieler ist unbekannt"
+  plan-unavailable: "<prefix><red>Die Spielzeiten konnten gerade nicht geladen werden. Bitte versuche es später erneut"
   command:
     invalidsender: "<prefix><red>Diesen Command kannst du nur als Spieler ausführen"
     nopermission: "<prefix><red>Dazu fehlt dir die Berechtigung"
@@ -268,7 +268,7 @@ event:
     subtitle: ""
     chat: ""
   nether:
-    enter-portal-locked: "<prefix><red>Das Nether ist bis zum <yellow>xx.xx.xx <red>gesperrt"
+    enter-portal-locked: "<prefix><red>Das Nether ist gesperrt, bis das große Portal am Spawn vervollständigt ist!"
     unlock:
       message: "<prefix><green><bold>Das Nether wurde entsperrt!"
       title: "<green>Das Nether wurde freigeschaltet!"
