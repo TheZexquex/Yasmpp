@@ -33,13 +33,15 @@ public class PortalCommand extends PaperCommand<YasmpPlugin> {
 
     private void handleFix(@NonNull CommandContext<Player> context) {
         var player = context.sender();
-        plugin.netherPortalManager().respawnPortalOnServerStart();
+        plugin.netherPortalManager().respawnPortal();
         plugin.messenger().sendMessage(player, NodePath.path("command", "portal", "fix"));
     }
 
     private void handleSummon(@NonNull CommandContext<Player> context) {
         var player = context.sender();
         var origin = player.getLocation();
-        plugin.netherPortalManager().spawnPortalAt(origin);
+        if (!plugin.netherPortalManager().spawnPortalAt(origin)) {
+            plugin.messenger().sendMessage(player, NodePath.path("command", "portal", "no-blueprint"));
+        }
     }
 }

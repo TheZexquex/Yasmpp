@@ -1,160 +1,186 @@
 package dev.thezexquex.yasmpp.modules.lockportal.nether;
 
 import dev.thezexquex.yasmpp.YasmpPlugin;
-import net.kyori.adventure.text.Component;
-import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.title.Title;
+import dev.thezexquex.yasmpp.configuration.PortalConfiguration;
+import org.bukkit.GameMode;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.spongepowered.configurate.NodePath;
 
-import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 
+/**
+ * Owns the portal flow: spawning, placing frame blocks and completing the portal.
+ * The blueprint and state are always read from the current portal configuration and never cached,
+ * so a reload of the configuration can not leave stale references behind.
+ */
 public class NetherPortalManager {
     private final YasmpPlugin plugin;
-    private PortalRenderer portalRenderer;
-    private BossBarManager bossBarManager;
-    private PortalProgress progress = PortalProgress.NOT_STARTED;
-    private final PortalScanSession scanSession = new PortalScanSession(null, null);
+    private final PortalRenderer renderer = new PortalRenderer();
+    private final List<PortalProgressListener> listeners = new ArrayList<>();
 
     public NetherPortalManager(YasmpPlugin plugin) {
         this.plugin = plugin;
-        this.bossBarManager = new BossBarManager(plugin, this);
     }
 
-    public void onPortalComplete() {
-        this.progress = PortalProgress.COMPLETED;
-        lightPortal(plugin.portalConfiguration().main().state());
+    public void addListener(PortalProgressListener listener) {
+        listeners.add(listener);
+    }
 
-        plugin.getServer().getOnlinePlayers().forEach(player -> {
-            player.playSound(player, "minecraft:entity.wither.death", 1.0f, 0.1f);
-            plugin.messenger().sendTitle(player,
-                    NodePath.path("event", "nether", "unlock", "title"),
-                    NodePath.path("event", "nether", "unlock", "subtitlle"),
-                    Title.Times.times(Duration.ofSeconds(1), Duration.ofSeconds(3), Duration.ofSeconds(3)));
-        });
+    public enum PlaceResult {
+        PLACED,
+        PORTAL_COMPLETED,
+        WRONG_ITEM,
+        NOT_PLACEABLE
+    }
 
-        plugin.configuration().main().general().portals().lockNether(false);
+    public PlaceResult placeBlock(Player player, int index) {
+        var blueprint = config().blueprint();
+        var state = config().state();
+        if (!isValid(blueprint, state) || !blueprint.isFrameIndex(index) || state.isCompleted(index)) {
+            return PlaceResult.NOT_PLACEABLE;
+        }
+        var origin = state.origin().toLocation();
+        if (origin.isEmpty()) {
+            return PlaceResult.NOT_PLACEABLE;
+        }
+
+        var portalBlock = blueprint.block(index);
+        var handItem = player.getInventory().getItemInMainHand();
+        if (handItem.getType() != portalBlock.getMaterial()) {
+            return PlaceResult.WRONG_ITEM;
+        }
+        if (player.getGameMode() != GameMode.CREATIVE) {
+            handItem.setAmount(handItem.getAmount() - 1);
+        }
+
+        PortalBlocks.place(origin.get(), portalBlock);
+        state.complete(index);
+        renderer.remove(index);
+        plugin.portalConfiguration().save();
+
+        if (state.isPortalComplete(blueprint)) {
+            listeners.forEach(listener -> listener.onCompleted(origin.get(), blueprint));
+            return PlaceResult.PORTAL_COMPLETED;
+        }
+        notifyProgress(blueprint, state);
+        return PlaceResult.PLACED;
+    }
+
+    /**
+     * Replaces the blueprint. The current state refers to the old blueprint, so it is discarded.
+     */
+    public void replaceBlueprint(PortalBlueprint blueprint) {
+        despawnPortal();
+        config().blueprint(blueprint);
+        config().state(null);
         plugin.portalConfiguration().save();
     }
 
-    public void lightPortal(PortalState state) {
-        var baseLocation = state.origin().toLocation();
-        state.blocks().forEach(portalBlockState -> {
-            var block = portalBlockState.block();
-            if (block.isPortalFill()) {
-                var loc = baseLocation.clone().add(block.x(), block.y(), block.z());
-                var worldBlock = loc.getBlock();
-                worldBlock.setType(Material.NETHER_PORTAL);
-
-                if (block.getBlockData() != null) {
-                    try {
-                        var blockData = plugin.getServer().createBlockData(block.getBlockData());
-                        worldBlock.setBlockData(blockData);
-                    } catch (IllegalArgumentException e) {
-                        plugin.getLogger().warning("Could not parse block data: " + block.getBlockData());
-                    }
-                }
-            }
-        });
-    }
-
-    public enum PortalProgress {
-        NOT_STARTED,
-        IN_PROGRESS,
-        COMPLETED
-    }
-
-    public PortalScanSession scanSession() {
-        return scanSession;
-    }
-
-
-    public void tryScanPortal(Player player) {
-        if (scanSession.pos1() == null || scanSession.pos2() == null) {
-            return;
+    /**
+     * Moves the portal to the given location, keeping its progress. Already placed blocks are moved along.
+     *
+     * @return false if no blueprint has been scanned yet
+     */
+    public boolean spawnPortalAt(Location originLoc) {
+        var blueprint = config().blueprint();
+        if (blueprint == null || !blueprint.hasBlocks()) {
+            return false;
         }
 
-        var portal = PortalScanner.scanStructure(
-                player.getWorld() ,
-                scanSession.pos1(),
-                scanSession.pos2()
-        );
+        var state = config().state();
+        if (state == null) {
+            state = new PortalState();
+            config().state(state);
+        }
 
-        scanSession.pos1(null);
-        scanSession.pos2(null);
-
-        plugin.portalConfiguration().main().blueprint(portal);
-        plugin.portalConfiguration().main().state(null);
+        var newOrigin = Origin.fromLocation(originLoc);
+        var oldOrigin = state.origin() == null ? null : state.origin().toLocation().orElse(null);
+        if (oldOrigin != null && !state.origin().equals(newOrigin) && blueprint.invalidBlockIndices().isEmpty()) {
+            state.retainValid(blueprint);
+            // Block aligned, like the origin the holograms are rendered at
+            PortalBlocks.move(oldOrigin, newOrigin.toLocation().orElseThrow(), blueprint, state.completed(), state.isPortalComplete(blueprint));
+        } else if (oldOrigin == null && state.origin() != null && !state.completed().isEmpty()) {
+            plugin.getLogger().warning("World '" + state.origin().world() + "' of the portal is not loaded. Placed blocks were not moved.");
+        }
+        state.origin(newOrigin);
         plugin.portalConfiguration().save();
-        player.sendMessage(Component.text("Portal successfully scanned! " + portal.blocks().size() + " blocks found.").color(NamedTextColor.GREEN));
+
+        respawnPortal();
+        return true;
     }
 
-    public void spawnPortalAt(Location originLoc) {
-        var blueprint = plugin.portalConfiguration().main().blueprint();
-        var state = plugin.portalConfiguration().main().state();
-        if (state == null || state.origin() == null || state.blocks() == null || state.blocks().isEmpty()) {
-            state = new PortalState(Origin.fromLocation(originLoc), blueprint.blocks().stream().map(PortalBlockState::new).toList());
-        }
-        state.origin(Origin.fromLocation(originLoc));
-        plugin.portalConfiguration().main().state(state);
-        plugin.portalConfiguration().save();
-        if (portalRenderer != null) {
-            portalRenderer.despawn();
-        }
-        portalRenderer = new PortalRenderer(this, blueprint, state);
-        if (portalRenderer.isCompleted(state)) {
-            return;
-        }
-        this.progress = PortalProgress.NOT_STARTED;
-        portalRenderer.render();
-        this.bossBarManager.startShowingBossBar();
-    }
+    /**
+     * Rebuilds the holograms from the stored state.
+     */
+    public void respawnPortal() {
+        despawnPortal();
 
-    public void respawnPortalOnServerStart() {
-        var state = plugin.portalConfiguration().main().state();
-        if (state == null || state.origin() == null || state.blocks() == null || state.blocks().isEmpty()) {
+        var blueprint = config().blueprint();
+        var state = config().state();
+        if (!isValid(blueprint, state)) {
             plugin.getLogger().warning("No portal state found. Skipping respawn.");
             return;
         }
 
-        if (portalRenderer != null) {
-            portalRenderer.despawn();
-        }
-
-        portalRenderer = new PortalRenderer(this, plugin.portalConfiguration().main().blueprint(), state);
-        if (portalRenderer.isCompleted(state)) {
+        var invalidBlocks = blueprint.invalidBlockIndices();
+        if (!invalidBlocks.isEmpty()) {
+            plugin.getLogger().severe("The portal blueprint contains unknown materials at block indices " + invalidBlocks + ". Rescan the portal.");
             return;
         }
-        portalRenderer.despawn();
-        portalRenderer.render();
-        this.bossBarManager.startShowingBossBar();
+
+        var removed = state.retainValid(blueprint);
+        if (removed > 0) {
+            plugin.getLogger().warning("Removed " + removed + " completed portal blocks that do not belong to the blueprint.");
+            plugin.portalConfiguration().save();
+        }
+
+        var origin = state.origin().toLocation();
+        if (origin.isEmpty()) {
+            plugin.getLogger().warning("World '" + state.origin().world() + "' of the portal is not loaded. Skipping respawn.");
+            return;
+        }
+
+        if (state.isPortalComplete(blueprint)) {
+            return;
+        }
+
+        var missing = blueprint.frameIndices().filter(index -> !state.isCompleted(index)).boxed().toList();
+        renderer.render(origin.get(), blueprint, missing);
+        notifyProgress(blueprint, state);
+    }
+
+    private void despawnPortal() {
+        renderer.despawn();
+        listeners.forEach(PortalProgressListener::onHidden);
+    }
+
+    private void notifyProgress(PortalBlueprint blueprint, PortalState state) {
+        var completed = state.completedFrameCount(blueprint);
+        var total = blueprint.frameBlockCount();
+        listeners.forEach(listener -> listener.onProgress(completed, total));
+    }
+
+    private boolean isValid(PortalBlueprint blueprint, PortalState state) {
+        return blueprint != null && blueprint.hasBlocks() && state != null && state.origin() != null;
+    }
+
+    private PortalConfiguration config() {
+        return plugin.portalConfiguration().main();
     }
 
     public void onDisable() {
-        portalRenderer.despawn();
+        despawnPortal();
     }
 
-    public void updateBossBarProgress(PortalState portalState) {
-        if (this.progress == PortalProgress.COMPLETED) {
-            return;
-        }
-        var completedBlocks = portalState.blocks().stream()
-                .filter(bs -> bs.block().isFrameBlock() && bs.completed())
-                .count();
-        var totalBlocks = plugin.portalConfiguration().main().blueprint().blocks().stream()
-                .filter(PortalBlock::isFrameBlock)
-                .count();
-
-        bossBarManager.updateBossBar(completedBlocks, totalBlocks);
+    /**
+     * The portal configuration is recreated on reload, so the holograms are rebuilt from the new state.
+     */
+    public void reload() {
+        respawnPortal();
     }
 
     public PortalRenderer portalRenderer() {
-        return portalRenderer;
-    }
-
-    public PortalProgress progress() {
-        return progress;
+        return renderer;
     }
 }

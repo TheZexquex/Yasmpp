@@ -1,20 +1,14 @@
 package dev.thezexquex.yasmpp.modules.lockportal.nether;
 
-import de.unknowncity.astralib.paper.api.inventory.InventoryUtil;
 import dev.thezexquex.yasmpp.YasmpPlugin;
-import net.kyori.adventure.text.Component;
-import org.bukkit.Material;
-import org.bukkit.entity.EntityType;
-import org.bukkit.entity.Interaction;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractAtEntityEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.EquipmentSlot;
 
-import java.util.Objects;
-
+/**
+ * Places frame blocks when a player clicks a portal hologram with the matching block.
+ */
 public class PlayerInteractListener implements Listener {
     private final YasmpPlugin plugin;
 
@@ -24,55 +18,22 @@ public class PlayerInteractListener implements Listener {
 
     @EventHandler
     public void onInteractAtEntity(PlayerInteractAtEntityEvent event) {
-        var clicked = event.getRightClicked();
-        var handItem = event.getPlayer().getInventory().getItemInMainHand();
-        if (clicked.getType() != EntityType.INTERACTION) return;
+        // Fired once per hand, but only the main hand item is consumed
+        if (event.getHand() != EquipmentSlot.HAND) return;
 
-        var portalRenderer = plugin.netherPortalManager().portalRenderer();
-        if (portalRenderer == null) return;
-
-        if (portalRenderer.isPortalBlock(clicked)) {
-            var portalBlock = portalRenderer.getPortalBlock(clicked);
-
-            if (handItem.getType() == portalBlock.getMaterial()) {
-                handItem.setAmount(handItem.getAmount() - 1);
-                var blockLoc = clicked.getLocation().getBlock().getLocation();
-                blockLoc.getBlock().setType(portalBlock.getMaterial());
-
-                portalRenderer.completePortalBlock(clicked);
-
-                event.getPlayer().playSound(blockLoc, "minecraft:block.end_portal_frame.fill", 1, 0.1f);
-                event.getPlayer().playSound(blockLoc, "minecraft:block.amethyst_block.place", 1, 2f);
-                event.getPlayer().playSound(blockLoc, "minecraft:block.amethyst_block.place", 1, 1.7f);
-
-                plugin.portalConfiguration().save();
-            }
-        }
-    }
-
-    @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent event) {
-        if (event.getClickedBlock() == null) {
-            return;
-        }
-
-        if (event.getItem() == null || event.getItem().getType() != Material.STRUCTURE_VOID) {
-            return;
-        }
-
-        var player = event.getPlayer();
-
-        if (event.getAction() == Action.LEFT_CLICK_BLOCK) {
-            plugin.netherPortalManager().scanSession().pos1(event.getClickedBlock().getLocation());
-            player.sendMessage(Component.text("Set position 1 to: " + event.getClickedBlock().getLocation()));
-        }
-        if (event.getAction() == Action.RIGHT_CLICK_BLOCK) {
-            plugin.netherPortalManager().scanSession().pos2(event.getClickedBlock().getLocation());
-            player.sendMessage(Component.text("Set position 2 to: " + Objects.requireNonNull(event.getClickedBlock().getLocation())));
-        }
+        var manager = plugin.netherPortalManager();
+        var index = manager.portalRenderer().blockIndex(event.getRightClicked());
+        if (index.isEmpty()) return;
 
         event.setCancelled(true);
 
-        plugin.netherPortalManager().tryScanPortal(player);
+        var player = event.getPlayer();
+        var result = manager.placeBlock(player, index.getAsInt());
+        if (result == NetherPortalManager.PlaceResult.PLACED || result == NetherPortalManager.PlaceResult.PORTAL_COMPLETED) {
+            var blockLoc = event.getRightClicked().getLocation();
+            player.playSound(blockLoc, "minecraft:block.end_portal_frame.fill", 1, 0.1f);
+            player.playSound(blockLoc, "minecraft:block.amethyst_block.place", 1, 2f);
+            player.playSound(blockLoc, "minecraft:block.amethyst_block.place", 1, 1.7f);
+        }
     }
 }
