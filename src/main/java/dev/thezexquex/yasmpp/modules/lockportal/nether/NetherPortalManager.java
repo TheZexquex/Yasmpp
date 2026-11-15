@@ -54,8 +54,7 @@ public class NetherPortalManager {
             handItem.setAmount(handItem.getAmount() - 1);
         }
 
-        origin.get().clone().add(portalBlock.x(), portalBlock.y(), portalBlock.z()).getBlock()
-                .setBlockData(portalBlock.createBlockData());
+        PortalBlocks.place(origin.get(), portalBlock);
         state.complete(index);
         renderer.remove(index);
         plugin.portalConfiguration().save();
@@ -79,7 +78,7 @@ public class NetherPortalManager {
     }
 
     /**
-     * Moves the portal to the given location, keeping its progress.
+     * Moves the portal to the given location, keeping its progress. Already placed blocks are moved along.
      *
      * @return false if no blueprint has been scanned yet
      */
@@ -94,7 +93,17 @@ public class NetherPortalManager {
             state = new PortalState();
             config().state(state);
         }
-        state.origin(Origin.fromLocation(originLoc));
+
+        var newOrigin = Origin.fromLocation(originLoc);
+        var oldOrigin = state.origin() == null ? null : state.origin().toLocation().orElse(null);
+        if (oldOrigin != null && !state.origin().equals(newOrigin) && blueprint.invalidBlockIndices().isEmpty()) {
+            state.retainValid(blueprint);
+            // Block aligned, like the origin the holograms are rendered at
+            PortalBlocks.move(oldOrigin, newOrigin.toLocation().orElseThrow(), blueprint, state.completed(), state.isPortalComplete(blueprint));
+        } else if (oldOrigin == null && state.origin() != null && !state.completed().isEmpty()) {
+            plugin.getLogger().warning("World '" + state.origin().world() + "' of the portal is not loaded. Placed blocks were not moved.");
+        }
+        state.origin(newOrigin);
         plugin.portalConfiguration().save();
 
         respawnPortal();

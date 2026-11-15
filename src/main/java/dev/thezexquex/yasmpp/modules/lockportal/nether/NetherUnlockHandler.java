@@ -19,7 +19,7 @@ public class NetherUnlockHandler implements PortalProgressListener {
 
     @Override
     public void onCompleted(Location origin, PortalBlueprint blueprint) {
-        lightPortal(origin, blueprint);
+        PortalBlocks.lightPortal(origin, blueprint);
 
         plugin.getServer().getOnlinePlayers().forEach(player -> {
             player.playSound(player, "minecraft:entity.wither.death", 1.0f, 0.1f);
@@ -31,15 +31,5 @@ public class NetherUnlockHandler implements PortalProgressListener {
 
         plugin.configuration().main().general().portals().lockNether(false);
         plugin.configuration().save();
-    }
-
-    private void lightPortal(Location origin, PortalBlueprint blueprint) {
-        blueprint.blocks().stream()
-                .filter(PortalBlock::isPortalFill)
-                .forEach(block -> {
-                    var worldBlock = origin.clone().add(block.x(), block.y(), block.z()).getBlock();
-                    // Without physics, otherwise portal blocks break while their neighbours are not set yet
-                    worldBlock.setBlockData(block.createBlockData(), false);
-                });
     }
 }

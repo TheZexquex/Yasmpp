@@ -271,7 +271,7 @@ event:
     subtitle: ""
     chat: ""
   nether:
-    bossbar: "<purple>Netherportal <gray>(<yellow><completed><gray>/<yellow><total><gray>)"
+    bossbar: "<light_purple>Netherportal <gray>(<yellow><completed><gray>/<yellow><total><gray>)"
     enter-portal-locked: "<prefix><red>Das Nether ist gesperrt, bis das große Portal am Spawn vervollständigt ist!"
     unlock:
       message: "<prefix><green><bold>Das Nether wurde entsperrt!"
