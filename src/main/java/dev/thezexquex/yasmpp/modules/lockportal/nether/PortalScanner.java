@@ -24,7 +24,7 @@ public class PortalScanner {
             for (int y = minY; y <= maxY; y++) {
                 for (int z = minZ; z <= maxZ; z++) {
                     var block = world.getBlockAt(x, y, z);
-                    if (block.getType() != Material.AIR && block.getType() != Material.STRUCTURE_BLOCK) {
+                    if (!block.getType().isAir() && block.getType() != Material.STRUCTURE_BLOCK) {
                         boolean isPortalFill = block.getType() == Material.NETHER_PORTAL;
 
                         blocks.add(new PortalBlock(

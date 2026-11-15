@@ -36,6 +36,7 @@ import dev.thezexquex.yasmpp.modules.joinleavemessage.PlayerQuitListener;
 import dev.thezexquex.yasmpp.modules.lockportal.LockPortalListener;
 import dev.thezexquex.yasmpp.modules.lockportal.nether.NetherPortalManager;
 import dev.thezexquex.yasmpp.modules.lockportal.nether.PlayerInteractListener;
+import dev.thezexquex.yasmpp.modules.lockportal.nether.PortalEntityCleanupListener;
 import dev.thezexquex.yasmpp.modules.mobileworkstations.WorkstationInteractListener;
 import dev.thezexquex.yasmpp.modules.respawn.RespawnListener;
 import dev.thezexquex.yasmpp.modules.signedit.SignEditListener;
@@ -80,7 +81,7 @@ public class YasmpPlugin extends PaperAstraPlugin {
         applyCommands();
         elytraManager = new ElytraManager(this);
         netherPortalManager = new NetherPortalManager(this);
-        netherPortalManager.respawnPortalOnServerStart();
+        netherPortalManager.respawnPortal();
 
         Permissions.ALL_PERMISSIONS.forEach(permission -> Bukkit.getPluginManager().addPermission(new Permission(permission)));
     }
@@ -100,6 +101,9 @@ public class YasmpPlugin extends PaperAstraPlugin {
     @Override
     public void onPluginReload() {
         reloadPlugin();
+        if (netherPortalManager != null) {
+            netherPortalManager.reload();
+        }
     }
 
     @Override
@@ -175,6 +179,7 @@ public class YasmpPlugin extends PaperAstraPlugin {
 
         // Nether Portal
         pluginManager.registerEvents(new PlayerInteractListener(this), this);
+        pluginManager.registerEvents(new PortalEntityCleanupListener(this), this);
 
         pluginManager.registerEvents(new SignEditListener(), this);
     }

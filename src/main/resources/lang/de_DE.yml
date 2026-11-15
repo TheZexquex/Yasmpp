@@ -100,6 +100,9 @@ command:
   reload:
     success: "<prefix><green>Plugin erfolgreich neu geladen!"
     error: "<prefix><red>Fehler beim Neuladen des Plugins"
+  portal:
+    fix: "<prefix><green>Das Portal wurde neu geladen"
+    no-blueprint: "<prefix><red>Es wurde noch kein Portal gescannt"
   setup:
     complete-step: "<prefix><green>Setup Stage <yellow><index> <green>abgeschlossen!"
     progress:
@@ -272,6 +275,7 @@ event:
     unlock:
       message: "<prefix><green><bold>Das Nether wurde entsperrt!"
       title: "<green>Das Nether wurde freigeschaltet!"
+      subtitle: ""
     lock:
       message: "<prefix><yellow><bold>Das Nether ist nun gesperrt"
       title: "<green>Das Nether wurde <red>gesperrt!"

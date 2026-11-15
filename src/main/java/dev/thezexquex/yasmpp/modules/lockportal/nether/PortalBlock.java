@@ -29,6 +29,11 @@ public record PortalBlock(
         return false;
     }
 
+    @Override
+    public int hashCode() {
+        return java.util.Objects.hash(x, y, z, material);
+    }
+
     public Material getMaterial() {
         return Material.valueOf(material);
     }
