@@ -6,20 +6,10 @@ import dev.thezexquex.yasmpp.configuration.settings.general.GeneralExplosionDama
 import dev.thezexquex.yasmpp.configuration.settings.general.GeneralSpawnElytraSettings;
 
 public class GeneralSettings {
-    private String planServerName = "Handwerksangriff";
-    private int planDataRefreshInterval = 120;
     private GeneralBorderSettings border = new GeneralBorderSettings();
     private GeneralPortalSettings portals = new GeneralPortalSettings();
     private GeneralExplosionDamageSettings explosionDamage = new GeneralExplosionDamageSettings();
     private GeneralSpawnElytraSettings spawnElytra = new GeneralSpawnElytraSettings();
-
-    public String planServerName() {
-        return planServerName;
-    }
-
-    public int planDataRefreshInterval() {
-        return planDataRefreshInterval;
-    }
 
     public GeneralBorderSettings border() {
         return border;

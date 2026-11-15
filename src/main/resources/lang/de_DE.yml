@@ -115,46 +115,37 @@ command:
       format-line-complete: "<yellow><index> <gray>» <green><step>"
       format-header: "<gray>-------------------[<yellow>Setup]<gray>-------------------"
   ontime:
-    global: |
-      <#8A84E2><player>'s <gray>Spielzeit
+    online: |
+      <#8A84E2><player>'s <gray>Spielzeit<afk_hint>
       <gray>├ <#95B8D1>Erster Login <gray>» <#AFAFDC><first_joined> <gray>(vor <first_joined_ago> Tagen)
       <gray>├ <#95B8D1>Seit Login <gray>» <#AFAFDC><ontime_session>
       <gray>├ <#95B8D1>Heute <gray>» <#AFAFDC><ontime_day>
       <gray>├ <#95B8D1>7 Tage <gray>» <#AFAFDC><ontime_week>
       <gray>├ <#95B8D1>30 Tage <gray>» <#AFAFDC><ontime_month>
       <gray>├ <#95B8D1><year> <gray>» <#AFAFDC><ontime_year>
-      <gray>└ <#95B8D1>Gesamt <gray>» <#AFAFDC><ontime_all>
-    global-offline: |
-      <#8A84E2><player>'s <gray>Spielzeit <gray>(<red>Offline<gray>)
+      <gray>└ <#95B8D1>Gesamt <gray>» <#AFAFDC><ontime_total>
+    offline: |
+      <#8A84E2><player>'s <gray>Spielzeit <gray>(<red>Offline<gray>)<afk_hint>
       <gray>├ <#95B8D1>Erster Login <gray>» <#AFAFDC><first_joined> <gray>(vor <first_joined_ago> Tagen)
-      <gray>├ <#95B8D1>Offline seit <gray>» <#AFAFDC><ontime_session>
+      <gray>├ <#95B8D1>Offline seit <gray>» <#AFAFDC><offline_since>
       <gray>├ <#95B8D1>Heute <gray>» <#AFAFDC><ontime_day>
       <gray>├ <#95B8D1>7 Tage <gray>» <#AFAFDC><ontime_week>
       <gray>├ <#95B8D1>30 Tage <gray>» <#AFAFDC><ontime_month>
       <gray>├ <#95B8D1><year> <gray>» <#AFAFDC><ontime_year>
-      <gray>└ <#95B8D1>Gesamt <gray>» <#AFAFDC><ontime_all>
-    empty: "N/A"
+      <gray>└ <#95B8D1>Gesamt <gray>» <#AFAFDC><ontime_total>
+    afk-excluded: " <gray>(ohne AFK)"
     never-joined: "<prefix><red>Dieser Spieler war noch nie auf diesem Server"
   ontimetop:
     empty: "<prefix><red>Keine Daten gefunden"
-    max-pages-reached: "<prefix><red>Diese Seite existiert nicht!"
-    header: "<#8A84E2>Top <gray>Spielzeiten auf <#8A84E2>Handwerksangriff"
-    list-self: "<#FF5964><count> <#AFAFDC><player> <#FF5964><ontime> <gray>(Du)"
-    list: "<#AFAFDC><count> <gray><player> <#AFAFDC><ontime>"
-    footer: "<gray><click:run_command:'/ontimetop <previous>'>[<#dea459><<<gray>]</click>==========[<#8A84E2><current-page><gray>/<#8A84E2><max-page><gray>]========<gray><click:run_command:'/ontimetop <next>'>[<#8A84E2>>><gray>]</click>"
-    footer-no-prev: "<gray>=============[<#8A84E2><current-page><gray>/<#8A84E2><max-page><gray>]========<gray><click:run_command:'/ontimetop <next>'>[<#8A84E2>>><gray>]</click>"
-    footer-no-prev-no-next: "<gray>=============[<#8A84E2><current-page><gray>/<#8A84E2><max-page><gray>]==========="
-    footer-no-next: "<gray><click:run_command:'/ontimetop <previous>'>[<#8A84E2><<<gray>]</click>==========[<#8A84E2><current-page><gray>/<#8A84E2><max-page><gray>]==========="
+    header: "<#8A84E2>Top <gray>Spielzeiten auf <#8A84E2>Handwerksangriff<afk_hint>"
+    entry-self: "<#FF5964><count> <#AFAFDC><player> <#FF5964><ontime> <gray>(Du)"
+    entry: "<#AFAFDC><count> <gray><player> <#AFAFDC><ontime>"
   lastonline:
     empty: "<prefix><red>Keine Daten gefunden"
-    max-pages-reached: "<prefix><red>Diese Seite existiert nicht!"
     header: "<#8A84E2>Zuletzt online auf Handwerksangriff"
-    list-self: "<#FF5964><count> <#AFAFDC><player> <#FF5964><lastonline> <gray>(Du)"
-    list: "<#AFAFDC><count> <gray><player> <#AFAFDC><lastonline>"
-    footer: "<gray><click:run_command:'/lastonline <previous>'>[<#8A84E2><<<gray>]</click>==========[<#8A84E2><current-page><gray>/<#8A84E2><max-page><gray>]========<gray><click:run_command:'/lastonline <next>'>[<#8A84E2>>><gray>]</click>"
-    footer-no-prev: "<gray>=============[<#8A84E2><current-page><gray>/<#8A84E2><max-page><gray>]========<gray><click:run_command:'/lastonline <next>'>[<#8A84E2>>><gray>]</click>"
-    footer-no-prev-no-next: "<gray>=============[<#8A84E2><current-page><gray>/<#8A84E2><max-page><gray>]==========="
-    footer-no-next: "<gray><click:run_command:'/lastonline <previous>'>[<#8A84E2><<<gray>]</click>==========[<#8A84E2><current-page><gray>/<#8A84E2><max-page><gray>]==========="
+    entry-self: "<#FF5964><count> <#AFAFDC><player> <#FF5964><lastonline> <gray>(Du)"
+    entry: "<#AFAFDC><count> <gray><player> <#AFAFDC><lastonline>"
+    online: "<green>Online"
   sysinfo:
     header: "<gray>-------------------[<yellow>Systeminfo<gray>]-------------------"
     footer: "<gray>-----------------------------------------------"
@@ -237,7 +228,16 @@ command:
       enabled: "<prefix><green>Live-Systeminfo in der Actionbar aktiviert"
       disabled: "<prefix><gray>Live-Systeminfo in der Actionbar deaktiviert"
       actionbar: "<gray>CPU <dark_gray>[<cpu-bar><dark_gray>] <#de7359><cpu-percent>  <gray>RAM <dark_gray>[<ram-bar><dark_gray>] <#de7359><ram-percent>  <gray>TPS <tps>"
+pagination:
+  footer: "<gray><previous>==========[<#8A84E2><current-page><gray>/<#8A84E2><max-page><gray>]==========<next>"
+  previous: "<gray><click:run_command:'<command>'>[<#8A84E2><<<gray>]</click>"
+  previous-none: "<gray>===="
+  next: "<gray><click:run_command:'<command>'>[<#8A84E2>>><gray>]</click>"
+  next-none: "<gray>===="
+  page-not-found: "<prefix><red>Diese Seite existiert nicht!"
 exception:
+  player-unknown: "<prefix><red>Dieser Spieler ist unbekannt"
+  plan-unavailable: "<prefix><red>Die Spielzeiten konnten gerade nicht geladen werden. Bitte versuche es später erneut"
   command:
     invalidsender: "<prefix><red>Diesen Command kannst du nur als Spieler ausführen"
     nopermission: "<prefix><red>Dazu fehlt dir die Berechtigung"

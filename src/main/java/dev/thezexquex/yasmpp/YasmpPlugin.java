@@ -18,6 +18,7 @@ import dev.thezexquex.yasmpp.configuration.CountdownConfiguration;
 import dev.thezexquex.yasmpp.configuration.PortalConfiguration;
 import dev.thezexquex.yasmpp.configuration.YasmppConfiguration;
 import dev.thezexquex.yasmpp.configuration.migrations.V1DatabaseSettingsMigration;
+import dev.thezexquex.yasmpp.configuration.migrations.V2RemovePlanCacheSettingsMigration;
 import dev.thezexquex.yasmpp.data.database.dao.HomeDao;
 import dev.thezexquex.yasmpp.data.database.dao.HomeSlotDao;
 import dev.thezexquex.yasmpp.data.database.dao.LocationDao;
@@ -41,6 +42,8 @@ import dev.thezexquex.yasmpp.modules.signedit.SignEditListener;
 import dev.thezexquex.yasmpp.modules.spawnelytra.ElytraManager;
 import dev.thezexquex.yasmpp.modules.spawnelytra.listener.*;
 import org.bukkit.Bukkit;
+import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
 
 import java.nio.file.Path;
@@ -124,7 +127,8 @@ public class YasmpPlugin extends PaperAstraPlugin {
 
         // Migrations must run before saving the default config / loading the configs
         var migrator = ConfigMigrator.builder(getDataPath(), getLogger()).migrations(
-                new V1DatabaseSettingsMigration()
+                new V1DatabaseSettingsMigration(),
+                new V2RemovePlanCacheSettingsMigration()
         ).build();
 
         migrator.migrate();
@@ -225,6 +229,16 @@ public class YasmpPlugin extends PaperAstraPlugin {
 
     public PaperMessenger messenger() {
         return messenger;
+    }
+
+    /**
+     * Language messages for the given receiver are resolved in, needed when building components ahead of sending.
+     */
+    public Language language(CommandSender sender) {
+        if (languageService == null) {
+            return Language.GERMAN;
+        }
+        return sender instanceof Player player ? languageService.getPlayerLanguage(player) : languageService.getDefaultLanguage();
     }
 
     public LocationService locationService() {
