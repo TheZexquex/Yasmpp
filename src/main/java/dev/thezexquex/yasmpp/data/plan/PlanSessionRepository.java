@@ -12,8 +12,10 @@ import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * Reads session data of this server straight from the Plan database (MariaDB/MySQL).
+ * Reads session data of this server straight from the Plan database.
  * All methods run the query asynchronously and never touch the Bukkit API.
+ * <p>
+ * Queries are written for MariaDB/MySQL and translated by {@link #forDatabase(String)} when Plan uses SQLite.
  */
 public class PlanSessionRepository {
     /**
@@ -51,9 +53,10 @@ public class PlanSessionRepository {
             GROUP BY u.id, u.uuid, u.name
             """;
 
+    // LOWER on both sides, as SQLite compares case-sensitively by default
     @Language("mariadb")
     private static final String FIND_USER_QUERY = """
-            SELECT uuid, name FROM plan_users WHERE name = ? LIMIT 1
+            SELECT uuid, name FROM plan_users WHERE LOWER(name) = LOWER(?) LIMIT 1
             """;
 
     private final ZoneId zone;
@@ -65,7 +68,7 @@ public class PlanSessionRepository {
     public CompletableFuture<StoredPlaytime> storedPlaytime(UUID uniqueId, Instant now) {
         return CompletableFuture.supplyAsync(() -> {
             var serverUuid = serverUuid();
-            return queryService().query(STORED_PLAYTIME_QUERY, statement -> {
+            return queryService().query(forDatabase(STORED_PLAYTIME_QUERY), statement -> {
                 var index = 1;
                 for (var window : TimeWindow.values()) {
                     var start = window.start(now, zone).toEpochMilli();
@@ -95,7 +98,7 @@ public class PlanSessionRepository {
     public CompletableFuture<List<StoredTotal>> storedTotals() {
         return CompletableFuture.supplyAsync(() -> {
             var serverUuid = serverUuid();
-            return queryService().query(TOTALS_QUERY, statement -> {
+            return queryService().query(forDatabase(TOTALS_QUERY), statement -> {
                 statement.setString(1, serverUuid.toString());
                 var totals = new ArrayList<StoredTotal>();
                 try (var resultSet = statement.executeQuery()) {
@@ -119,7 +122,7 @@ public class PlanSessionRepository {
      * which is case-insensitive in a default Plan setup.
      */
     public CompletableFuture<Optional<PlanUserRef>> findUser(String name) {
-        return CompletableFuture.supplyAsync(() -> queryService().query(FIND_USER_QUERY, statement -> {
+        return CompletableFuture.supplyAsync(() -> queryService().query(forDatabase(FIND_USER_QUERY), statement -> {
             statement.setString(1, name);
             try (var resultSet = statement.executeQuery()) {
                 if (!resultSet.next()) {
@@ -133,6 +136,16 @@ public class PlanSessionRepository {
     private static Instant nullableInstant(ResultSet resultSet, int column) throws SQLException {
         var millis = resultSet.getLong(column);
         return resultSet.wasNull() ? null : Instant.ofEpochMilli(millis);
+    }
+
+    /**
+     * SQLite has no GREATEST but a multi-argument scalar MAX, and divides integers with {@code /} already.
+     */
+    private static String forDatabase(String sql) {
+        if (!"sqlite".equalsIgnoreCase(queryService().getDBType())) {
+            return sql;
+        }
+        return sql.replace("GREATEST(", "MAX(").replace(" DIV ", " / ");
     }
 
     private static QueryService queryService() {
