@@ -1,8 +1,9 @@
 package dev.thezexquex.yasmpp.modules.lockportal.nether;
 
-import org.bukkit.Location;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.World;
+import org.bukkit.block.data.BlockData;
+import org.jetbrains.annotations.Nullable;
 
 public record PortalBlock(
         int x,
@@ -13,39 +14,26 @@ public record PortalBlock(
         String blockData
 ) {
 
-    public PortalBlock(int x, int y, int z, String material, String blockData) {
-        this(x, y, z, material, false, blockData);
+    /**
+     * @return the material, or null if the server does not know it
+     */
+    public @Nullable Material getMaterial() {
+        return Material.matchMaterial(material);
     }
 
-    public Location toLocation(World world) {
-        return new Location(world, x, y, z);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (obj instanceof PortalBlock other) {
-            return other.x == x && other.y == y && other.z == z && other.material.equals(material);
+    /**
+     * @return the stored block data, falling back to the material's default if it can not be parsed
+     */
+    public BlockData createBlockData() {
+        if (blockData != null) {
+            try {
+                return Bukkit.createBlockData(blockData);
+            } catch (IllegalArgumentException ignored) {
+                // Fall back to the material's default block data
+            }
         }
-        return false;
+        return getMaterial().createBlockData();
     }
-
-    @Override
-    public int hashCode() {
-        return java.util.Objects.hash(x, y, z, material);
-    }
-
-    public Material getMaterial() {
-        return Material.valueOf(material);
-    }
-
-    public String getBlockData() {
-        return blockData;
-    }
-
-    public boolean isPortalFill() {
-        return isPortalFill;
-    }
-
 
     public boolean isFrameBlock() {
         return !isPortalFill;

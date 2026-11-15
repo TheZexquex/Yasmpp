@@ -9,53 +9,52 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalInt;
 import java.util.Set;
 import java.util.UUID;
 
+/**
+ * Shows the missing frame blocks of the portal as holograms. Holds no portal state itself, it only knows
+ * which entities it spawned for which blueprint index.
+ */
 public class PortalRenderer {
     public static final NamespacedKey PORTAL_KEY = new NamespacedKey("yasmpp", "portal");
+    public static final NamespacedKey BLOCK_INDEX_KEY = new NamespacedKey("yasmpp", "portal_block_index");
 
-    private final PortalState state;
-    private final NetherPortalManager netherPortalManager;
-    private final Map<UUID, PortalBlock> interactionToBlock = new HashMap<>();
-    private final Map<UUID, List<UUID>> interactionToDisplay = new HashMap<>();
+    private final Map<Integer, List<UUID>> entitiesByIndex = new HashMap<>();
     // Every entity spawned by this renderer. Tagged entities not in here are leftovers and get removed on load.
     private final Set<UUID> ownedEntities = new HashSet<>();
+    private World world;
 
-    public PortalRenderer(NetherPortalManager netherPortalManager, PortalState state) {
-        this.state = state;
-        this.netherPortalManager = netherPortalManager;
-    }
-
-    public void render() {
-        var origin = state.origin().toLocation();
-        for (var block : state.blocks()) {
-            var placedBlock = block.block();
-            if (placedBlock.isFrameBlock() && !block.completed()) {
-                spawnBlueprintBlock(origin.getWorld(), origin, placedBlock);
-            }
+    /**
+     * Replaces all holograms with one per given blueprint index.
+     */
+    public void render(Location origin, PortalBlueprint blueprint, Iterable<Integer> indices) {
+        despawn();
+        // Also clears leftovers in the target world, which may differ from the previous one
+        this.world = origin.getWorld();
+        despawn();
+        for (int index : indices) {
+            spawnBlueprintBlock(origin, index, blueprint.block(index));
         }
-        netherPortalManager.updateBossBarProgress(state);
     }
 
-    private void spawnBlueprintBlock(World world, Location base, PortalBlock portalBlock) {
+    private void spawnBlueprintBlock(Location base, int index, PortalBlock portalBlock) {
         Location loc = base.clone().add(portalBlock.x(), portalBlock.y(), portalBlock.z()).toCenterLocation();
 
         BlockDisplay display = (BlockDisplay) world.spawnEntity(loc, EntityType.BLOCK_DISPLAY);
-        display.setBlock(portalBlock.getMaterial().createBlockData());
+        display.setBlock(portalBlock.createBlockData());
         display.setBrightness(new Display.Brightness(15, 15));
         display.setGlowing(true);
         display.setGlowColorOverride(Color.RED);
-        display.setPersistent(true);
         display.setRotation(0, 0);
-        display.getPersistentDataContainer().set(PORTAL_KEY, PersistentDataType.BYTE, (byte) 1);
+        tag(display, index);
 
         BlockDisplay overlayDisplay = (BlockDisplay) world.spawnEntity(loc, EntityType.BLOCK_DISPLAY);
         overlayDisplay.setBlock(Material.RED_STAINED_GLASS.createBlockData());
         overlayDisplay.setBrightness(new Display.Brightness(15, 15));
-        overlayDisplay.setPersistent(true);
         overlayDisplay.setRotation(0, 0);
-        overlayDisplay.getPersistentDataContainer().set(PORTAL_KEY, PersistentDataType.BYTE, (byte) 1);
+        tag(overlayDisplay, index);
 
         Transformation transform = display.getTransformation();
         transform.getTranslation().set(-0.5, -0.5, -0.5);
@@ -68,14 +67,32 @@ public class PortalRenderer {
         interaction.setInteractionWidth(1.001f);
         interaction.setInteractionHeight(1.001f);
         interaction.setResponsive(true);
-        interaction.setPersistent(true);
-        interaction.getPersistentDataContainer().set(PORTAL_KEY, PersistentDataType.BYTE, (byte) 1);
+        tag(interaction, index);
 
-        interactionToBlock.put(interaction.getUniqueId(), portalBlock);
-        interactionToDisplay.put(interaction.getUniqueId(), List.of(display.getUniqueId(), overlayDisplay.getUniqueId()));
-        ownedEntities.add(display.getUniqueId());
-        ownedEntities.add(overlayDisplay.getUniqueId());
-        ownedEntities.add(interaction.getUniqueId());
+        var uuids = List.of(display.getUniqueId(), overlayDisplay.getUniqueId(), interaction.getUniqueId());
+        entitiesByIndex.put(index, uuids);
+        ownedEntities.addAll(uuids);
+    }
+
+    private void tag(Entity entity, int index) {
+        // Persistent, because non persistent entities are not spawned reliably in unloaded chunks
+        entity.setPersistent(true);
+        entity.getPersistentDataContainer().set(PORTAL_KEY, PersistentDataType.BYTE, (byte) 1);
+        entity.getPersistentDataContainer().set(BLOCK_INDEX_KEY, PersistentDataType.INTEGER, index);
+    }
+
+    /**
+     * Removes the hologram of a single blueprint index.
+     */
+    public void remove(int index) {
+        var uuids = entitiesByIndex.remove(index);
+        if (uuids == null) {
+            return;
+        }
+        uuids.forEach(uuid -> {
+            ownedEntities.remove(uuid);
+            removeEntity(uuid);
+        });
     }
 
     /**
@@ -83,17 +100,10 @@ public class PortalRenderer {
      * Tagged entities in unloaded chunks are removed by {@link PortalEntityCleanupListener} once they load.
      */
     public void despawn() {
-        ownedEntities.forEach(uuid -> {
-            var entity = Bukkit.getEntity(uuid);
-            if (entity != null) {
-                entity.remove();
-            }
-        });
-        interactionToBlock.clear();
-        interactionToDisplay.clear();
+        ownedEntities.forEach(this::removeEntity);
+        entitiesByIndex.clear();
         ownedEntities.clear();
 
-        var world = state.origin().toLocation().getWorld();
         if (world == null) {
             return;
         }
@@ -104,51 +114,26 @@ public class PortalRenderer {
         });
     }
 
-    public void completePortalBlock(Entity interaction) {
-        var block = interactionToBlock.remove(interaction.getUniqueId());
-        if (block == null) {
-            return;
+    private void removeEntity(UUID uuid) {
+        var entity = Bukkit.getEntity(uuid);
+        if (entity != null) {
+            entity.remove();
         }
-        var blockState = state.getBlock(block);
-        if (blockState == null || blockState.completed()) {
-            return;
-        }
-        blockState.complete();
-
-        var displays = interactionToDisplay.remove(interaction.getUniqueId());
-        if (displays != null) {
-            displays.forEach(uuid -> {
-                ownedEntities.remove(uuid);
-                var entity = Bukkit.getEntity(uuid);
-                if (entity != null) {
-                    entity.remove();
-                }
-            });
-        }
-        ownedEntities.remove(interaction.getUniqueId());
-        interaction.remove();
-
-        if (isCompleted(state)) {
-            netherPortalManager.onPortalComplete();
-        }
-
-        netherPortalManager.updateBossBarProgress(state);
-    }
-
-    public boolean isPortalBlock(Entity entity) {
-        return interactionToBlock.containsKey(entity.getUniqueId());
     }
 
     public boolean owns(Entity entity) {
         return ownedEntities.contains(entity.getUniqueId());
     }
 
-    public PortalBlock getPortalBlock(Entity interaction) {
-        return interactionToBlock.get(interaction.getUniqueId());
-    }
-
-    public boolean isCompleted(PortalState state) {
-        return state.blocks().stream().filter(portalBlockState -> portalBlockState.block().isFrameBlock()).allMatch(PortalBlockState::completed);
+    /**
+     * @return the blueprint index of an interaction spawned by this renderer
+     */
+    public OptionalInt blockIndex(Entity entity) {
+        if (!(entity instanceof Interaction) || !owns(entity)) {
+            return OptionalInt.empty();
+        }
+        var index = entity.getPersistentDataContainer().get(BLOCK_INDEX_KEY, PersistentDataType.INTEGER);
+        return index == null ? OptionalInt.empty() : OptionalInt.of(index);
     }
 
     public static boolean isPortalEntity(Entity entity) {

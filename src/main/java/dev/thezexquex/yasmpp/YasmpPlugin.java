@@ -19,6 +19,7 @@ import dev.thezexquex.yasmpp.configuration.PortalConfiguration;
 import dev.thezexquex.yasmpp.configuration.YasmppConfiguration;
 import dev.thezexquex.yasmpp.configuration.migrations.V1DatabaseSettingsMigration;
 import dev.thezexquex.yasmpp.configuration.migrations.V2RemovePlanCacheSettingsMigration;
+import dev.thezexquex.yasmpp.configuration.migrations.V3PortalStateIndicesMigration;
 import dev.thezexquex.yasmpp.data.database.dao.HomeDao;
 import dev.thezexquex.yasmpp.data.database.dao.HomeSlotDao;
 import dev.thezexquex.yasmpp.data.database.dao.LocationDao;
@@ -34,9 +35,12 @@ import dev.thezexquex.yasmpp.modules.chat.ChatListener;
 import dev.thezexquex.yasmpp.modules.joinleavemessage.PlayerJoinListener;
 import dev.thezexquex.yasmpp.modules.joinleavemessage.PlayerQuitListener;
 import dev.thezexquex.yasmpp.modules.lockportal.LockPortalListener;
+import dev.thezexquex.yasmpp.modules.lockportal.nether.BossBarManager;
 import dev.thezexquex.yasmpp.modules.lockportal.nether.NetherPortalManager;
+import dev.thezexquex.yasmpp.modules.lockportal.nether.NetherUnlockHandler;
 import dev.thezexquex.yasmpp.modules.lockportal.nether.PlayerInteractListener;
 import dev.thezexquex.yasmpp.modules.lockportal.nether.PortalEntityCleanupListener;
+import dev.thezexquex.yasmpp.modules.lockportal.nether.PortalScanListener;
 import dev.thezexquex.yasmpp.modules.mobileworkstations.WorkstationInteractListener;
 import dev.thezexquex.yasmpp.modules.respawn.RespawnListener;
 import dev.thezexquex.yasmpp.modules.signedit.SignEditListener;
@@ -81,6 +85,8 @@ public class YasmpPlugin extends PaperAstraPlugin {
         applyCommands();
         elytraManager = new ElytraManager(this);
         netherPortalManager = new NetherPortalManager(this);
+        netherPortalManager.addListener(new BossBarManager(this));
+        netherPortalManager.addListener(new NetherUnlockHandler(this));
         netherPortalManager.respawnPortal();
 
         Permissions.ALL_PERMISSIONS.forEach(permission -> Bukkit.getPluginManager().addPermission(new Permission(permission)));
@@ -135,7 +141,8 @@ public class YasmpPlugin extends PaperAstraPlugin {
         // Migrations must run before saving the default config / loading the configs
         var migrator = ConfigMigrator.builder(getDataPath(), getLogger()).migrations(
                 new V1DatabaseSettingsMigration(),
-                new V2RemovePlanCacheSettingsMigration()
+                new V2RemovePlanCacheSettingsMigration(),
+                new V3PortalStateIndicesMigration()
         ).build();
 
         migrator.migrate();
@@ -179,6 +186,7 @@ public class YasmpPlugin extends PaperAstraPlugin {
 
         // Nether Portal
         pluginManager.registerEvents(new PlayerInteractListener(this), this);
+        pluginManager.registerEvents(new PortalScanListener(this), this);
         pluginManager.registerEvents(new PortalEntityCleanupListener(this), this);
 
         pluginManager.registerEvents(new SignEditListener(), this);
