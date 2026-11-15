@@ -37,27 +37,31 @@ public class OnTimeCommand extends PaperCommand<YasmpPlugin> {
 
     @Override
     public void apply(CommandManager<CommandSender> commandManager) {
-        var base = commandManager.commandBuilder("ontime")
+        // A single command with an optional name, as cloud rejects a flag node next to an argument node
+        commandManager.command(commandManager.commandBuilder("ontime")
                 .permission("yasmpp.command.ontime.self")
-                .flag(commandManager.flagBuilder("no-afk"));
-
-        commandManager.command(base
-                .senderType(Player.class)
-                .handler(context -> handleOnTime(context, context.sender().getName()))
-        );
-
-        commandManager.command(base
-                .required("player_name", stringParser(), (context, input) -> CompletableFuture.completedFuture(
+                .optional("player_name", stringParser(), (context, input) -> CompletableFuture.completedFuture(
                         playtimeService.knownNames().stream().map(Suggestion::suggestion).toList()))
-                .handler(context -> handleOnTime(context, context.get("player_name")))
+                .flag(commandManager.flagBuilder("no-afk"))
+                .handler(this::handleOnTime)
         );
     }
 
-    private void handleOnTime(CommandContext<? extends CommandSender> context, String targetName) {
+    private void handleOnTime(CommandContext<CommandSender> context) {
         var sender = context.sender();
         var excludeAfk = context.flags().isPresent("no-afk");
 
-        playtimeService.resolve(targetName)
+        var targetName = context.<String>optional("player_name").orElse(null);
+        if (targetName == null) {
+            if (!(sender instanceof Player player)) {
+                plugin.messenger().sendMessage(sender, NodePath.path("exception", "command", "invalidsender"));
+                return;
+            }
+            targetName = player.getName();
+        }
+        var target = targetName;
+
+        playtimeService.resolve(target)
                 .thenCompose(user -> user
                         .map(planUser -> playtimeService.stats(planUser).thenApply(Optional::of))
                         .orElseGet(() -> CompletableFuture.completedFuture(Optional.empty())))
@@ -73,7 +77,7 @@ public class OnTimeCommand extends PaperCommand<YasmpPlugin> {
                     sendStats(sender, stats.get(), excludeAfk);
                 })
                 .exceptionally(throwable -> {
-                    plugin.getLogger().log(Level.SEVERE, "Failed to load playtime of " + targetName, throwable);
+                    plugin.getLogger().log(Level.SEVERE, "Failed to load playtime of " + target, throwable);
                     plugin.messenger().sendMessage(sender, NodePath.path("exception", "plan-unavailable"));
                     return null;
                 });

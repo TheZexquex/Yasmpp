@@ -45,6 +45,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.permissions.Permission;
+import org.incendo.cloud.setting.ManagerSetting;
 
 import java.nio.file.Path;
 import java.util.logging.Logger;
@@ -70,6 +71,8 @@ public class YasmpPlugin extends PaperAstraPlugin {
         reloadPlugin();
         initDataServices();
         applyListeners();
+        // Lets flags precede optional arguments, e.g. "/ontime --no-afk" instead of parsing the flag as player name
+        commandManager.settings().set(ManagerSetting.LIBERAL_FLAG_PARSING, true);
         hookRegistry.register(new PlanHook(this));
 
         registerGameSettings();
