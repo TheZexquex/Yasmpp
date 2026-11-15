@@ -15,7 +15,6 @@ import org.incendo.cloud.CommandManager;
 import org.incendo.cloud.context.CommandContext;
 import org.spongepowered.configurate.NodePath;
 
-import java.util.Comparator;
 import java.util.logging.Level;
 
 import static org.incendo.cloud.parser.standard.IntegerParser.integerParser;
@@ -52,9 +51,7 @@ public class OnTimeTopCommand extends PaperCommand<YasmpPlugin> {
                         return;
                     }
 
-                    var sorted = leaderboard.stream()
-                            .sorted(Comparator.comparing((LeaderboardEntry entry) -> entry.playtime(excludeAfk)).reversed())
-                            .toList();
+                    var sorted = leaderboard.stream().sorted(LeaderboardEntry.mostPlaytimeFirst(excludeAfk)).toList();
                     var page = Page.of(sorted, pageNumber, entry -> isSelf(sender, entry));
                     if (page.isEmpty()) {
                         plugin.messenger().sendMessage(sender, NodePath.path("pagination", "page-not-found"));
